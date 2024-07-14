@@ -102,13 +102,13 @@ function lineIntersect(
 	y4: number
 ) {
 	var ua,
-		ub,
+		//ub,
 		denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
 	if (denom == 0) {
 		return null;
 	}
 	ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
-	ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
+	//ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
 
 	return {
 		x: x1 + ua * (x2 - x1),

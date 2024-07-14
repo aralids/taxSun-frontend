@@ -6,7 +6,7 @@ import RightSection from "./components/RightSection.tsx";
 import Plot from "./components/Plot.tsx";
 
 import { lns, taxSet } from "./services/predefinedObjects.tsx";
-import { handleMouseMove } from "./services/helperFunctions.tsx";
+//import { handleMouseMove } from "./services/helperFunctions.tsx";
 import { calcBasicInfo, getAncestors } from "./services/someFunctions.tsx";
 
 export const LeftSectionCtx = createContext({});
@@ -52,7 +52,7 @@ const App = () => {
 
 		fetchedIDs: {},
 	});
-	const [ctxMenuVis, setCtxMenuVis] = useState(false);
+	//const [ctxMenuVis, setCtxMenuVis] = useState(false);
 	const [hover, setHover] = useState("");
 	const sttRef = useRef(stt);
 	sttRef.current = stt;

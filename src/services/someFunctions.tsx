@@ -157,6 +157,7 @@ const eFilter = (
 				}
 				return item !== null && item <= eValue;
 			});
+			console.log(newEValues);
 
 			relTaxSet[lastTaxon]["goodIndices"] = goodIndices;
 
@@ -813,6 +814,8 @@ const label = (
 		relTaxSet[lyr]["name"],
 		Infinity
 	);
+
+	console.log(hoverLabel);
 
 	const [optLabel, optLabelWidth]: any[] = calcOptLabel(
 		2,
