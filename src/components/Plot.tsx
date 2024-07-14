@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useMemo } from "react";
 
 import Shape from "./Shape.tsx";
 import Label from "./Label.tsx";
@@ -12,7 +12,7 @@ interface Props {
 
 const Plot = ({ ancestors, lyr, relTaxSet, plotHandleClick }: Props) => {
 	const signature = JSON.stringify(relTaxSet);
-	return React.useMemo(() => {
+	return useMemo(() => {
 		console.log("Plot render");
 		let shapes: any[] = [];
 		let labels: any[] = [];
