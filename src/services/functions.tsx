@@ -45,7 +45,7 @@ const calcBasicInfo = (
 		view
 	);
 
-	const [layerWidth, cx, cy, plotPadding] = getLayerWidthInPx(
+	const [layerWidth, cx, cy] = getLayerWidthInPx(
 		0,
 		0,
 		window.innerWidth,

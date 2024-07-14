@@ -186,12 +186,7 @@ function getLayerWidthInPx(
 	const smallerDimSize = Math.min(cx * (1 - 0.4), cy) - plotPadding;
 	const layerNumber = minRankPattern.length;
 
-	return [
-		Math.max(smallerDimSize / layerNumber, dpmm * 1),
-		cx,
-		cy,
-		plotPadding,
-	];
+	return [Math.max(smallerDimSize / layerNumber, dpmm * 1), cx, cy];
 }
 
 function makeID(length: number) {
