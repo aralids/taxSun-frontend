@@ -7,7 +7,7 @@ import Plot from "./components/Plot.tsx";
 
 import { lns, taxSet } from "./services/predefinedObjects.tsx";
 import { handleMouseMove } from "./services/helperFunctions.tsx";
-import { calcBasicInfo, getAncestors } from "./services/functions.tsx";
+import { calcBasicInfo, getAncestors } from "./services/someFunctions.tsx";
 
 export const LeftSectionCtx = createContext({});
 export const RightSectionCtx = createContext({});
