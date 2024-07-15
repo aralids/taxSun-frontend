@@ -85,7 +85,9 @@ const App = () => {
 	const IDInfoHandleClick = (key: string) => {
 		console.log("IDInfoHandleClick");
 		axios
-			.post("/fetchID", { taxName: key })
+			.post("https://web-production-0834.up.railway.app/fetchID", {
+				taxName: key,
+			})
 			.then((response) => {
 				const id = response.data.taxID;
 				const newFetchedIDs: any = { ...sttRef.current.fetchedIDs };
