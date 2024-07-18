@@ -22,6 +22,7 @@ const EValue = () => {
 					</label>
 					<input
 						type="text"
+						defaultValue={1.9e-28}
 						style={{ height: "2vh", maxWidth: "3vw", marginLeft: "0.5vw" }}
 						onKeyDown={ctx["eValueHandleKeyDown"]}
 						ref={ctx["eValueRef"]}

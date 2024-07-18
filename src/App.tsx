@@ -137,6 +137,15 @@ const App = () => {
 		setStt({
 			...sttRef.current,
 			eValueApplied: !sttRef.current["eValueApplied"],
+			relTaxSet: calcBasicInfo(
+				!sttRef.current["eValueApplied"],
+				sttRef.current.eValue,
+				sttRef.current.collapse,
+				sttRef.current.lns,
+				sttRef.current.lyr,
+				sttRef.current.taxSet,
+				sttRef.current.view
+			),
 		});
 		console.log("eValueAppliedHandleChange");
 	};
@@ -144,7 +153,19 @@ const App = () => {
 	const eValueHandleKeyDown = (event: any) => {
 		if (event.key === "Enter") {
 			if (sttRef.current["eValueApplied"]) {
-				setStt({ ...sttRef.current, eValue: eValueRef.current.value });
+				setStt({
+					...sttRef.current,
+					eValue: eValueRef.current.value,
+					relTaxSet: calcBasicInfo(
+						sttRef.current.eValueApplied,
+						eValueRef.current.value,
+						sttRef.current.collapse,
+						sttRef.current.lns,
+						sttRef.current.lyr,
+						sttRef.current.taxSet,
+						sttRef.current.view
+					),
+				});
 			} else {
 				setStt({ ...sttRef.current, eValue: eValueRef.current.value });
 			}
@@ -153,7 +174,30 @@ const App = () => {
 	};
 
 	const viewHandleChange = () => {
-		console.log("viewHandleChange", radioRef.current);
+		console.log("viewHandleChange", unalteredRef.current.checked);
+		let newView: string = "";
+		if (unalteredRef.current.checked) {
+			newView = "unaltered";
+		} else if (marriedIRef.current.checked) {
+			newView = "marriedTaxaI";
+		} else if (marriedIIRef.current.checked) {
+			newView = "marriedTaxaII";
+		} else if (allEqualRef.current.checked) {
+			newView = "allEqual";
+		}
+		setStt({
+			...sttRef.current,
+			view: newView,
+			relTaxSet: calcBasicInfo(
+				sttRef.current.eValueApplied,
+				eValueRef.current.value,
+				sttRef.current.collapse,
+				sttRef.current.lns,
+				sttRef.current.lyr,
+				sttRef.current.taxSet,
+				newView
+			),
+		});
 	};
 
 	const dldOnClick = () => {
@@ -163,7 +207,10 @@ const App = () => {
 	const tsvRef = useRef();
 	const faaRef = useRef();
 	const eValueRef = useRef({ value: 0 });
-	const radioRef = useRef({ value: 0 });
+	const unalteredRef = useRef({ checked: false });
+	const marriedIRef = useRef({ checked: false });
+	const marriedIIRef = useRef({ checked: false });
+	const allEqualRef = useRef({ checked: true });
 
 	useEffect(() => {
 		//window.addEventListener("mousemove", (event) => handleMouseMove(event));
@@ -230,7 +277,10 @@ const App = () => {
 					eValueHandleKeyDown: eValueHandleKeyDown,
 					eValueRef: eValueRef,
 
-					radioRef: radioRef,
+					unalteredRef: unalteredRef,
+					marriedIRef: marriedIRef,
+					marriedIIRef: marriedIIRef,
+					allEqualRef: allEqualRef,
 					viewHandleChange: viewHandleChange,
 
 					dldOnClick: dldOnClick,

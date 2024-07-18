@@ -7,7 +7,6 @@ const Views = () => {
 		return (
 			<fieldset
 				onChange={ctx["viewHandleChange"]}
-				ref={ctx["radioRef"]}
 				style={{ border: "none", padding: "0", margin: "2vh 0 0 0" }}
 			>
 				<div style={{ display: "flex", alignItems: "start" }}>
@@ -16,6 +15,8 @@ const Views = () => {
 						type="radio"
 						name="radio"
 						style={{ accentColor: "#800080" }}
+						ref={ctx["unalteredRef"]}
+						defaultChecked={false}
 					/>
 					<label htmlFor="unaltered" style={{ padding: "0 0 0 0.5vw" }}>
 						Unaltered
@@ -27,6 +28,8 @@ const Views = () => {
 						type="radio"
 						name="radio"
 						style={{ accentColor: "#800080" }}
+						ref={ctx["marriedIRef"]}
+						defaultChecked={false}
 					/>
 					<label htmlFor="married-i" style={{ padding: "0 0 0 0.5vw" }}>
 						Married I
@@ -38,6 +41,8 @@ const Views = () => {
 						type="radio"
 						name="radio"
 						style={{ accentColor: "#800080" }}
+						ref={ctx["marriedIIRef"]}
+						defaultChecked={false}
 					/>
 					<label htmlFor="married-ii" style={{ padding: "0 0 0 0.5vw" }}>
 						Married II
@@ -49,6 +54,8 @@ const Views = () => {
 						type="radio"
 						name="radio"
 						style={{ accentColor: "#800080" }}
+						ref={ctx["allEqualRef"]}
+						defaultChecked={true}
 					/>
 					<label htmlFor="all-equal" style={{ padding: "0 0 0 0.5vw" }}>
 						All equal
