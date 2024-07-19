@@ -2,9 +2,17 @@ interface Props {
 	path?: string;
 	color?: string;
 	handleClick?: any;
+	handleMouseOver?: any;
+	handleMouseOut?: any;
 }
 
-const Shape = ({ path, color, handleClick }: Props) => {
+const Shape = ({
+	path,
+	color,
+	handleClick,
+	handleMouseOver,
+	handleMouseOut,
+}: Props) => {
 	return (
 		<path
 			d={path}
@@ -15,6 +23,8 @@ const Shape = ({ path, color, handleClick }: Props) => {
 				cursor: "pointer",
 			}}
 			onClick={handleClick}
+			onMouseOver={handleMouseOver}
+			onMouseOut={handleMouseOut}
 		></path>
 	);
 };

@@ -35,6 +35,7 @@ const UploadTsv = () => {
 							padding: "1px 6px 1px 6px",
 							margin: "0",
 							width: "100%",
+							cursor: "pointer",
 						}}
 					>
 						<span
@@ -87,6 +88,7 @@ const UploadTsv = () => {
 							margin: "0",
 							width: "fit-content",
 							minWidth: "53.03px",
+							cursor: "pointer",
 						}}
 					>
 						<span

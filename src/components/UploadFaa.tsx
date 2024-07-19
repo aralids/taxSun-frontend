@@ -3,8 +3,11 @@ import { RightSectionCtx } from "../App.tsx";
 
 const UploadFaa = () => {
 	const ctx: any = useContext(RightSectionCtx);
-	const signature = ctx["faaLoadStatus"];
+	const signature =
+		JSON.stringify(ctx["faaLoadStatus"]) + JSON.stringify(ctx["fastaEnabled"]);
 	return useMemo(() => {
+		const cursor = ctx["fastaEnabled"] ? "pointer" : "default";
+		const fontColor = ctx["fastaEnabled"] ? "black" : "lightgrey";
 		return (
 			<div
 				style={{
@@ -20,6 +23,7 @@ const UploadFaa = () => {
 					style={{ display: "none" }}
 					ref={ctx["faaFormRef"]}
 					onChange={ctx["uplFaaHandleChange"]}
+					disabled={!ctx["fastaEnabled"]}
 				/>
 				<label
 					htmlFor="faa-file-input"
@@ -35,6 +39,8 @@ const UploadFaa = () => {
 						padding: "1px 6px 1px 6px",
 						margin: "0",
 						width: "100%",
+						color: fontColor,
+						cursor: cursor,
 					}}
 				>
 					<span

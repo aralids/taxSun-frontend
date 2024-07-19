@@ -39,6 +39,7 @@ const Download = () => {
 						padding: "1px 6px 1px 6px",
 						margin: "0",
 						width: "100%",
+						cursor: "pointer",
 					}}
 				>
 					<span

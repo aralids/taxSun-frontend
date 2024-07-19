@@ -103,8 +103,6 @@ const App = () => {
 	};
 
 	const uplTsvHandleChange = () => {
-		console.log("uplTsvHandleChange");
-		console.log("tsvRef.current: ", tsvRef.current.files[0]);
 		const newFile: any = tsvRef.current.files[0];
 		const newLastTry: any = newFile.name;
 		setStt({
@@ -122,23 +120,6 @@ const App = () => {
 				{ headers: { "Content-Type": "multipart/form-data" } }
 			)
 			.then((response) => {
-				console.log("tsv post success: ", response.data.taxSet);
-				console.log("curr taxSet: ", taxSet);
-				for (const key in taxSet) {
-					if (
-						JSON.stringify(taxSet[key]) !==
-						JSON.stringify(response.data.taxSet[key])
-					) {
-						console.log("taxSet key: ", key);
-						console.log("taxSet[key]: ", taxSet[key]);
-						console.log(
-							"response.data.taxSet[key]: ",
-							response.data.taxSet[key]
-						);
-					} else {
-						console.log("ok key: ", key);
-					}
-				}
 				const newData = response.data;
 				setStt({
 					...sttRef.current,
@@ -163,8 +144,11 @@ const App = () => {
 					),
 				});
 			})
-			.catch((error) => {
-				console.log("error: ", error);
+			.catch(() => {
+				setStt({
+					...sttRef.current,
+					tsvLoadStatus: "close",
+				});
 			});
 	};
 
@@ -187,7 +171,6 @@ const App = () => {
 				sttRef.current.view
 			),
 		});
-		console.log("collHandleChange");
 	};
 
 	const eValueAppliedHandleChange = () => {
@@ -204,7 +187,6 @@ const App = () => {
 				sttRef.current.view
 			),
 		});
-		console.log("eValueAppliedHandleChange");
 	};
 
 	const eValueHandleKeyDown = (event: any) => {
@@ -259,6 +241,24 @@ const App = () => {
 
 	const dldOnClick = () => {
 		console.log("dldOnClick");
+		console.log("plotRef: ", plotRef.current.outerHTML);
+		const pr: any = plotRef.current;
+		let base64doc = new XMLSerializer().serializeToString(pr);
+		base64doc = btoa(base64doc);
+		const a = document.createElement("a");
+		const e = new MouseEvent("click");
+
+		const tsvNameAbbr = sttRef.current.tsvName.slice(0, 10);
+		const lyrAbbr = sttRef.current.lyr.slice(0, 10);
+		const collAbbr = `collapse-${sttRef.current.collapse}`;
+		const eValAbbr = `eValue-${
+			sttRef.current.collapse ? sttRef.current.eValue : "false"
+		}`;
+		const viewAbbr = sttRef.current.view;
+		const svgFileName = `${tsvNameAbbr}_${lyrAbbr}_${collAbbr}_${eValAbbr}_${viewAbbr}.svg`;
+		a.download = svgFileName;
+		a.href = "data:text/html;base64," + base64doc;
+		a.dispatchEvent(e);
 	};
 
 	const tsvRef = useRef({ files: [{ name: "" }] });
@@ -268,6 +268,7 @@ const App = () => {
 	const marriedIRef = useRef({ checked: false });
 	const marriedIIRef = useRef({ checked: false });
 	const allEqualRef = useRef({ checked: true });
+	const plotRef = useRef({ outerHTML: "" });
 
 	useEffect(() => {
 		//window.addEventListener("mousemove", (event) => handleMouseMove(event));
@@ -321,6 +322,7 @@ const App = () => {
 					uplTsvHandleChange: uplTsvHandleChange,
 					tsvFormRef: tsvRef,
 
+					fastaEnabled: stt.fastaEnabled,
 					faaLastTry: stt.faaLastTry,
 					faaLoadStatus: stt.faaLoadStatus,
 					uplFaaHandleChange: uplFaaHandleChange,
@@ -357,9 +359,11 @@ const App = () => {
 
 			<Plot
 				ancestors={stt["ancestors"]}
+				handleHover={setHover}
 				lyr={stt["lyr"]}
 				relTaxSet={stt["relTaxSet"]}
 				plotHandleClick={plotHandleClick}
+				plotRef={plotRef}
 			/>
 		</div>
 	);

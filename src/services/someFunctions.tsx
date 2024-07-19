@@ -157,7 +157,7 @@ const eFilter = (
 				}
 				return item !== null && item <= eValue;
 			});
-			console.log(newEValues);
+			newEValues.concat([]);
 
 			relTaxSet[lastTaxon]["goodIndices"] = goodIndices;
 
