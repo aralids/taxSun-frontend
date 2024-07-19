@@ -511,7 +511,7 @@ const calcSVGPaths = (
 			},0 a ${layerWidth},${layerWidth} 0 1,0 -${layerWidth * 2},0`;
 		} else {
 			// If the shape to be drawn completes a full circle...
-			if (round(endDeg - startDeg) === 360) {
+			if (round(endDeg - startDeg) >= 360) {
 				const innerArcPath = `M ${cx}, ${cy} m -${innRad}, 0 a ${innRad},${innRad} 0 1,0 ${
 					innRad * 2
 				},0 a ${innRad},${innRad} 0 1,0 -${innRad * 2},0`;

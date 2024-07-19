@@ -24,14 +24,7 @@ const App = () => {
 			taxSet,
 			"allEqual"
 		),
-		ancestors: [
-			{
-				ancKey: "root root",
-				ancName: "root",
-				ancPerc: "11.83%",
-				ancHandleClick: () => shortcutsHandleClick("root root"),
-			},
-		],
+		ancestors: [],
 
 		lns: lns,
 		taxSet: taxSet,
@@ -50,6 +43,9 @@ const App = () => {
 		eValueApplied: false,
 		view: "allEqual",
 
+		eValueEnabled: false,
+		fastaEnabled: false,
+
 		fetchedIDs: {},
 	});
 	//const [ctxMenuVis, setCtxMenuVis] = useState(false);
@@ -67,7 +63,7 @@ const App = () => {
 			sttRef.current.taxSet,
 			sttRef.current.view
 		);
-		const newAncestors = getAncestors(
+		const newAncestors: any = getAncestors(
 			sttRef.current.lns,
 			key,
 			newRelTaxSet,
@@ -108,7 +104,68 @@ const App = () => {
 
 	const uplTsvHandleChange = () => {
 		console.log("uplTsvHandleChange");
-		console.log("tsvRef.current: ", tsvRef);
+		console.log("tsvRef.current: ", tsvRef.current.files[0]);
+		const newFile: any = tsvRef.current.files[0];
+		const newLastTry: any = newFile.name;
+		setStt({
+			...sttRef.current,
+			tsvLastTry: newLastTry,
+			tsvLoadStatus: "pending",
+		});
+
+		let formData = new FormData();
+		formData.append("file", newFile);
+		axios
+			.post(
+				"https://web-production-0834.up.railway.app/load_tsv_data",
+				formData,
+				{ headers: { "Content-Type": "multipart/form-data" } }
+			)
+			.then((response) => {
+				console.log("tsv post success: ", response.data.taxSet);
+				console.log("curr taxSet: ", taxSet);
+				for (const key in taxSet) {
+					if (
+						JSON.stringify(taxSet[key]) !==
+						JSON.stringify(response.data.taxSet[key])
+					) {
+						console.log("taxSet key: ", key);
+						console.log("taxSet[key]: ", taxSet[key]);
+						console.log(
+							"response.data.taxSet[key]: ",
+							response.data.taxSet[key]
+						);
+					} else {
+						console.log("ok key: ", key);
+					}
+				}
+				const newData = response.data;
+				setStt({
+					...sttRef.current,
+					tsvName: sttRef.current.tsvLastTry,
+					tsvLoadStatus: "check",
+					eValueEnabled: newData.eValueEnabled,
+					fastaEnabled: newData.fastaEnabled,
+					lns: newData.lns,
+					taxSet: newData.taxSet,
+					eValueApplied: false,
+					collapse: false,
+					lyr: "root root",
+					view: "allEqual",
+					relTaxSet: calcBasicInfo(
+						false,
+						sttRef.current.eValue,
+						false,
+						newData.lns,
+						"root root",
+						newData.taxSet,
+						"allEqual"
+					),
+				});
+			})
+			.catch((error) => {
+				console.log("error: ", error);
+			});
 	};
 
 	const uplFaaHandleChange = () => {
@@ -204,7 +261,7 @@ const App = () => {
 		console.log("dldOnClick");
 	};
 
-	const tsvRef = useRef();
+	const tsvRef = useRef({ files: [{ name: "" }] });
 	const faaRef = useRef();
 	const eValueRef = useRef({ value: 0 });
 	const unalteredRef = useRef({ checked: false });
@@ -272,6 +329,7 @@ const App = () => {
 					coll: stt["collapse"],
 					collHandleChange: collHandleChange,
 
+					eValueEnabled: stt["eValueEnabled"],
 					eValueApplied: stt["eValueApplied"],
 					eValueAppliedHandleChange: eValueAppliedHandleChange,
 					eValueHandleKeyDown: eValueHandleKeyDown,

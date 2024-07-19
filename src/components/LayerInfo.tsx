@@ -8,10 +8,8 @@ import { LeftSectionCtx } from "../App.tsx";
 const LayerInfo = () => {
 	const ctx: any = useContext(LeftSectionCtx);
 	const signature = JSON.stringify(ctx["bsc"]);
-	console.log("bsc: ", ctx["bsc"]);
 
 	return useMemo(() => {
-		console.log("LayerInfo render");
 		return (
 			<fieldset
 				style={{
