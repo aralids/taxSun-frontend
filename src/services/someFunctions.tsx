@@ -649,6 +649,7 @@ const label = (
 ) => {
 	const twoVmin = Math.min(window.innerWidth, window.innerHeight) / (100 / 2);
 	const yOffset = twoVminHeights[twoVmin] / 4;
+	const framePadding = 10;
 	for (let key in relTaxSet) {
 		const txn = relTaxSet[key];
 		const startDeg = txn["degrees"][0];
@@ -674,14 +675,20 @@ const label = (
 		);
 
 		const perc = round((txn.totCount / relTaxSet[lyr].totCount) * 100);
-		const [hoverLabel, hoverLabelWidth]: any[] = calcOptLabel(
+		const [extContent, extWidth]: any[] = calcOptLabel(
 			2,
 			`${txn.name} ${perc}%`,
 			Infinity
 		);
 
-		let angle, hoverX, optLabel: any, originX, originY, x, y;
-		let optLabelWidth: any;
+		const y = labelCy + yOffset;
+		const originX = labelCx;
+		const originY = labelCy;
+
+		const frameWidth = extWidth + framePadding;
+		const frameY = labelCy - twoVminHeights[twoVmin] / 2;
+
+		let angle, extX: any, abbrContent: any, abbrX, abbrWidth: any, frameX;
 		if (!(shapeWidth < twoVmin && range < 180)) {
 			// If the wedge touches the edge of the plot and is simple-shaped.
 			if (txn.unaCount > 0 && txn.layers.length === 2) {
@@ -690,7 +697,7 @@ const label = (
 					(txn.layers[1] - fstLabelLyr - 1) * layerWidth +
 					4 * 15;
 				if (txn.rank === "species") {
-					[optLabel, optLabelWidth] = calcOptLabel(
+					[abbrContent, abbrWidth] = calcOptLabel(
 						2,
 						`${txn.name.slice(0, 1)}. ${txn.name
 							.split(" ")
@@ -699,27 +706,24 @@ const label = (
 						spaceInPx
 					);
 				} else {
-					[optLabel, optLabelWidth] = calcOptLabel(2, txn.name, spaceInPx);
+					[abbrContent, abbrWidth] = calcOptLabel(2, txn.name, spaceInPx);
 				}
 
 				angle = midDeg <= 180 ? 270 + midDeg : 270 - midDeg;
 				if (midDeg >= 180 && midDeg < 360) {
 					angle = 360 - angle;
-					x = labelCx;
-					hoverX = labelCx;
+					abbrX = labelCx;
+					extX = labelCx + framePadding / 2;
+					frameX = labelCx;
 				} else if (midDeg >= 0 && midDeg < 180) {
-					x = labelCx - optLabelWidth;
-					hoverX = labelCx - hoverLabelWidth;
+					abbrX = labelCx - abbrWidth;
+					extX = labelCx - extWidth - framePadding / 2;
+					frameX = labelCx - frameWidth;
 				}
-
-				originX = labelCx;
-				originY = labelCy;
-				y = labelCy + yOffset;
 			} else {
 				// If the wedge is internal, measure both vertical and horizontal available space.
 				//console.log(key);
 				const lstLabelLyr = Math.min.apply(Math, txn.layers.slice(1));
-
 				const verticalSpace = (lstLabelLyr - fstLabelLyr - 0.4) * layerWidth;
 
 				angle =
@@ -730,6 +734,7 @@ const label = (
 					(270 - midDeg + 360) % 360 > 180 && (270 - midDeg + 360) % 360 <= 360
 						? "below"
 						: "above";
+
 				const horizontalSpace = calcHorizontalSpace(
 					angle,
 					cx,
@@ -746,7 +751,7 @@ const label = (
 				);
 
 				if (verticalSpace > horizontalSpace) {
-					[optLabel, optLabelWidth] = calcOptLabel(
+					[abbrContent, abbrWidth] = calcOptLabel(
 						2,
 						txn.name,
 						verticalSpace,
@@ -756,80 +761,84 @@ const label = (
 					angle = midDeg <= 180 ? 270 + midDeg : 270 - midDeg;
 					if (midDeg >= 180 && midDeg < 360) {
 						angle = 360 - angle;
-						x = labelCx;
-						hoverX = labelCx;
+						abbrX = labelCx;
+						extX = labelCx + framePadding / 2;
+						frameX = labelCx;
 					} else if (midDeg >= 0 && midDeg < 180) {
-						x = labelCx - optLabelWidth;
-						hoverX = labelCx - hoverLabelWidth;
+						abbrX = labelCx - abbrWidth;
+						extX = labelCx - extWidth - framePadding / 2;
+						frameX = labelCx - frameWidth;
 					}
-
-					originX = labelCx;
-					originY = labelCy;
-					y = labelCy + yOffset;
 				} else {
-					[optLabel, optLabelWidth] = calcOptLabel(
+					[abbrContent, abbrWidth] = calcOptLabel(
 						2,
 						txn.name,
 						horizontalSpace - 6,
 						true
 					);
-					x = labelCx - optLabelWidth / 2;
-					hoverX = labelCx - hoverLabelWidth;
-					originX = labelCx;
-					originY = labelCy;
-					y = labelCy + yOffset;
+					abbrX = labelCx - abbrWidth / 2;
+					extX = labelCx - extWidth / 2;
+					frameX = labelCx - frameWidth / 2;
 				}
 			}
 		} else {
 			// If the wedge is too small for any label.
-			optLabel = "";
+			abbrContent = "";
 			angle = midDeg <= 180 ? 270 + midDeg : 270 - midDeg;
 			if (midDeg >= 180 && midDeg < 360) {
 				angle = 360 - angle;
-				x = labelCx;
-				hoverX = labelCx;
+				abbrX = labelCx;
+				extX = labelCx + framePadding / 2;
+				frameX = labelCx;
 			} else if (midDeg >= 0 && midDeg < 180) {
-				x = labelCx;
-				hoverX = labelCx - hoverLabelWidth;
+				abbrX = labelCx;
+				extX = labelCx - extWidth - framePadding / 2;
+				frameX = labelCx - frameWidth;
 			}
-			originX = labelCx;
-			originY = labelCy;
-			y = labelCy + yOffset;
 		}
 
 		//console.log("\n");
 
 		relTaxSet[key]["lblObj"] = {
-			hoverLabel: hoverLabel,
-			hoverX: hoverX,
-			optLabel: optLabel.length < 4 ? "" : optLabel,
 			transform: `rotate(${round(angle)} ${originX} ${originY})`,
-			x: optLabel.length < 4 ? 0 : x,
 			y: y,
+			abbrX: abbrContent.length < 4 ? 0 : abbrX,
+			abbrContent: abbrContent.length < 4 ? "" : abbrContent,
+			extContent: extContent,
+			extX: extX,
+			frameX: frameX,
+			frameY: frameY,
+			frameWidth: frameWidth,
 		};
 	}
 
-	const [hoverLabel, hoverLabelWidth]: any[] = calcOptLabel(
+	const [extContent, extWidth]: any[] = calcOptLabel(
 		2,
 		relTaxSet[lyr]["name"],
 		Infinity
 	);
 
-	console.log(hoverLabel);
+	console.log(extContent);
 
-	const [optLabel, optLabelWidth]: any[] = calcOptLabel(
+	const [abbrContent, abbrWidth]: any[] = calcOptLabel(
 		2,
 		relTaxSet[lyr]["name"],
 		2 * layerWidth,
 		true
 	);
+
+	const frameWidth = extWidth + framePadding;
+
 	relTaxSet[lyr]["lblObj"] = {
-		hoverLabel: relTaxSet[lyr]["name"],
-		hoverX: cx - hoverLabelWidth / 2,
-		optLabel: optLabel.length < 4 ? "" : optLabel,
 		transform: ``,
-		x: optLabel.length < 4 ? 0 : cx - optLabelWidth / 2,
 		y: cy + yOffset,
+		extContent: relTaxSet[lyr]["name"],
+		extX: cx - extWidth / 2,
+		abbrContent: abbrContent.length < 4 ? "" : abbrContent,
+		abbrX: abbrContent.length < 4 ? 0 : cx - abbrWidth / 2,
+		frameX: cx - frameWidth / 2,
+		frameY: cy - twoVminHeights[twoVmin] / 2,
+		frameWidth: frameWidth,
 	};
 
 	return relTaxSet;

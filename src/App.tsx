@@ -49,7 +49,7 @@ const App = () => {
 		fetchedIDs: {},
 	});
 	//const [ctxMenuVis, setCtxMenuVis] = useState(false);
-	const [hover, setHover] = useState("");
+	const [hovered, setHovered] = useState("");
 	const sttRef = useRef(stt);
 	sttRef.current = stt;
 
@@ -309,7 +309,7 @@ const App = () => {
 					IDInfoHandleClick: () =>
 						IDInfoHandleClick(stt["lyr"].split(" ").slice(0, -1).join(" ")),
 					ancestors: stt["ancestors"],
-					hovered: stt["relTaxSet"][hover],
+					hovered: stt["relTaxSet"][hovered],
 				}}
 			>
 				<LeftSection />
@@ -349,17 +349,10 @@ const App = () => {
 				<RightSection />
 			</RightSectionCtx.Provider>
 
-			<button
-				onMouseOver={() => setHover("Bacteria superkingdom")}
-				onMouseOut={() => setHover("")}
-				style={{ position: "fixed", top: "90%", left: "90%" }}
-			>
-				Bacteria
-			</button>
-
 			<Plot
 				ancestors={stt["ancestors"]}
-				handleHover={setHover}
+				handleHover={setHovered}
+				hovered={hovered}
 				lyr={stt["lyr"]}
 				relTaxSet={stt["relTaxSet"]}
 				plotHandleClick={plotHandleClick}

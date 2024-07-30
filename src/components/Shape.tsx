@@ -4,6 +4,7 @@ interface Props {
 	handleClick?: any;
 	handleMouseOver?: any;
 	handleMouseOut?: any;
+	strokeWidth?: string;
 }
 
 const Shape = ({
@@ -12,6 +13,7 @@ const Shape = ({
 	handleClick,
 	handleMouseOver,
 	handleMouseOut,
+	strokeWidth,
 }: Props) => {
 	return (
 		<path
@@ -19,7 +21,7 @@ const Shape = ({
 			style={{
 				fill: color,
 				stroke: "#800080",
-				strokeWidth: "0.2vmin",
+				strokeWidth: strokeWidth,
 				cursor: "pointer",
 			}}
 			onClick={handleClick}
