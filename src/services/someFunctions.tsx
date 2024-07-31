@@ -881,4 +881,11 @@ const getAncestors = (
 	return ancestors;
 };
 
-export { calcBasicInfo, getAncestors };
+const determinePaintingOrder = (relTaxSet: any) => {
+	const keys: any[] = Object.keys(relTaxSet);
+	return keys.sort(
+		(a, b) => relTaxSet[b]["layers"][0] - relTaxSet[a]["layers"][0]
+	);
+};
+
+export { calcBasicInfo, determinePaintingOrder, getAncestors };

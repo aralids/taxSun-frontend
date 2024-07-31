@@ -11,6 +11,7 @@ interface Props {
 	hovered?: string;
 	lyr?: string;
 	relTaxSet?: any;
+	paintingOrder?: any;
 	plotHandleClick?: any;
 	plotRef?: any;
 }
@@ -21,6 +22,7 @@ const Plot = ({
 	hovered,
 	lyr,
 	relTaxSet,
+	paintingOrder,
 	plotHandleClick,
 	plotRef,
 }: Props) => {
@@ -30,7 +32,7 @@ const Plot = ({
 		let labels: any[] = [];
 		let labelFrames: any[] = [];
 		const twoVmin = Math.min(window.innerWidth, window.innerHeight) / (100 / 2);
-		for (const key in relTaxSet) {
+		for (const key of paintingOrder) {
 			console.log("key: ", key, relTaxSet[key]["lblObj"]);
 			const hc =
 				key === lyr && ancestors.length > 0

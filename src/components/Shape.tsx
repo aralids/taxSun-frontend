@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 interface Props {
 	path?: string;
 	color?: string;
@@ -15,20 +17,23 @@ const Shape = ({
 	handleMouseOut,
 	strokeWidth,
 }: Props) => {
-	return (
-		<path
-			d={path}
-			style={{
-				fill: color,
-				stroke: "#800080",
-				strokeWidth: strokeWidth,
-				cursor: "pointer",
-			}}
-			onClick={handleClick}
-			onMouseOver={handleMouseOver}
-			onMouseOut={handleMouseOut}
-		></path>
-	);
+	const signature = path;
+	return useMemo(() => {
+		return (
+			<path
+				d={path}
+				style={{
+					fill: color,
+					stroke: "#800080",
+					strokeWidth: strokeWidth,
+					cursor: "pointer",
+				}}
+				onClick={handleClick}
+				onMouseOver={handleMouseOver}
+				onMouseOut={handleMouseOut}
+			></path>
+		);
+	}, [signature]);
 };
 
 export default Shape;

@@ -5,9 +5,13 @@ import LeftSection from "./components/LeftSection.tsx";
 import RightSection from "./components/RightSection.tsx";
 import Plot from "./components/Plot.tsx";
 
-import { lns, taxSet } from "./services/predefinedObjects.tsx";
+import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
 //import { handleMouseMove } from "./services/helperFunctions.tsx";
-import { calcBasicInfo, getAncestors } from "./services/someFunctions.tsx";
+import {
+	calcBasicInfo,
+	determinePaintingOrder,
+	getAncestors,
+} from "./services/someFunctions.tsx";
 
 export const LeftSectionCtx = createContext({});
 export const RightSectionCtx = createContext({});
@@ -24,6 +28,7 @@ const App = () => {
 			taxSet,
 			"allEqual"
 		),
+		paintingOrder: pO,
 		ancestors: [],
 
 		lns: lns,
@@ -63,6 +68,7 @@ const App = () => {
 			sttRef.current.taxSet,
 			sttRef.current.view
 		);
+		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 		const newAncestors: any = getAncestors(
 			sttRef.current.lns,
 			key,
@@ -74,6 +80,7 @@ const App = () => {
 			...sttRef.current,
 			ancestors: newAncestors,
 			lyr: key,
+			paintingOrder: newPaintingOrder,
 			relTaxSet: newRelTaxSet,
 		});
 	};
@@ -121,6 +128,16 @@ const App = () => {
 			)
 			.then((response) => {
 				const newData = response.data;
+				const newRelTaxSet = calcBasicInfo(
+					false,
+					sttRef.current.eValue,
+					false,
+					newData.lns,
+					"root root",
+					newData.taxSet,
+					"allEqual"
+				);
+				const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 				setStt({
 					...sttRef.current,
 					tsvName: sttRef.current.tsvLastTry,
@@ -133,15 +150,8 @@ const App = () => {
 					collapse: false,
 					lyr: "root root",
 					view: "allEqual",
-					relTaxSet: calcBasicInfo(
-						false,
-						sttRef.current.eValue,
-						false,
-						newData.lns,
-						"root root",
-						newData.taxSet,
-						"allEqual"
-					),
+					paintingOrder: newPaintingOrder,
+					relTaxSet: newRelTaxSet,
 				});
 			})
 			.catch(() => {
@@ -158,52 +168,61 @@ const App = () => {
 	};
 
 	const collHandleChange = () => {
+		const newRelTaxSet = calcBasicInfo(
+			sttRef.current.eValueApplied,
+			sttRef.current.eValue,
+			!sttRef.current["collapse"],
+			sttRef.current.lns,
+			sttRef.current.lyr,
+			sttRef.current.taxSet,
+			sttRef.current.view
+		);
+		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 		setStt({
 			...sttRef.current,
 			collapse: !sttRef.current["collapse"],
-			relTaxSet: calcBasicInfo(
-				sttRef.current.eValueApplied,
-				sttRef.current.eValue,
-				!sttRef.current["collapse"],
-				sttRef.current.lns,
-				sttRef.current.lyr,
-				sttRef.current.taxSet,
-				sttRef.current.view
-			),
+			paintingOrder: newPaintingOrder,
+			relTaxSet: newRelTaxSet,
 		});
 	};
 
 	const eValueAppliedHandleChange = () => {
+		const newRelTaxSet = calcBasicInfo(
+			!sttRef.current["eValueApplied"],
+			sttRef.current.eValue,
+			sttRef.current.collapse,
+			sttRef.current.lns,
+			sttRef.current.lyr,
+			sttRef.current.taxSet,
+			sttRef.current.view
+		);
+		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 		setStt({
 			...sttRef.current,
 			eValueApplied: !sttRef.current["eValueApplied"],
-			relTaxSet: calcBasicInfo(
-				!sttRef.current["eValueApplied"],
-				sttRef.current.eValue,
-				sttRef.current.collapse,
-				sttRef.current.lns,
-				sttRef.current.lyr,
-				sttRef.current.taxSet,
-				sttRef.current.view
-			),
+			paintingOrder: newPaintingOrder,
+			relTaxSet: newRelTaxSet,
 		});
 	};
 
 	const eValueHandleKeyDown = (event: any) => {
 		if (event.key === "Enter") {
+			const newRelTaxSet = calcBasicInfo(
+				sttRef.current.eValueApplied,
+				eValueRef.current.value,
+				sttRef.current.collapse,
+				sttRef.current.lns,
+				sttRef.current.lyr,
+				sttRef.current.taxSet,
+				sttRef.current.view
+			);
+			const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 			if (sttRef.current["eValueApplied"]) {
 				setStt({
 					...sttRef.current,
 					eValue: eValueRef.current.value,
-					relTaxSet: calcBasicInfo(
-						sttRef.current.eValueApplied,
-						eValueRef.current.value,
-						sttRef.current.collapse,
-						sttRef.current.lns,
-						sttRef.current.lyr,
-						sttRef.current.taxSet,
-						sttRef.current.view
-					),
+					paintingOrder: newPaintingOrder,
+					relTaxSet: newRelTaxSet,
 				});
 			} else {
 				setStt({ ...sttRef.current, eValue: eValueRef.current.value });
@@ -224,18 +243,21 @@ const App = () => {
 		} else if (allEqualRef.current.checked) {
 			newView = "allEqual";
 		}
+		const newRelTaxSet = calcBasicInfo(
+			sttRef.current.eValueApplied,
+			eValueRef.current.value,
+			sttRef.current.collapse,
+			sttRef.current.lns,
+			sttRef.current.lyr,
+			sttRef.current.taxSet,
+			newView
+		);
+		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 		setStt({
 			...sttRef.current,
 			view: newView,
-			relTaxSet: calcBasicInfo(
-				sttRef.current.eValueApplied,
-				eValueRef.current.value,
-				sttRef.current.collapse,
-				sttRef.current.lns,
-				sttRef.current.lyr,
-				sttRef.current.taxSet,
-				newView
-			),
+			paintingOrder: newPaintingOrder,
+			relTaxSet: newRelTaxSet,
 		});
 	};
 
@@ -355,6 +377,7 @@ const App = () => {
 				hovered={hovered}
 				lyr={stt["lyr"]}
 				relTaxSet={stt["relTaxSet"]}
+				paintingOrder={stt["paintingOrder"]}
 				plotHandleClick={plotHandleClick}
 				plotRef={plotRef}
 			/>
