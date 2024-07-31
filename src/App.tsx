@@ -4,9 +4,10 @@ import axios from "axios";
 import LeftSection from "./components/LeftSection.tsx";
 import RightSection from "./components/RightSection.tsx";
 import Plot from "./components/Plot.tsx";
+import HoverLabel from "./components/HoveredLabel.tsx";
 
 import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
-//import { handleMouseMove } from "./services/helperFunctions.tsx";
+import { handleMouseMove } from "./services/helperFunctions.tsx";
 import {
 	calcBasicInfo,
 	determinePaintingOrder,
@@ -293,7 +294,7 @@ const App = () => {
 	const plotRef = useRef({ outerHTML: "" });
 
 	useEffect(() => {
-		//window.addEventListener("mousemove", (event) => handleMouseMove(event));
+		window.addEventListener("mousemove", (event) => handleMouseMove(event));
 	}, []);
 
 	useEffect(() => {
@@ -374,12 +375,19 @@ const App = () => {
 			<Plot
 				ancestors={stt["ancestors"]}
 				handleHover={setHovered}
-				hovered={hovered}
 				lyr={stt["lyr"]}
 				relTaxSet={stt["relTaxSet"]}
 				paintingOrder={stt["paintingOrder"]}
 				plotHandleClick={plotHandleClick}
 				plotRef={plotRef}
+			/>
+			<HoverLabel
+				ancestors={stt["ancestors"]}
+				hovered={hovered}
+				lyr={stt["lyr"]}
+				relTaxSet={stt["relTaxSet"]}
+				handleHover={setHovered}
+				plotHandleClick={plotHandleClick}
 			/>
 		</div>
 	);

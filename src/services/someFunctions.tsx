@@ -649,7 +649,7 @@ const label = (
 ) => {
 	const twoVmin = Math.min(window.innerWidth, window.innerHeight) / (100 / 2);
 	const yOffset = twoVminHeights[twoVmin] / 4;
-	const framePadding = 10;
+	const framePadding = 0;
 	for (let key in relTaxSet) {
 		const txn = relTaxSet[key];
 		const startDeg = txn["degrees"][0];
@@ -686,9 +686,10 @@ const label = (
 		const originY = labelCy;
 
 		const frameWidth = extWidth + framePadding;
-		const frameY = labelCy - twoVminHeights[twoVmin] / 2;
+		let frameTransformOrigin = "center";
+		let frameTransform = "";
 
-		let angle, extX: any, abbrContent: any, abbrX, abbrWidth: any, frameX;
+		let angle, abbrContent: any, abbrX, abbrWidth: any, frameX;
 		if (!(shapeWidth < twoVmin && range < 180)) {
 			// If the wedge touches the edge of the plot and is simple-shaped.
 			if (txn.unaCount > 0 && txn.layers.length === 2) {
@@ -713,12 +714,14 @@ const label = (
 				if (midDeg >= 180 && midDeg < 360) {
 					angle = 360 - angle;
 					abbrX = labelCx;
-					extX = labelCx + framePadding / 2;
 					frameX = labelCx;
+					frameTransformOrigin = "left";
+					frameTransform = `translate(0%, -50%) rotate(${angle}deg)`;
 				} else if (midDeg >= 0 && midDeg < 180) {
 					abbrX = labelCx - abbrWidth;
-					extX = labelCx - extWidth - framePadding / 2;
 					frameX = labelCx - frameWidth;
+					frameTransformOrigin = "right";
+					frameTransform = `translate(-100%, -50%) rotate(${angle}deg)`;
 				}
 			} else {
 				// If the wedge is internal, measure both vertical and horizontal available space.
@@ -762,12 +765,14 @@ const label = (
 					if (midDeg >= 180 && midDeg < 360) {
 						angle = 360 - angle;
 						abbrX = labelCx;
-						extX = labelCx + framePadding / 2;
 						frameX = labelCx;
+						frameTransformOrigin = "left";
+						frameTransform = `translate(0%, -50%) rotate(${angle}deg)`;
 					} else if (midDeg >= 0 && midDeg < 180) {
 						abbrX = labelCx - abbrWidth;
-						extX = labelCx - extWidth - framePadding / 2;
 						frameX = labelCx - frameWidth;
+						frameTransformOrigin = "right";
+						frameTransform = `translate(-100%, -50%) rotate(${angle}deg)`;
 					}
 				} else {
 					[abbrContent, abbrWidth] = calcOptLabel(
@@ -777,8 +782,9 @@ const label = (
 						true
 					);
 					abbrX = labelCx - abbrWidth / 2;
-					extX = labelCx - extWidth / 2;
 					frameX = labelCx - frameWidth / 2;
+					frameTransformOrigin = "center";
+					frameTransform = `translate(-50%, -50%) rotate(${angle}deg)`;
 				}
 			}
 		} else {
@@ -788,12 +794,14 @@ const label = (
 			if (midDeg >= 180 && midDeg < 360) {
 				angle = 360 - angle;
 				abbrX = labelCx;
-				extX = labelCx + framePadding / 2;
 				frameX = labelCx;
+				frameTransformOrigin = "left";
+				frameTransform = `translate(0%, -50%) rotate(${angle}deg)`;
 			} else if (midDeg >= 0 && midDeg < 180) {
 				abbrX = labelCx;
-				extX = labelCx - extWidth - framePadding / 2;
 				frameX = labelCx - frameWidth;
+				frameTransformOrigin = "right";
+				frameTransform = `translate(-100%, -50%) rotate(${angle}deg)`;
 			}
 		}
 
@@ -805,20 +813,12 @@ const label = (
 			abbrX: abbrContent.length < 4 ? 0 : abbrX,
 			abbrContent: abbrContent.length < 4 ? "" : abbrContent,
 			extContent: extContent,
-			extX: extX,
-			frameX: frameX,
-			frameY: frameY,
-			frameWidth: frameWidth,
+			frameX: labelCx,
+			frameY: labelCy,
+			frameTransform: frameTransform,
+			frameTransformOrigin: frameTransformOrigin,
 		};
 	}
-
-	const [extContent, extWidth]: any[] = calcOptLabel(
-		2,
-		relTaxSet[lyr]["name"],
-		Infinity
-	);
-
-	console.log(extContent);
 
 	const [abbrContent, abbrWidth]: any[] = calcOptLabel(
 		2,
@@ -827,18 +827,16 @@ const label = (
 		true
 	);
 
-	const frameWidth = extWidth + framePadding;
-
 	relTaxSet[lyr]["lblObj"] = {
 		transform: ``,
 		y: cy + yOffset,
 		extContent: relTaxSet[lyr]["name"],
-		extX: cx - extWidth / 2,
 		abbrContent: abbrContent.length < 4 ? "" : abbrContent,
 		abbrX: abbrContent.length < 4 ? 0 : cx - abbrWidth / 2,
-		frameX: cx - frameWidth / 2,
-		frameY: cy - twoVminHeights[twoVmin] / 2,
-		frameWidth: frameWidth,
+		frameX: cx,
+		frameY: cy,
+		frameTransformOrigin: "center",
+		frameTransform: `translate(-50%, -50%) rotate(0deg)`,
 	};
 
 	return relTaxSet;

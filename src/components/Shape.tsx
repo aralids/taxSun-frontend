@@ -6,7 +6,6 @@ interface Props {
 	handleClick?: any;
 	handleMouseOver?: any;
 	handleMouseOut?: any;
-	strokeWidth?: string;
 }
 
 const Shape = ({
@@ -15,17 +14,16 @@ const Shape = ({
 	handleClick,
 	handleMouseOver,
 	handleMouseOut,
-	strokeWidth,
 }: Props) => {
 	const signature = path;
 	return useMemo(() => {
 		return (
 			<path
+				className="taxSun-shape"
 				d={path}
 				style={{
 					fill: color,
 					stroke: "#800080",
-					strokeWidth: strokeWidth,
 					cursor: "pointer",
 				}}
 				onClick={handleClick}

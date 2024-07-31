@@ -2,13 +2,10 @@ import { useMemo } from "react";
 
 import Shape from "./Shape.tsx";
 import Label from "./Label.tsx";
-import LabelFrame from "./LabelFrame.tsx";
-import { twoVminHeights } from "../services/predefinedObjects.tsx";
 
 interface Props {
 	ancestors?: any;
 	handleHover?: any;
-	hovered?: string;
 	lyr?: string;
 	relTaxSet?: any;
 	paintingOrder?: any;
@@ -19,80 +16,49 @@ interface Props {
 const Plot = ({
 	ancestors,
 	handleHover,
-	hovered,
 	lyr,
 	relTaxSet,
 	paintingOrder,
 	plotHandleClick,
 	plotRef,
 }: Props) => {
-	const signature = JSON.stringify(relTaxSet) + hovered;
+	const signature = JSON.stringify(relTaxSet);
 	return useMemo(() => {
-		let shapes: any[] = [];
-		let labels: any[] = [];
-		let labelFrames: any[] = [];
-		const twoVmin = Math.min(window.innerWidth, window.innerHeight) / (100 / 2);
+		let groups: any[] = [];
 		for (const key of paintingOrder) {
-			console.log("key: ", key, relTaxSet[key]["lblObj"]);
 			const hc =
 				key === lyr && ancestors.length > 0
 					? () => plotHandleClick(ancestors[0].ancKey)
 					: () => plotHandleClick(key);
-			shapes = shapes.concat([
-				<Shape
-					path={relTaxSet[key]["path"]}
-					color={relTaxSet[key]["color"]}
-					handleClick={hc}
-					handleMouseOver={() => {
-						handleHover(key);
-					}}
-					handleMouseOut={() => {
-						handleHover("");
-					}}
-					strokeWidth={hovered === key ? "0.4vmin" : "0.2vmin"}
-				/>,
-			]);
-			labelFrames = labelFrames.concat([
-				<LabelFrame
-					display={hovered === key ? "unset" : "none"}
-					x={relTaxSet[key]["lblObj"]["frameX"]}
-					transform={relTaxSet[key]["lblObj"]["transform"]}
-					handleMouseOver={() => {
-						handleHover(key);
-					}}
-					handleMouseOut={() => {
-						handleHover("");
-					}}
-					y={relTaxSet[key]["lblObj"]["frameY"]}
-					width={relTaxSet[key]["lblObj"]["frameWidth"]}
-					height={twoVminHeights[twoVmin]}
-				/>,
-			]);
-			labels = labels.concat([
-				<Label
-					content={
-						hovered === key
-							? relTaxSet[key]["lblObj"]["extContent"]
-							: relTaxSet[key]["lblObj"]["abbrContent"]
-					}
-					fontSize="2vmin"
-					fontWeight={hovered === key ? "bold" : "normal"}
-					lineHeight="2vmin"
-					transform={relTaxSet[key]["lblObj"]["transform"]}
-					x={
-						hovered === key
-							? relTaxSet[key]["lblObj"]["extX"]
-							: relTaxSet[key]["lblObj"]["abbrX"]
-					}
-					y={relTaxSet[key]["lblObj"]["y"]}
-					handleClick={hc}
-					handleMouseOver={() => {
-						handleHover(key);
-					}}
-					handleMouseOut={() => {
-						handleHover("");
-					}}
-				/>,
+			groups = groups.concat([
+				<g className="wedge">
+					<Shape
+						path={relTaxSet[key]["path"]}
+						color={relTaxSet[key]["color"]}
+						handleClick={hc}
+						handleMouseOver={() => {
+							handleHover(key);
+						}}
+						handleMouseOut={() => {
+							handleHover("");
+						}}
+					/>
+					<Label
+						content={relTaxSet[key]["lblObj"]["abbrContent"]}
+						fontSize="2vmin"
+						lineHeight="2vmin"
+						transform={relTaxSet[key]["lblObj"]["transform"]}
+						x={relTaxSet[key]["lblObj"]["abbrX"]}
+						y={relTaxSet[key]["lblObj"]["y"]}
+						handleClick={hc}
+						handleMouseOver={() => {
+							handleHover(key);
+						}}
+						handleMouseOut={() => {
+							handleHover("");
+						}}
+					/>
+				</g>,
 			]);
 		}
 		return (
@@ -107,9 +73,7 @@ const Plot = ({
 					zIndex: 0,
 				}}
 			>
-				{...shapes}
-				{...labelFrames}
-				{...labels}
+				{...groups}
 			</svg>
 		);
 	}, [signature]);

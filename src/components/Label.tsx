@@ -1,7 +1,6 @@
 interface Props {
 	content?: string;
 	fontSize?: string;
-	fontWeight?: string;
 	lineHeight?: string;
 	transform?: string;
 	x?: any;
@@ -14,7 +13,6 @@ interface Props {
 const Label = ({
 	content,
 	fontSize,
-	fontWeight,
 	lineHeight,
 	transform,
 	x,
@@ -25,11 +23,11 @@ const Label = ({
 }: Props) => {
 	return (
 		<text
+			className="taxSun-label"
 			style={{
 				fill: "#800080",
 				fontFamily: "calibri",
 				fontSize: fontSize,
-				fontWeight: fontWeight,
 				lineHeight: lineHeight,
 				margin: 0,
 				padding: 0,
