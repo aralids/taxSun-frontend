@@ -653,7 +653,6 @@ const label = (
 ) => {
 	const twoVmin = Math.min(window.innerWidth, window.innerHeight) / (100 / 2);
 	const yOffset = twoVminHeights[twoVmin] / 4;
-	const framePadding = 0;
 	for (let key in relTaxSet) {
 		const txn = relTaxSet[key];
 		const startDeg = txn["degrees"][0];
