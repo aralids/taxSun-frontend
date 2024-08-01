@@ -7,7 +7,7 @@ import Plot from "./components/Plot.tsx";
 import HoverLabel from "./components/HoveredLabel.tsx";
 
 import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
-import { handleMouseMove } from "./services/helperFunctions.tsx";
+//import { handleMouseMove } from "./services/helperFunctions.tsx";
 import {
 	calcBasicInfo,
 	determinePaintingOrder,
@@ -294,7 +294,7 @@ const App = () => {
 	const plotRef = useRef({ outerHTML: "" });
 
 	useEffect(() => {
-		window.addEventListener("mousemove", (event) => handleMouseMove(event));
+		//window.addEventListener("mousemove", (event) => handleMouseMove(event));
 	}, []);
 
 	useEffect(() => {
