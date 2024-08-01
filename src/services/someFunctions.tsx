@@ -684,12 +684,11 @@ const label = (
 			`${txn.name} ${perc}%`,
 			Infinity
 		);
-
+		extWidth;
 		const y = labelCy + yOffset;
 		const originX = labelCx;
 		const originY = labelCy;
 
-		const frameWidth = extWidth + framePadding;
 		let frameTransformOrigin = "center";
 		let frameTransform = "";
 
