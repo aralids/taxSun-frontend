@@ -3,22 +3,11 @@ import { useMemo } from "react";
 import { twoVminHeights } from "../services/predefinedObjects.tsx";
 
 interface Props {
-	ancestors?: any;
 	hovered: string;
-	lyr?: string;
 	relTaxSet?: any;
-	handleHover?: any;
-	plotHandleClick?: any;
 }
 
-const HoverLabel = ({
-	ancestors,
-	hovered,
-	lyr,
-	relTaxSet,
-	handleHover,
-	plotHandleClick,
-}: Props) => {
+const HoverLabel = ({ hovered, relTaxSet }: Props) => {
 	const signature = hovered;
 	return useMemo(() => {
 		if (hovered === "") {
@@ -26,11 +15,6 @@ const HoverLabel = ({
 		}
 
 		const twoVmin = Math.min(window.innerWidth, window.innerHeight) / (100 / 2);
-
-		const hc =
-			hovered === lyr && ancestors.length > 0
-				? () => plotHandleClick(ancestors[0].ancKey)
-				: () => plotHandleClick(hovered);
 		return (
 			<div
 				style={{

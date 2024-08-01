@@ -401,14 +401,7 @@ const App = () => {
 				plotHandleClick={plotHandleClick}
 				plotRef={plotRef}
 			/>
-			<HoverLabel
-				ancestors={stt["ancestors"]}
-				hovered={hovered}
-				lyr={stt["lyr"]}
-				relTaxSet={stt["relTaxSet"]}
-				handleHover={setHovered}
-				plotHandleClick={plotHandleClick}
-			/>
+			<HoverLabel hovered={hovered} relTaxSet={stt["relTaxSet"]} />
 		</div>
 	);
 };
