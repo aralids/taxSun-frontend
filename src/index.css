@@ -1,7 +1,12 @@
 .taxSun-shape {
 	stroke-width: 0.2vmin;
+	transition: fill ease 0.2s;
 }
 
 .taxSun-shape:hover {
+	fill: #800080;
+}
+
+.wedge:hover .taxSun-shape {
 	fill: #800080;
 }

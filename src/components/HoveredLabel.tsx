@@ -45,12 +45,7 @@ const HoverLabel = ({
 					padding: 0,
 					height: "fit-content",
 					cursor: "pointer",
-				}}
-				onMouseOver={() => handleHover(hovered)}
-				onMouseOut={() => handleHover("")}
-				onClick={() => {
-					hc();
-					handleHover("");
+					pointerEvents: "none",
 				}}
 			>
 				<p
@@ -63,6 +58,7 @@ const HoverLabel = ({
 						fontSize: "2.1vmin",
 						color: "#800080",
 						fontFamily: "calibri",
+						pointerEvents: "none",
 					}}
 				>
 					{relTaxSet[hovered]["lblObj"]["extContent"]}

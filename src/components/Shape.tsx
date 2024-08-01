@@ -27,8 +27,8 @@ const Shape = ({
 				}}
 				fill={color}
 				onClick={handleClick}
-				onMouseOver={handleMouseOver}
-				onMouseOut={handleMouseOut}
+				onMouseEnter={handleMouseOver}
+				onMouseLeave={handleMouseOut}
 			></path>
 		);
 	}, [signature]);

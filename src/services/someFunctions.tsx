@@ -35,11 +35,7 @@ const calcBasicInfo = (
 
 	[croppedLns, relTaxSet] = marry(croppedLns, lyr, relTaxSet, view);
 
-	console.log(
-		"croppedLns, relTaxSet: ",
-		JSON.parse(JSON.stringify(croppedLns)),
-		JSON.parse(JSON.stringify(relTaxSet))
-	);
+	//console.log("croppedLns, relTaxSet: ", JSON.parse(JSON.stringify(croppedLns)), JSON.parse(JSON.stringify(relTaxSet)));
 
 	[croppedLns, relTaxSet] = collapse(coll, croppedLns, relTaxSet);
 

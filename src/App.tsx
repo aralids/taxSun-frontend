@@ -18,17 +18,10 @@ export const LeftSectionCtx = createContext({});
 export const RightSectionCtx = createContext({});
 
 const App = () => {
+	const relTaxSetInit: any = {};
 	const [stt, setStt] = useState({
 		lyr: "root root",
-		relTaxSet: calcBasicInfo(
-			false,
-			1.9e-28,
-			false,
-			lns,
-			"root root",
-			taxSet,
-			"allEqual"
-		),
+		relTaxSet: relTaxSetInit,
 		paintingOrder: pO,
 		ancestors: [],
 
@@ -161,6 +154,10 @@ const App = () => {
 					marriedIIRef,
 					allEqualRef
 				);
+				unalteredRef.current.checked = false;
+				marriedIRef.current.checked = false;
+				marriedIIRef.current.checked = false;
+				allEqualRef.current.checked = true;
 			})
 			.catch(() => {
 				setStt({
@@ -302,6 +299,18 @@ const App = () => {
 
 	useEffect(() => {
 		//window.addEventListener("mousemove", (event) => handleMouseMove(event));
+		setStt({
+			...sttRef.current,
+			relTaxSet: calcBasicInfo(
+				false,
+				1.9e-28,
+				false,
+				lns,
+				"root root",
+				taxSet,
+				"allEqual"
+			),
+		});
 	}, []);
 
 	useEffect(() => {
@@ -326,6 +335,10 @@ const App = () => {
 	}, []);
 
 	const tmpFetchedIds: any = stt["fetchedIDs"];
+
+	if (Object.keys(stt["relTaxSet"]).length === 0) {
+		return null;
+	}
 
 	return (
 		<div>

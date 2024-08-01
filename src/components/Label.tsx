@@ -38,8 +38,8 @@ const Label = ({
 			x={x}
 			y={y}
 			onClick={handleClick}
-			onMouseOver={handleMouseOver}
-			onMouseOut={handleMouseOut}
+			onMouseEnter={handleMouseOver}
+			onMouseLeave={handleMouseOut}
 		>
 			{content}
 		</text>
