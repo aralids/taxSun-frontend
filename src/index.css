@@ -3,5 +3,5 @@
 }
 
 .taxSun-shape:hover {
-	stroke-width: 0.4vmin;
+	fill: #800080;
 }

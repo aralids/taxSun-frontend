@@ -35,6 +35,12 @@ const calcBasicInfo = (
 
 	[croppedLns, relTaxSet] = marry(croppedLns, lyr, relTaxSet, view);
 
+	console.log(
+		"croppedLns, relTaxSet: ",
+		JSON.parse(JSON.stringify(croppedLns)),
+		JSON.parse(JSON.stringify(relTaxSet))
+	);
+
 	[croppedLns, relTaxSet] = collapse(coll, croppedLns, relTaxSet);
 
 	relTaxSet = assignDegreesLayers(
@@ -58,8 +64,6 @@ const calcBasicInfo = (
 	relTaxSet = color(croppedLns, lyr, relTaxSet);
 
 	relTaxSet = label(cx, cy, layerWidth, lyr, minRankPattern, relTaxSet);
-
-	//console.log("croppedLns, relTaxSet: ", croppedLns, relTaxSet);
 
 	//calcOptLabel(2, "Gammaproteobacteria", 50);
 

@@ -154,6 +154,13 @@ const App = () => {
 					paintingOrder: newPaintingOrder,
 					relTaxSet: newRelTaxSet,
 				});
+				console.log(
+					"unalteredRef, marriedIRef, marriedIIRef, allEqualRef: ",
+					unalteredRef,
+					marriedIRef,
+					marriedIIRef,
+					allEqualRef
+				);
 			})
 			.catch(() => {
 				setStt({
@@ -287,10 +294,10 @@ const App = () => {
 	const tsvRef = useRef({ files: [{ name: "" }] });
 	const faaRef = useRef();
 	const eValueRef = useRef({ value: 0 });
-	const unalteredRef = useRef({ checked: false });
-	const marriedIRef = useRef({ checked: false });
-	const marriedIIRef = useRef({ checked: false });
-	const allEqualRef = useRef({ checked: true });
+	let unalteredRef = useRef({ checked: false });
+	let marriedIRef = useRef({ checked: false });
+	let marriedIIRef = useRef({ checked: false });
+	let allEqualRef = useRef({ checked: true });
 	const plotRef = useRef({ outerHTML: "" });
 
 	useEffect(() => {

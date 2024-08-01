@@ -22,10 +22,10 @@ const Shape = ({
 				className="taxSun-shape"
 				d={path}
 				style={{
-					fill: color,
 					stroke: "#800080",
 					cursor: "pointer",
 				}}
+				fill={color}
 				onClick={handleClick}
 				onMouseOver={handleMouseOver}
 				onMouseOut={handleMouseOut}

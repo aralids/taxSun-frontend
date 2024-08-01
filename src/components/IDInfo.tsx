@@ -3,7 +3,7 @@ import { LeftSectionCtx } from "../App.tsx";
 
 const IDInfo = () => {
 	const ctx: any = useContext(LeftSectionCtx);
-	const signature = ctx["name"] + ctx["root"];
+	const signature = ctx["name"] + ctx["root"] + ctx["id"];
 
 	return useMemo(() => {
 		const stl = {
