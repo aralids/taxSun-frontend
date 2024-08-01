@@ -693,7 +693,7 @@ const label = (
 		let frameTransformOrigin = "center";
 		let frameTransform = "";
 
-		let angle, abbrContent: any, abbrX, abbrWidth: any, frameX;
+		let angle, abbrContent: any, abbrX, abbrWidth: any;
 		if (!(shapeWidth < twoVmin && range < 180)) {
 			// If the wedge touches the edge of the plot and is simple-shaped.
 			if (txn.unaCount > 0 && txn.layers.length === 2) {
@@ -718,12 +718,10 @@ const label = (
 				if (midDeg >= 180 && midDeg < 360) {
 					angle = 360 - angle;
 					abbrX = labelCx;
-					frameX = labelCx;
 					frameTransformOrigin = "left";
 					frameTransform = `translate(0%, -50%) rotate(${angle}deg)`;
 				} else if (midDeg >= 0 && midDeg < 180) {
 					abbrX = labelCx - abbrWidth;
-					frameX = labelCx - frameWidth;
 					frameTransformOrigin = "right";
 					frameTransform = `translate(-100%, -50%) rotate(${angle}deg)`;
 				}
@@ -769,12 +767,10 @@ const label = (
 					if (midDeg >= 180 && midDeg < 360) {
 						angle = 360 - angle;
 						abbrX = labelCx;
-						frameX = labelCx;
 						frameTransformOrigin = "left";
 						frameTransform = `translate(0%, -50%) rotate(${angle}deg)`;
 					} else if (midDeg >= 0 && midDeg < 180) {
 						abbrX = labelCx - abbrWidth;
-						frameX = labelCx - frameWidth;
 						frameTransformOrigin = "right";
 						frameTransform = `translate(-100%, -50%) rotate(${angle}deg)`;
 					}
@@ -786,7 +782,6 @@ const label = (
 						true
 					);
 					abbrX = labelCx - abbrWidth / 2;
-					frameX = labelCx - frameWidth / 2;
 					frameTransformOrigin = "center";
 					frameTransform = `translate(-50%, -50%) rotate(${angle}deg)`;
 				}
@@ -798,12 +793,10 @@ const label = (
 			if (midDeg >= 180 && midDeg < 360) {
 				angle = 360 - angle;
 				abbrX = labelCx;
-				frameX = labelCx;
 				frameTransformOrigin = "left";
 				frameTransform = `translate(0%, -50%) rotate(${angle}deg)`;
 			} else if (midDeg >= 0 && midDeg < 180) {
 				abbrX = labelCx;
-				frameX = labelCx - frameWidth;
 				frameTransformOrigin = "right";
 				frameTransform = `translate(-100%, -50%) rotate(${angle}deg)`;
 			}
