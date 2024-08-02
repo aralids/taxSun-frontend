@@ -345,9 +345,9 @@ const App = () => {
 			<LeftSectionCtx.Provider
 				value={{
 					...stt["relTaxSet"][stt["lyr"]],
-					rawCount: stt["taxSet"][stt["lyr"]]["rawCount"],
-					id: Boolean(stt["taxSet"][stt["lyr"]]["taxID"])
-						? stt["taxSet"][stt["lyr"]]["taxID"]
+					rawCount: stt["relTaxSet"][stt["lyr"]]["rawCount"],
+					id: Boolean(stt["relTaxSet"][stt["lyr"]]["taxID"])
+						? stt["relTaxSet"][stt["lyr"]]["taxID"]
 						: tmpFetchedIds[stt["lyr"]] ?? "",
 					IDInfoHandleClick: () =>
 						IDInfoHandleClick(stt["lyr"].split(" ").slice(0, -1).join(" ")),

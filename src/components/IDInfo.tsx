@@ -12,7 +12,7 @@ const IDInfo = () => {
 		};
 
 		console.log("IDInfo id: ", ctx["id"]);
-		if (ctx["name"] === "root") {
+		if (ctx["name"] === "root" || ctx["name"].includes("&")) {
 			return <></>;
 		} else if (ctx["id"] === "") {
 			return (

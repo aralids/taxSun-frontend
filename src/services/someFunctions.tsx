@@ -35,8 +35,6 @@ const calcBasicInfo = (
 
 	[croppedLns, relTaxSet] = marry(croppedLns, lyr, relTaxSet, view);
 
-	//console.log("croppedLns, relTaxSet: ", JSON.parse(JSON.stringify(croppedLns)), JSON.parse(JSON.stringify(relTaxSet)));
-
 	[croppedLns, relTaxSet] = collapse(coll, croppedLns, relTaxSet);
 
 	relTaxSet = assignDegreesLayers(
@@ -63,6 +61,12 @@ const calcBasicInfo = (
 
 	//calcOptLabel(2, "Gammaproteobacteria", 50);
 
+	console.log(
+		"croppedLns, relTaxSet: ",
+		JSON.parse(JSON.stringify(croppedLns)),
+		JSON.parse(JSON.stringify(relTaxSet))
+	);
+
 	return relTaxSet;
 };
 
@@ -86,16 +90,82 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 				lns[i][index][1] === taxon &&
 				lns[i][index][0] === rank
 			) {
-				croppedLns = croppedLns.concat([lns[i].slice(index)]);
+				const croppedLn: string[][] = [[rootRank, rootTaxa.join(" & ")]].concat(
+					lns[i].slice(index + 1)
+				);
+				croppedLns = croppedLns.concat([croppedLn]);
 			}
 		}
 	}
 
 	const relTaxSet: any = {};
+	if (rootTaxa.length === 1) {
+		relTaxSet[lyr] = { ...taxSet[lyr] };
+	} else {
+		let newNames: any = [taxSet[rootTaxa[0] + " " + rootRank]["names"]];
+		for (let i = 1; i < rootTaxa.length; i++) {
+			const newAdd =
+				newNames[newNames.length - 1][
+					newNames[newNames.length - 1].length - 1
+				][1];
+			const n = taxSet[rootTaxa[i] + " " + rootRank]["names"];
+			if (n[0][1] === -1) {
+				if (n.length > 1) {
+					newNames = newNames.concat([
+						n.slice(1).map((item: any[]) => [item[0], item[1] + newAdd + 1]),
+					]);
+				}
+			} else {
+				newNames = newNames.concat([
+					n.map((item: any[]) => [item[0], item[1] + newAdd + 1]),
+				]);
+			}
+		}
+
+		relTaxSet[lyr] = {
+			children: rootTaxa.reduce(
+				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["children"]),
+				[]
+			),
+			eValues: rootTaxa.reduce(
+				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["eValues"]),
+				[]
+			),
+			fastaHeaders: rootTaxa.reduce(
+				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["fastaHeaders"]),
+				[]
+			),
+			geneNames: rootTaxa.reduce(
+				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["geneNames"]),
+				[]
+			),
+			lnIndex: taxSet[rootTaxa[0] + " " + rootRank]["lnIndex"],
+			name: rootTaxa.join(" & "),
+			names: newNames,
+			rank: rootRank,
+			rawCount: rootTaxa.reduce(
+				(acc, txn) => acc + taxSet[txn + " " + rootRank]["rawCount"],
+				0
+			),
+			taxID: "",
+			totCount: rootTaxa.reduce(
+				(acc, txn) => acc + taxSet[txn + " " + rootRank]["totCount"],
+				0
+			),
+			unaCount: rootTaxa.reduce(
+				(acc, txn) => acc + taxSet[txn + " " + rootRank]["unaCount"],
+				0
+			),
+		};
+
+		let strArr = croppedLns.map((item) => JSON.stringify(item));
+		strArr = strArr.filter((value, index, arr) => arr.indexOf(value) === index);
+		croppedLns = strArr.map((item) => JSON.parse(item));
+	}
 	for (const ln of croppedLns) {
-		for (const item of ln) {
-			relTaxSet[item[1] + " " + item[0]] = {
-				...taxSet[item[1] + " " + item[0]],
+		for (let i = 1; i < ln.length; i++) {
+			relTaxSet[ln[i][1] + " " + ln[i][0]] = {
+				...taxSet[ln[i][1] + " " + ln[i][0]],
 			};
 		}
 	}
@@ -843,11 +913,10 @@ const getAncestors = (
 	let ancestors: any[] = [];
 	for (const ln of lns) {
 		if (ln[relTaxSet[lyr]["lnIndex"]]) {
-			const name =
-				ln[relTaxSet[lyr]["lnIndex"]][1] +
-				" " +
-				ln[relTaxSet[lyr]["lnIndex"]][0];
-			if (name === lyr) {
+			if (
+				lyr.includes(ln[relTaxSet[lyr]["lnIndex"]][1]) &&
+				lyr.includes(ln[relTaxSet[lyr]["lnIndex"]][0])
+			) {
 				for (let j = 0; j < relTaxSet[lyr]["lnIndex"]; j++) {
 					let currName = ln[j][1] + " " + ln[j][0];
 					let currTxn = taxSet[currName];
@@ -867,6 +936,7 @@ const getAncestors = (
 			}
 		}
 	}
+	console.log("ancestors:", ancestors);
 	return ancestors;
 };
 
