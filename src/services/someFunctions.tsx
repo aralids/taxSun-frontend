@@ -61,11 +61,13 @@ const calcBasicInfo = (
 
 	//calcOptLabel(2, "Gammaproteobacteria", 50);
 
+	/*
 	console.log(
 		"croppedLns, relTaxSet: ",
 		JSON.parse(JSON.stringify(croppedLns)),
 		JSON.parse(JSON.stringify(relTaxSet))
 	);
+    */
 
 	return relTaxSet;
 };
@@ -306,6 +308,9 @@ const marry = (
 						perc: round(relTaxSet[bachelor]["totCount"] / sumCount, 5),
 						rank: bachelorRank,
 						count: relTaxSet[bachelor]["totCount"],
+						goodIndices: relTaxSet[bachelor]["goodIndices"] ?? [],
+						geneNames: relTaxSet[bachelor]["geneNames"],
+						children: relTaxSet[bachelor]["children"],
 					};
 				} else {
 					bachelorTaxa[bachelor]["indices"] = bachelorTaxa[bachelor][
@@ -414,6 +419,14 @@ const marry = (
 					(acc, member) => acc + member.count,
 					0
 				);
+				const marriedGeneNames = groupMembers.reduce(
+					(acc, member) => acc.concat(member.geneNames),
+					[]
+				);
+				const marriedChildren = groupMembers.reduce(
+					(acc, member) => acc.concat(member.children),
+					[]
+				);
 				const groupNewIndex = groupIndices[0];
 				const deletableIndices = groupIndices.slice(1);
 
@@ -451,6 +464,8 @@ const marry = (
 					unaCount: marriedCount,
 					totCount: marriedCount,
 					married: true,
+					geneNames: marriedGeneNames,
+					children: marriedChildren,
 				};
 				newCroppedLns[groupNewIndex] = newCroppedLns[groupNewIndex].concat([
 					[marriedRank, marriedName],

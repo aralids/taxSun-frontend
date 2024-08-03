@@ -565,4 +565,5 @@ export {
 	getLayers,
 	calculateArcEndpoints,
 	calcHorizontalSpace,
+	getClickCoords,
 };

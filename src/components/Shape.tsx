@@ -6,6 +6,7 @@ interface Props {
 	handleClick?: any;
 	handleMouseOver?: any;
 	handleMouseOut?: any;
+	handlePlotRightClick?: any;
 }
 
 const Shape = ({
@@ -14,6 +15,7 @@ const Shape = ({
 	handleClick,
 	handleMouseOver,
 	handleMouseOut,
+	handlePlotRightClick,
 }: Props) => {
 	const signature = path;
 	return useMemo(() => {
@@ -27,6 +29,7 @@ const Shape = ({
 				}}
 				fill={color}
 				onClick={handleClick}
+				onContextMenu={handlePlotRightClick}
 				onMouseEnter={handleMouseOver}
 				onMouseLeave={handleMouseOut}
 			></path>

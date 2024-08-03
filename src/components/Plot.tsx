@@ -6,6 +6,7 @@ import Label from "./Label.tsx";
 interface Props {
 	ancestors?: any;
 	handleHover?: any;
+	handlePlotRightClick?: any;
 	lyr?: string;
 	relTaxSet?: any;
 	paintingOrder?: any;
@@ -16,6 +17,7 @@ interface Props {
 const Plot = ({
 	ancestors,
 	handleHover,
+	handlePlotRightClick,
 	lyr,
 	relTaxSet,
 	paintingOrder,
@@ -46,6 +48,9 @@ const Plot = ({
 						handleMouseOut={() => {
 							handleHover("");
 						}}
+						handlePlotRightClick={(event: any) =>
+							handlePlotRightClick(event, key)
+						}
 					/>
 					<Label
 						content={
@@ -65,6 +70,9 @@ const Plot = ({
 						handleMouseOut={() => {
 							handleHover("");
 						}}
+						handlePlotRightClick={(event: any) =>
+							handlePlotRightClick(event, key)
+						}
 					/>
 				</g>,
 			]);

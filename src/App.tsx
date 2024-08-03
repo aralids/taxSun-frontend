@@ -5,9 +5,13 @@ import LeftSection from "./components/LeftSection.tsx";
 import RightSection from "./components/RightSection.tsx";
 import Plot from "./components/Plot.tsx";
 import HoverLabel from "./components/HoveredLabel.tsx";
+import ContextMenu from "./components/ContextMenu.tsx";
 
 import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
-//import { handleMouseMove } from "./services/helperFunctions.tsx";
+import {
+	handleMouseMove,
+	getClickCoords,
+} from "./services/helperFunctions.tsx";
 import {
 	calcBasicInfo,
 	determinePaintingOrder,
@@ -19,6 +23,7 @@ export const RightSectionCtx = createContext({});
 
 const App = () => {
 	const relTaxSetInit: any = {};
+	const contextMenuInit: any = [];
 	const [stt, setStt] = useState({
 		lyr: "root root",
 		relTaxSet: relTaxSetInit,
@@ -34,7 +39,7 @@ const App = () => {
 
 		faaLastTry: "",
 		faaLoadStatus: "",
-		faaName: "",
+		faaName: "a",
 		faaObj: {},
 
 		collapse: false,
@@ -49,6 +54,10 @@ const App = () => {
 	});
 	//const [ctxMenuVis, setCtxMenuVis] = useState(false);
 	const [hovered, setHovered] = useState("");
+	const [context, setContext] = useState({
+		coords: contextMenuInit,
+		target: null,
+	});
 	const sttRef = useRef(stt);
 	sttRef.current = stt;
 
@@ -288,6 +297,45 @@ const App = () => {
 		a.dispatchEvent(e);
 	};
 
+	const handlePlotRightClick = (
+		event: { [x: string]: any; target: any },
+		target: any
+	) => {
+		event.preventDefault();
+		const newCoords: any = getClickCoords(event);
+		setContext({ coords: [newCoords.x, newCoords.y], target: target });
+	};
+
+	const handleCopyClick = (target: string, unspecOnly: any) => {
+		const targetTxn = sttRef.current.relTaxSet[target];
+		let geneNames = targetTxn.geneNames;
+		console.log("target: ", target, targetTxn);
+		if (sttRef.current.eValueApplied) {
+			geneNames = targetTxn.goodIndices.map(
+				(ind: number) => targetTxn.geneNames[ind]
+			);
+		}
+		if (!unspecOnly) {
+			geneNames = geneNames.concat(
+				targetTxn.children.reduce((acc: string[], child: string) => {
+					const childTxn = sttRef.current.relTaxSet[child];
+					if (childTxn) {
+						if (sttRef.current.eValueApplied) {
+							return acc.concat(
+								childTxn.goodIndices.map(
+									(ind: number) => childTxn.geneNames[ind]
+								)
+							);
+						}
+						return acc.concat(childTxn.geneNames);
+					}
+					return acc.concat([]);
+				}, [])
+			);
+		}
+		navigator.clipboard.writeText(geneNames.join(" "));
+	};
+
 	const tsvRef = useRef({ files: [{ name: "" }] });
 	const faaRef = useRef();
 	const eValueRef = useRef({ value: 0 });
@@ -299,6 +347,9 @@ const App = () => {
 
 	useEffect(() => {
 		//window.addEventListener("mousemove", (event) => handleMouseMove(event));
+		window.addEventListener("click", () =>
+			setContext({ coords: [], target: null })
+		);
 		setStt({
 			...sttRef.current,
 			relTaxSet: calcBasicInfo(
@@ -395,6 +446,7 @@ const App = () => {
 			<Plot
 				ancestors={stt["ancestors"]}
 				handleHover={setHovered}
+				handlePlotRightClick={handlePlotRightClick}
 				lyr={stt["lyr"]}
 				relTaxSet={stt["relTaxSet"]}
 				paintingOrder={stt["paintingOrder"]}
@@ -402,6 +454,12 @@ const App = () => {
 				plotRef={plotRef}
 			/>
 			<HoverLabel hovered={hovered} relTaxSet={stt["relTaxSet"]} />
+			<ContextMenu
+				coords={context["coords"]}
+				faaName={stt["faaName"]}
+				handleCopyClick={handleCopyClick}
+				target={context["target"]}
+			/>
 		</div>
 	);
 };

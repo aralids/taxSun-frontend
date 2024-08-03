@@ -8,6 +8,7 @@ interface Props {
 	handleClick?: any;
 	handleMouseOver?: any;
 	handleMouseOut?: any;
+	handlePlotRightClick?: any;
 }
 
 const Label = ({
@@ -20,6 +21,7 @@ const Label = ({
 	handleClick,
 	handleMouseOver,
 	handleMouseOut,
+	handlePlotRightClick,
 }: Props) => {
 	return (
 		<text
@@ -38,6 +40,7 @@ const Label = ({
 			x={x}
 			y={y}
 			onClick={handleClick}
+			onContextMenu={handlePlotRightClick}
 			onMouseEnter={handleMouseOver}
 			onMouseLeave={handleMouseOut}
 		>
