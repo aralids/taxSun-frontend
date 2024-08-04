@@ -1,52 +1,36 @@
 import { useContext, useMemo } from "react";
 import { LeftSectionCtx } from "../App.tsx";
 
+import Card from "react-bootstrap/Card";
+
 const HoverInfo = () => {
 	const ctx: any = useContext(LeftSectionCtx);
 	const signature = JSON.stringify(ctx["hovered"]);
 	return useMemo(() => {
-		console.log("HoverInfo render");
 		if (!ctx["hovered"]) {
 			return <></>;
 		}
-		const stl = {
-			display: "block",
-			margin: 0,
-		};
 		return (
-			<fieldset
-				style={{
-					borderColor: "#800080",
-					borderRadius: "5px",
-					margin: "0",
-					marginTop: "2vh",
-					maxWidth: "18vw",
-					padding: "1.5vh 1.5vw 1.5vh 1.5vw",
-					wordBreak: "break-all",
-				}}
+			<Card
+				className="mt-3"
+				bg={"light"}
+				text={"black"}
+				style={{ width: "18vw" }}
 			>
-				<legend
-					style={{
-						color: "#800080",
-						fontWeight: "bold",
-						wordBreak: "keep-all",
-					}}
-				>
-					HOVERING OVER
-				</legend>
-				<p style={stl}>
-					Taxon: <b>{ctx["hovered"]["name"]}</b>
-				</p>
-				<p style={stl}>
-					Rank: <b>{ctx["hovered"]["rank"]}</b>
-				</p>
-				<p style={stl}>
-					Total count: <b>{ctx["hovered"]["totCount"]}</b>
-				</p>
-				<p style={stl}>
-					Unassigned count: <b>{ctx["hovered"]["unaCount"]}</b>
-				</p>
-			</fieldset>
+				<Card.Header>Hovering over:</Card.Header>
+				<Card.Body>
+					<Card.Title>{ctx["hovered"]["name"]}</Card.Title>
+					<Card.Text className="m-0">
+						Rank: <b>{ctx["hovered"]["rank"]}</b>
+					</Card.Text>
+					<Card.Text className="m-0">
+						Total count: <b>{ctx["hovered"]["totCount"]}</b>
+					</Card.Text>
+					<Card.Text className="m-0">
+						Unassigned count: <b>{ctx["hovered"]["unaCount"]}</b>
+					</Card.Text>
+				</Card.Body>
+			</Card>
 		);
 	}, [signature]);
 };

@@ -1,4 +1,5 @@
 import { useContext, useMemo } from "react";
+import Card from "react-bootstrap/Card";
 
 import BasicLayerInfo from "./BasicLayerInfo.tsx";
 import IDInfo from "./IDInfo.tsx";
@@ -7,34 +8,24 @@ import { LeftSectionCtx } from "../App.tsx";
 
 const LayerInfo = () => {
 	const ctx: any = useContext(LeftSectionCtx);
-	const signature = JSON.stringify(ctx["bsc"]);
+	const signature = JSON.stringify(ctx["name"]);
 
 	return useMemo(() => {
 		return (
-			<fieldset
-				style={{
-					borderColor: "#800080",
-					borderRadius: "5px",
-					margin: "0",
-					marginTop: "2vh",
-					maxWidth: "18vw",
-					padding: "1.5vh 1.5vw 1.5vh 1.5vw",
-					wordBreak: "break-all",
-				}}
+			<Card
+				className="mt-3"
+				bg={"light"}
+				text={"black"}
+				style={{ width: "18vw" }}
 			>
-				<legend
-					style={{
-						color: "#800080",
-						fontWeight: "bold",
-						wordBreak: "keep-all",
-					}}
-				>
-					CURRENT LAYER
-				</legend>
-				<BasicLayerInfo />
-				<IDInfo />
-				<Shortcuts />
-			</fieldset>
+				<Card.Header>Current layer:</Card.Header>
+				<Card.Body>
+					<Card.Title>{ctx["name"]}</Card.Title>
+					<BasicLayerInfo />
+					<IDInfo />
+					<Shortcuts />
+				</Card.Body>
+			</Card>
 		);
 	}, [signature]);
 };

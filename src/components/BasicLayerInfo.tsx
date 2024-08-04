@@ -1,50 +1,40 @@
 import { useContext } from "react";
 import { LeftSectionCtx } from "../App.tsx";
+import Card from "react-bootstrap/Card";
 
 const BasicLayerInfo = () => {
-	const stl = {
-		display: "block",
-		margin: 0,
-	};
-
 	const ctx: any = useContext(LeftSectionCtx);
 	if (ctx["rawCount"] === 0) {
 		return (
-			<div>
-				<p style={stl}>
-					Taxon: <b>{ctx["name"]}</b>
-				</p>
-				<p style={stl}>
+			<>
+				<Card.Text className="m-0">
 					Rank: <b>{ctx["rank"]}</b>
-				</p>
-				<p style={stl}>
+				</Card.Text>
+				<Card.Text className="m-0">
 					Total count: <b>{ctx["totCount"]}</b>
-				</p>
-				<p style={stl}>
+				</Card.Text>
+				<Card.Text className="m-0">
 					Unspec. count: <b>{ctx["unaCount"]}</b>
-				</p>
-			</div>
+				</Card.Text>
+			</>
 		);
 	}
 
 	return (
-		<div>
-			<p style={stl}>
-				Taxon: <b>{ctx["name"]}</b>
-			</p>
-			<p style={stl}>
+		<>
+			<Card.Text className="m-0">
 				Rank: <b>{ctx["rank"]}</b>
-			</p>
-			<p style={stl}>
+			</Card.Text>
+			<Card.Text className="m-0">
 				Total count: <b>{ctx["totCount"]}</b>
-			</p>
-			<p style={stl}>
+			</Card.Text>
+			<Card.Text className="m-0">
 				Unspec. count: <b>{ctx["unaCount"]}</b>
-			</p>
-			<p style={stl}>
+			</Card.Text>
+			<Card.Text className="m-0">
 				Raw file count: <b>{ctx["rawCount"]}</b>
-			</p>
-		</div>
+			</Card.Text>
+		</>
 	);
 };
 

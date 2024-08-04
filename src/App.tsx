@@ -1,5 +1,6 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import LeftSection from "./components/LeftSection.tsx";
 import RightSection from "./components/RightSection.tsx";

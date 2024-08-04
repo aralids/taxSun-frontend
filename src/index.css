@@ -6,3 +6,7 @@
 .wedge:hover .taxSun-shape {
 	fill: #800080;
 }
+
+a {
+	color: magenta !important;
+}
