@@ -1,33 +1,23 @@
 import { useMemo } from "react";
 import UploadTsv from "./UploadTsv.tsx";
 import UploadFaa from "./UploadFaa.tsx";
+import Card from "react-bootstrap/Card";
 
 const Upload = () => {
 	return useMemo(() => {
 		return (
-			<fieldset
-				style={{
-					borderColor: "#800080",
-					borderRadius: "5px",
-					margin: "0",
-					marginTop: "2vh",
-					maxWidth: "18vw",
-					padding: "1.5vh 1.5vw 1.5vh 1.5vw",
-					wordBreak: "break-all",
-				}}
+			<Card
+				className="mt-3"
+				bg={"light"}
+				text={"black"}
+				style={{ width: "18vw" }}
 			>
-				<legend
-					style={{
-						color: "#800080",
-						fontWeight: "bold",
-						wordBreak: "keep-all",
-					}}
-				>
-					LOAD YOUR DATA
-				</legend>
-				<UploadTsv />
-				<UploadFaa />
-			</fieldset>
+				<Card.Header>Load your data:</Card.Header>
+				<Card.Body>
+					<UploadTsv />
+					<UploadFaa />
+				</Card.Body>
+			</Card>
 		);
 	}, []);
 };

@@ -241,6 +241,7 @@ const App = () => {
 
 	const eValueHandleKeyDown = (event: any) => {
 		if (event.key === "Enter") {
+			event.preventDefault();
 			const newRelTaxSet = calcBasicInfo(
 				sttRef.current.eValueApplied,
 				eValueRef.current.value,

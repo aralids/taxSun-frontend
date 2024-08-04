@@ -1,5 +1,6 @@
 import { useContext, useMemo } from "react";
 import { RightSectionCtx } from "../App.tsx";
+import Button from "react-bootstrap/Button";
 
 const UploadFaa = () => {
 	const ctx: any = useContext(RightSectionCtx);
@@ -10,119 +11,69 @@ const UploadFaa = () => {
 		const fontColor = ctx["fastaEnabled"] ? "black" : "lightgrey";
 		if (ctx["faaLastTry"] === "") {
 			return (
-				<div
-					style={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "space-between",
-						marginTop: "0.75vh",
-					}}
-				>
+				<div className="d-flex align-items-center justify-content-center w-100 mt-2">
+					<Button
+						className="w-100 p-2 m-0 border-0"
+						disabled={!ctx["fastaEnabled"]}
+						style={{ transition: "all ease-in-out 1s" }}
+					>
+						<label
+							htmlFor="faa-file-input"
+							className="w-100 d-flex justify-content-center"
+							style={{ cursor: "pointer" }}
+						>
+							<span className="material-symbols-outlined">upload</span>
+							FAA
+						</label>
+					</Button>
 					<input
 						id="faa-file-input"
 						type="file"
-						style={{ display: "none" }}
-						ref={ctx["faaFormRef"]}
+						className="d-none"
 						onChange={ctx["uplFaaHandleChange"]}
-						disabled={!ctx["fastaEnabled"]}
+						ref={ctx["faaFormRef"]}
 					/>
-					<label
-						htmlFor="faa-file-input"
-						style={{
-							border: "1px solid grey",
-							borderRadius: "3px",
-							backgroundColor: "#F0F0F0",
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-							fontFamily: "Arial",
-							fontSize: "1.8vh",
-							padding: "1px 6px 1px 6px",
-							margin: "0",
-							width: "100%",
-							cursor: cursor,
-							color: fontColor,
-						}}
-					>
-						<span
-							className="material-symbols-outlined"
-							style={{ display: "inline" }}
-						>
-							upload
-						</span>
-						.faa
-					</label>
-					<span
-						className="material-symbols-outlined"
-						style={{ display: "inline" }}
-					>
-						{ctx["faaLoadStatus"]}
-					</span>
 				</div>
 			);
 		} else {
 			return (
-				<div
-					style={{
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "space-between",
-						margin: "0.75vh 0 0 0",
-						maxWidth: "15vw",
-						padding: "0px",
-					}}
-				>
+				<div className="d-flex align-items-center justify-content-between w-100 mt-2">
+					<Button
+						className="p-2 m-0 border-0"
+						style={{
+							width: "20%",
+							minWidth: "fit-content",
+							transition: "all ease-in-out 1s",
+						}}
+					>
+						<label
+							htmlFor="faa-file-input"
+							className="w-100 d-flex justify-content-center"
+							style={{ cursor: "pointer" }}
+						>
+							<span className="material-symbols-outlined">upload</span>
+							FAA
+						</label>
+					</Button>
 					<input
 						id="faa-file-input"
 						type="file"
-						style={{ display: "none" }}
-						ref={ctx["faaFormRef"]}
+						className="d-none"
 						onChange={ctx["uplFaaHandleChange"]}
-						disabled={!ctx["fastaEnabled"]}
+						ref={ctx["faaFormRef"]}
 					/>
-					<label
-						htmlFor="faa-file-input"
-						style={{
-							border: "1px solid grey",
-							borderRadius: "3px",
-							backgroundColor: "#F0F0F0",
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-							fontFamily: "Arial",
-							fontSize: "1.8vh",
-							padding: "1px 6px 1px 1px",
-							margin: "0",
-							width: "fit-content",
-							minWidth: "53.03px",
-							cursor: "pointer",
-						}}
-					>
-						<span
-							className="material-symbols-outlined"
-							style={{ display: "inline" }}
-						>
-							upload
-						</span>
-						.faa
-					</label>
 					<p
 						style={{
 							textAlign: "center",
 							textOverflow: "ellipsis",
 							overflow: "hidden",
 							whiteSpace: "nowrap",
-							width: "calc(15vw - 77.03px)",
-							padding: "0px 6px 0px 6px",
-							margin: "0px",
 						}}
+						className="ps-2 pe-2 m-0"
 					>
 						{ctx["faaLastTry"]}
 					</p>
-					<span
-						className="material-symbols-outlined"
-						style={{ display: "inline" }}
-					>
+					<span className="material-symbols-outlined d-inline">
 						{ctx["faaLoadStatus"]}
 					</span>
 				</div>

@@ -31,11 +31,13 @@ const calcBasicInfo = (
 		relTaxSet
 	);
 
+	/*
 	console.log(
 		"croppedLns, relTaxSet: ",
 		JSON.parse(JSON.stringify(croppedLns)),
 		JSON.parse(JSON.stringify(relTaxSet))
 	);
+    */
 
 	const minRankPattern = calcMinRankPattern(croppedLns, rankPatternFull);
 
@@ -722,7 +724,7 @@ const label = (
 	relTaxSet: any
 ) => {
 	const twoVmin = Math.min(window.innerWidth, window.innerHeight) / (100 / 2);
-	const yOffset = twoVminHeights[twoVmin] / 4;
+	const yOffset = twoVminHeights[round(twoVmin, 1)] / 4;
 	for (let key in relTaxSet) {
 		const txn = relTaxSet[key];
 		const startDeg = txn["degrees"][0];

@@ -1,4 +1,5 @@
 import { useContext, useMemo } from "react";
+import Form from "react-bootstrap/Form";
 
 import { RightSectionCtx } from "../App.tsx";
 
@@ -9,37 +10,22 @@ const EValue = () => {
 	return useMemo(() => {
 		const fontColor = ctx["eValueEnabled"] ? "black" : "lightgrey";
 		return (
-			<div style={{ display: "flex", alignItems: "start" }}>
-				<input
-					type="checkbox"
-					name="eValueApplied"
-					style={{ accentColor: "#800080" }}
+			<Form>
+				<Form.Check
+					type={"checkbox"}
+					id={`eValueApplied`}
+					label={`Filter by e-value: `}
 					onChange={ctx["eValueAppliedHandleChange"]}
 					checked={ctx["eValueApplied"]}
 					disabled={!ctx["eValueEnabled"]}
 				/>
-				<div>
-					<label
-						htmlFor="eValueApplied"
-						style={{ padding: "0 0 0 0.5vw", color: fontColor }}
-					>
-						Filter by e-value:
-					</label>
-					<input
-						type="text"
-						defaultValue={1.9e-28}
-						style={{
-							height: "2vh",
-							maxWidth: "3vw",
-							marginLeft: "0.5vw",
-							color: fontColor,
-						}}
-						onKeyDown={ctx["eValueHandleKeyDown"]}
-						ref={ctx["eValueRef"]}
-						disabled={!ctx["eValueEnabled"]}
-					/>
-				</div>
-			</div>
+				<Form.Control
+					defaultValue={1.9e-28}
+					onKeyDown={ctx["eValueHandleKeyDown"]}
+					ref={ctx["eValueRef"]}
+					disabled={!ctx["eValueEnabled"]}
+				/>
+			</Form>
 		);
 	}, [signature]);
 };
