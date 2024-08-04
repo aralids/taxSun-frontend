@@ -39,7 +39,7 @@ const App = () => {
 
 		faaLastTry: "",
 		faaLoadStatus: "",
-		faaName: "a",
+		faaName: "",
 		faaObj: {},
 
 		collapse: false,
@@ -91,7 +91,7 @@ const App = () => {
 	const IDInfoHandleClick = (key: string) => {
 		console.log("IDInfoHandleClick");
 		axios
-			.post("https://web-production-0834.up.railway.app/fetchID", {
+			.post("http://127.0.0.1:5000/fetchID", {
 				taxName: key,
 			})
 			.then((response) => {
@@ -124,11 +124,9 @@ const App = () => {
 		let formData = new FormData();
 		formData.append("file", newFile);
 		axios
-			.post(
-				"https://web-production-0834.up.railway.app/load_tsv_data",
-				formData,
-				{ headers: { "Content-Type": "multipart/form-data" } }
-			)
+			.post("http://127.0.0.1:5000/load_tsv_data", formData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			})
 			.then((response) => {
 				const newData = response.data;
 				const newRelTaxSet = calcBasicInfo(
@@ -156,13 +154,6 @@ const App = () => {
 					paintingOrder: newPaintingOrder,
 					relTaxSet: newRelTaxSet,
 				});
-				console.log(
-					"unalteredRef, marriedIRef, marriedIIRef, allEqualRef: ",
-					unalteredRef,
-					marriedIRef,
-					marriedIIRef,
-					allEqualRef
-				);
 				unalteredRef.current.checked = false;
 				marriedIRef.current.checked = false;
 				marriedIIRef.current.checked = false;
@@ -177,8 +168,36 @@ const App = () => {
 	};
 
 	const uplFaaHandleChange = () => {
-		console.log("uplFaaHandleChange");
-		console.log("faaRef.current: ", faaRef);
+		const newFile: any = faaRef.current.files[0];
+		const newLastTry: any = newFile.name;
+		setStt({
+			...sttRef.current,
+			faaLastTry: newLastTry,
+			faaLoadStatus: "pending",
+		});
+
+		let formData = new FormData();
+		formData.append("file", newFile);
+		axios
+			.post("http://127.0.0.1:5000/load_faa_data", formData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			})
+			.then((response) => {
+				const newData = response.data.faaObj;
+				console.log("newData: ", newData);
+				setStt({
+					...sttRef.current,
+					faaObj: newData,
+					faaName: sttRef.current.faaLastTry,
+					faaLoadStatus: "check",
+				});
+			})
+			.catch(() => {
+				setStt({
+					...sttRef.current,
+					faaLoadStatus: "close",
+				});
+			});
 	};
 
 	const collHandleChange = () => {
@@ -309,24 +328,12 @@ const App = () => {
 	const handleCopyClick = (target: string, unspecOnly: any) => {
 		const targetTxn = sttRef.current.relTaxSet[target];
 		let geneNames = targetTxn.geneNames;
-		console.log("target: ", target, targetTxn);
-		if (sttRef.current.eValueApplied) {
-			geneNames = targetTxn.goodIndices.map(
-				(ind: number) => targetTxn.geneNames[ind]
-			);
-		}
+
 		if (!unspecOnly) {
 			geneNames = geneNames.concat(
 				targetTxn.children.reduce((acc: string[], child: string) => {
 					const childTxn = sttRef.current.relTaxSet[child];
 					if (childTxn) {
-						if (sttRef.current.eValueApplied) {
-							return acc.concat(
-								childTxn.goodIndices.map(
-									(ind: number) => childTxn.geneNames[ind]
-								)
-							);
-						}
 						return acc.concat(childTxn.geneNames);
 					}
 					return acc.concat([]);
@@ -336,8 +343,53 @@ const App = () => {
 		navigator.clipboard.writeText(geneNames.join(" "));
 	};
 
+	const handleDownloadSeqClick = (target: string, unspecOnly: any) => {
+		const targetTxn = sttRef.current.relTaxSet[target];
+		let fastaHeaders = targetTxn.fastaHeaders;
+		let geneNames = targetTxn.geneNames;
+		let names = targetTxn.names;
+
+		if (!unspecOnly) {
+			fastaHeaders = fastaHeaders.concat(
+				targetTxn.children.reduce((acc: string[], child: string) => {
+					const childTxn = sttRef.current.relTaxSet[child];
+					if (childTxn) {
+						names = names.concat(childTxn.names);
+						geneNames = geneNames.concat(childTxn.geneNames);
+						return acc.concat(childTxn.fastaHeaders);
+					}
+					return acc.concat([]);
+				}, [])
+			);
+		}
+		const faaObj: any = sttRef.current.faaObj;
+
+		let ntSeqs = fastaHeaders.map(
+			(item: string) => faaObj[item] ?? "No sequence found."
+		);
+		let entries: any[] = [];
+		for (let i = 0; i < fastaHeaders.length; i++) {
+			entries = entries.concat([
+				`> ${fastaHeaders[i]} (${geneNames[i]}) ${names[i]}\n${ntSeqs[i]}\n\n`,
+			]);
+		}
+
+		let seqsFile = entries.join("\n");
+		const a = document.createElement("a");
+		const e = new MouseEvent("click");
+
+		a.download = `${unspecOnly ? "unspec" : "all"}_${sttRef.current.tsvName}_${
+			sttRef.current.faaName
+		}_${target}${
+			sttRef.current.eValueApplied ? `_${sttRef.current.eValue}` : ""
+		}.tsv`;
+		a.href = "data:text/tab-separated-values," + encodeURIComponent(seqsFile);
+		a.dispatchEvent(e);
+		console.log("ntSeqs: ", ntSeqs);
+	};
+
 	const tsvRef = useRef({ files: [{ name: "" }] });
-	const faaRef = useRef();
+	const faaRef = useRef({ files: [{ name: "" }] });
 	const eValueRef = useRef({ value: 0 });
 	let unalteredRef = useRef({ checked: false });
 	let marriedIRef = useRef({ checked: false });
@@ -458,6 +510,7 @@ const App = () => {
 				coords={context["coords"]}
 				faaName={stt["faaName"]}
 				handleCopyClick={handleCopyClick}
+				handleDownloadSeqClick={handleDownloadSeqClick}
 				target={context["target"]}
 			/>
 		</div>

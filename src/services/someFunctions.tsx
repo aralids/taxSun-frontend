@@ -31,6 +31,12 @@ const calcBasicInfo = (
 		relTaxSet
 	);
 
+	console.log(
+		"croppedLns, relTaxSet: ",
+		JSON.parse(JSON.stringify(croppedLns)),
+		JSON.parse(JSON.stringify(relTaxSet))
+	);
+
 	const minRankPattern = calcMinRankPattern(croppedLns, rankPatternFull);
 
 	[croppedLns, relTaxSet] = marry(croppedLns, lyr, relTaxSet, view);
@@ -60,14 +66,6 @@ const calcBasicInfo = (
 	relTaxSet = label(cx, cy, layerWidth, lyr, minRankPattern, relTaxSet);
 
 	//calcOptLabel(2, "Gammaproteobacteria", 50);
-
-	/*
-	console.log(
-		"croppedLns, relTaxSet: ",
-		JSON.parse(JSON.stringify(croppedLns)),
-		JSON.parse(JSON.stringify(relTaxSet))
-	);
-    */
 
 	return relTaxSet;
 };
@@ -104,26 +102,6 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 	if (rootTaxa.length === 1) {
 		relTaxSet[lyr] = { ...taxSet[lyr] };
 	} else {
-		let newNames: any = [taxSet[rootTaxa[0] + " " + rootRank]["names"]];
-		for (let i = 1; i < rootTaxa.length; i++) {
-			const newAdd =
-				newNames[newNames.length - 1][
-					newNames[newNames.length - 1].length - 1
-				][1];
-			const n = taxSet[rootTaxa[i] + " " + rootRank]["names"];
-			if (n[0][1] === -1) {
-				if (n.length > 1) {
-					newNames = newNames.concat([
-						n.slice(1).map((item: any[]) => [item[0], item[1] + newAdd + 1]),
-					]);
-				}
-			} else {
-				newNames = newNames.concat([
-					n.map((item: any[]) => [item[0], item[1] + newAdd + 1]),
-				]);
-			}
-		}
-
 		relTaxSet[lyr] = {
 			children: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["children"]),
@@ -143,7 +121,10 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 			),
 			lnIndex: taxSet[rootTaxa[0] + " " + rootRank]["lnIndex"],
 			name: rootTaxa.join(" & "),
-			names: newNames,
+			names: rootTaxa.reduce(
+				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["names"]),
+				[]
+			),
 			rank: rootRank,
 			rawCount: rootTaxa.reduce(
 				(acc, txn) => acc + taxSet[txn + " " + rootRank]["rawCount"],
@@ -221,19 +202,28 @@ const eFilter = (
 			let ln = croppedLns[i];
 			let lastTaxon = ln[ln.length - 1][1] + " " + ln[ln.length - 1][0];
 			let oldUnaCount = relTaxSet[lastTaxon]["unaCount"];
-			let goodIndices: number[] = [];
-			let eVals: number[] = relTaxSet[lastTaxon]["eValues"];
-			let newEValues = eVals.filter((item, index) => {
-				if (item !== null && item <= eValue) {
-					goodIndices = goodIndices.concat([index]);
+			let newGeneNames: any[] = [];
+			let newNames: any[] = [];
+			let newHeaders: any[] = [];
+
+			for (let i = 0; i < relTaxSet[lastTaxon]["eValues"].length; i++) {
+				const ev = relTaxSet[lastTaxon]["eValues"][i];
+				if (ev <= eValue) {
+					newGeneNames = newGeneNames.concat([
+						relTaxSet[lastTaxon]["geneNames"][i],
+					]);
+					newNames = newNames.concat([relTaxSet[lastTaxon]["names"][i]]);
+					newHeaders = newHeaders.concat([
+						relTaxSet[lastTaxon]["fastaHeaders"][i],
+					]);
 				}
-				return item !== null && item <= eValue;
-			});
-			newEValues.concat([]);
+			}
 
-			relTaxSet[lastTaxon]["goodIndices"] = goodIndices;
+			relTaxSet[lastTaxon]["geneNames"] = newGeneNames;
+			relTaxSet[lastTaxon]["names"] = newNames;
+			relTaxSet[lastTaxon]["fastaHeaders"] = newHeaders;
 
-			let newUnaCount = goodIndices.length;
+			let newUnaCount = newGeneNames.length;
 			relTaxSet[lastTaxon]["unaCount"] = newUnaCount;
 
 			let diff = oldUnaCount - newUnaCount;
@@ -308,9 +298,8 @@ const marry = (
 						perc: round(relTaxSet[bachelor]["totCount"] / sumCount, 5),
 						rank: bachelorRank,
 						count: relTaxSet[bachelor]["totCount"],
-						goodIndices: relTaxSet[bachelor]["goodIndices"] ?? [],
 						geneNames: relTaxSet[bachelor]["geneNames"],
-						children: relTaxSet[bachelor]["children"],
+						fastaHeaders: relTaxSet[bachelor]["fastaHeaders"],
 					};
 				} else {
 					bachelorTaxa[bachelor]["indices"] = bachelorTaxa[bachelor][
@@ -423,8 +412,8 @@ const marry = (
 					(acc, member) => acc.concat(member.geneNames),
 					[]
 				);
-				const marriedChildren = groupMembers.reduce(
-					(acc, member) => acc.concat(member.children),
+				const marriedHeaders = groupMembers.reduce(
+					(acc, member) => acc.concat(member.fastaHeaders),
 					[]
 				);
 				const groupNewIndex = groupIndices[0];
@@ -465,7 +454,7 @@ const marry = (
 					totCount: marriedCount,
 					married: true,
 					geneNames: marriedGeneNames,
-					children: marriedChildren,
+					fastaHeaders: marriedHeaders,
 				};
 				newCroppedLns[groupNewIndex] = newCroppedLns[groupNewIndex].concat([
 					[marriedRank, marriedName],

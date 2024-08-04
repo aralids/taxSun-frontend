@@ -12,6 +12,7 @@ const UploadTsv = () => {
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "space-between",
+						maxWidth: "15vw",
 					}}
 				>
 					<input

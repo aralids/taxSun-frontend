@@ -2,10 +2,17 @@ interface Props {
 	coords: any;
 	faaName: String;
 	handleCopyClick: any;
+	handleDownloadSeqClick: any;
 	target: any;
 }
 
-const ContextMenu = ({ coords, faaName, handleCopyClick, target }: Props) => {
+const ContextMenu = ({
+	coords,
+	faaName,
+	handleCopyClick,
+	handleDownloadSeqClick,
+	target,
+}: Props) => {
 	if (coords.length === 0) {
 		return <></>;
 	} else {
@@ -25,18 +32,10 @@ const ContextMenu = ({ coords, faaName, handleCopyClick, target }: Props) => {
 			minHeight: "27.6px",
 		};
 		let newTop;
-		let faaButtons: any = faaName
-			? [
-					<button style={stl}>Copy unspecified sequences</button>,
-					<button style={stl}>Copy all sequences</button>,
-			  ]
-			: [];
 		if (coords[1] <= window.innerHeight / 2) {
 			newTop = coords[1];
-		} else if (faaName) {
-			newTop = coords[1] - 4 * 27.6;
 		} else {
-			newTop = coords[1] - 2 * 27.6;
+			newTop = coords[1] - 4 * 27.6;
 		}
 		return (
 			<div
@@ -52,10 +51,27 @@ const ContextMenu = ({ coords, faaName, handleCopyClick, target }: Props) => {
 				<button style={stl} onClick={() => handleCopyClick(target, true)}>
 					Copy unspecified sequences
 				</button>
-				<button style={stl} onClick={() => handleCopyClick(target, false)}>
+				<button
+					style={stl}
+					onClick={() => handleCopyClick(target, false)}
+					disabled={target.includes("&")}
+				>
 					Copy all sequences
 				</button>
-				{...faaButtons}
+				<button
+					style={stl}
+					disabled={faaName === ""}
+					onClick={() => handleDownloadSeqClick(target, true)}
+				>
+					Download unspecified sequences
+				</button>
+				<button
+					style={stl}
+					disabled={target.includes("&") || faaName === ""}
+					onClick={() => handleDownloadSeqClick(target, false)}
+				>
+					Download all sequences
+				</button>
 			</div>
 		);
 	}
