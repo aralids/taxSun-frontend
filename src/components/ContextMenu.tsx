@@ -1,3 +1,6 @@
+import Button from "react-bootstrap/Button";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
+
 interface Props {
 	coords: any;
 	faaName: String;
@@ -16,30 +19,17 @@ const ContextMenu = ({
 	if (coords.length === 0) {
 		return <></>;
 	} else {
-		const stl = {
-			border: "1px solid grey",
-			borderRadius: "3px",
-			backgroundColor: "#F0F0F0",
-			display: "flex",
-			alignItems: "center",
-			justifyContent: "center",
-			fontFamily: "Arial",
-			fontSize: "1.8vh",
-			padding: "1px 6px 1px 6px",
-			margin: "0",
-			width: "18vw",
-			cursor: "pointer",
-			minHeight: "27.6px",
-		};
 		let newTop;
 		if (coords[1] <= window.innerHeight / 2) {
 			newTop = coords[1];
 		} else {
-			newTop = coords[1] - 4 * 27.6;
+			newTop = coords[1] - 4 * 40;
 		}
 		return (
-			<div
+			<ButtonGroup
+				vertical
 				style={{
+					width: "18vw",
 					position: "fixed",
 					top: newTop,
 					left: coords[0],
@@ -48,31 +38,34 @@ const ContextMenu = ({
 					zIndex: 200,
 				}}
 			>
-				<button style={stl} onClick={() => handleCopyClick(target, true)}>
+				<Button
+					className="border-0 m-0 p-2"
+					onClick={() => handleCopyClick(target, true)}
+				>
 					Copy unspecified sequences
-				</button>
-				<button
-					style={stl}
+				</Button>
+				<Button
+					className="border-0 m-0 p-2"
 					onClick={() => handleCopyClick(target, false)}
 					disabled={target.includes("&")}
 				>
 					Copy all sequences
-				</button>
-				<button
-					style={stl}
+				</Button>
+				<Button
+					className="border-0 m-0 p-2"
 					disabled={faaName === ""}
 					onClick={() => handleDownloadSeqClick(target, true)}
 				>
 					Download unspecified sequences
-				</button>
-				<button
-					style={stl}
+				</Button>
+				<Button
+					className="border-0 m-0 p-2"
 					disabled={target.includes("&") || faaName === ""}
 					onClick={() => handleDownloadSeqClick(target, false)}
 				>
 					Download all sequences
-				</button>
-			</div>
+				</Button>
+			</ButtonGroup>
 		);
 	}
 };
