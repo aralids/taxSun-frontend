@@ -20,14 +20,14 @@ Occasionally, especially if your TSV file contains > 10,000 unique taxIDs, the r
 > [!IMPORTANT]
 > The NCBI taxonomy database gets regularly updated and is unusable for a couple of hours.
 
-For Windows:
-
 1. Download the code from this repository into a folder called "taxSun-frontend"
 2. Download the code from [the backend repository](https://github.com/aralids/taxSun-backend) into a folder called "taxSun-backend"
 
-For Windows: 3. Open a terminal in the "taxSun-backend" folder and run the following commands: `python install requirements.txt`, `set FLASK_APP=main.py`, `python -m flask run`. It might take a few minutes to load the NCBI taxonomy database, after which the backend will be running at http://localhost:8080.
+3. For Windows:
+   Open a terminal in the "taxSun-backend" folder and run the following commands: `python install requirements.txt`, `set FLASK_APP=main.py`, `python -m flask run`. It might take a few minutes to load the NCBI taxonomy database, after which the backend will be running at http://localhost:8080.
 
-For Linux/MacOS: 3. Open a terminal in the "taxSun-backend" folder and run the following commands: `python install -r requirements.txt`, `python -m flask --app main.py run`. It might take a few minutes to load the NCBI taxonomy database, after which the backend will be running at http://localhost:8080.
+For Linux/MacOS:
+Open a terminal in the "taxSun-backend" folder and run the following commands: `python install -r requirements.txt`, `python -m flask --app main.py run`. It might take a few minutes to load the NCBI taxonomy database, after which the backend will be running at http://localhost:8080.
 
 4. Open the file taxSun-frontend/src/App.tsx in a code editor. Change the first line `const baseURL = https://github.com/aralids/taxSun-backend` to `const baseURL = http://localhost:8080`
 5. Open a second terminal in the "taxSun-frontend" folder and run the following commands: `npm install`, `npm run build`, `npm run preview`. The frontend will usually be hosted at http://localhost:5173, or on another port if this one is not available. Open it and use taxSun like you would the deployed version.
