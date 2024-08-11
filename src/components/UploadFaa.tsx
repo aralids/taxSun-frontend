@@ -7,8 +7,6 @@ const UploadFaa = () => {
 	const signature =
 		JSON.stringify(ctx["faaLoadStatus"]) + JSON.stringify(ctx["fastaEnabled"]);
 	return useMemo(() => {
-		const cursor = ctx["fastaEnabled"] ? "pointer" : "default";
-		const fontColor = ctx["fastaEnabled"] ? "black" : "lightgrey";
 		if (ctx["faaLastTry"] === "") {
 			return (
 				<div className="d-flex align-items-center justify-content-center w-100 mt-2">

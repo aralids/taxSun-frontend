@@ -10,7 +10,7 @@ import ContextMenu from "./components/ContextMenu.tsx";
 
 import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
 import {
-	handleMouseMove,
+	//handleMouseMove,
 	getClickCoords,
 } from "./services/helperFunctions.tsx";
 import {

@@ -10,3 +10,27 @@
 a {
 	color: magenta !important;
 }
+
+/*
+
+button {
+	background-color: #aa00aa !important;
+	transition: all ease-in-out 1s !important;
+}
+
+button:hover,
+button:active {
+	background-color: magenta !important;
+}
+
+.form-check-input:checked {
+	background-color: #aa00aa !important;
+	border-color: #aa00aa;
+}
+
+.form-check-input:focus {
+	border: magenta !important;
+	box-shadow: 0 0 0 0.25rem rgba(255, 0, 255, 0.15) !important;
+}
+
+*/

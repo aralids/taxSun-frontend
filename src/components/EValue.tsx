@@ -8,7 +8,6 @@ const EValue = () => {
 	const signature =
 		JSON.stringify(ctx["eValueApplied"]) + JSON.stringify(ctx["eValueEnabled"]);
 	return useMemo(() => {
-		const fontColor = ctx["eValueEnabled"] ? "black" : "lightgrey";
 		return (
 			<Form>
 				<Form.Check
