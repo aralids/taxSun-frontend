@@ -90,7 +90,6 @@ const App = () => {
 	};
 
 	const IDInfoHandleClick = (key: string) => {
-		console.log("IDInfoHandleClick");
 		axios
 			.post("http://127.0.0.1:5000/fetchID", {
 				taxName: key,
@@ -185,7 +184,6 @@ const App = () => {
 			})
 			.then((response) => {
 				const newData = response.data.faaObj;
-				console.log("newData: ", newData);
 				setStt({
 					...sttRef.current,
 					faaObj: newData,
@@ -262,12 +260,10 @@ const App = () => {
 			} else {
 				setStt({ ...sttRef.current, eValue: eValueRef.current.value });
 			}
-			console.log("eValueHandleKeyDown: ", eValueRef.current.value);
 		}
 	};
 
 	const viewHandleChange = () => {
-		console.log("viewHandleChange", unalteredRef.current.checked);
 		let newView: string = "";
 		if (unalteredRef.current.checked) {
 			newView = "unaltered";
@@ -297,8 +293,6 @@ const App = () => {
 	};
 
 	const dldOnClick = () => {
-		console.log("dldOnClick");
-		console.log("plotRef: ", plotRef.current.outerHTML);
 		const pr: any = plotRef.current;
 		let base64doc = new XMLSerializer().serializeToString(pr);
 		base64doc = btoa(base64doc);
@@ -387,7 +381,6 @@ const App = () => {
 		}.tsv`;
 		a.href = "data:text/tab-separated-values," + encodeURIComponent(seqsFile);
 		a.dispatchEvent(e);
-		console.log("ntSeqs: ", ntSeqs);
 	};
 
 	const tsvRef = useRef({ files: [{ name: "" }] });

@@ -8,7 +8,6 @@ import { LeftSectionCtx } from "../App.tsx";
 
 const LayerInfo = () => {
 	const ctx: any = useContext(LeftSectionCtx);
-	const signature = JSON.stringify(ctx["name"]);
 
 	return useMemo(() => {
 		return (
@@ -27,7 +26,7 @@ const LayerInfo = () => {
 				</Card.Body>
 			</Card>
 		);
-	}, [signature]);
+	}, [ctx["name"]]);
 };
 
 export default LayerInfo;

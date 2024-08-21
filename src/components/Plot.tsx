@@ -3,17 +3,6 @@ import { useMemo } from "react";
 import Shape from "./Shape.tsx";
 import Label from "./Label.tsx";
 
-interface Props {
-	ancestors?: any;
-	handleHover?: any;
-	handlePlotRightClick?: any;
-	lyr?: string;
-	relTaxSet?: any;
-	paintingOrder?: any;
-	plotHandleClick?: any;
-	plotRef?: any;
-}
-
 const Plot = ({
 	ancestors,
 	handleHover,
@@ -23,8 +12,7 @@ const Plot = ({
 	paintingOrder,
 	plotHandleClick,
 	plotRef,
-}: Props) => {
-	const signature = JSON.stringify(relTaxSet);
+}: any) => {
 	return useMemo(() => {
 		let groups: any[] = [];
 		for (const key of paintingOrder) {
@@ -131,7 +119,12 @@ const Plot = ({
 				</svg>
 			</>
 		);
-	}, [signature]);
+	}, [
+		lyr,
+		window.innerWidth,
+		window.innerHeight,
+		Object.keys(relTaxSet).length,
+	]);
 };
 
 export default Plot;

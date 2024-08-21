@@ -2,13 +2,7 @@ import { useMemo } from "react";
 
 import { twoVminHeights } from "../services/predefinedObjects.tsx";
 
-interface Props {
-	hovered: string;
-	relTaxSet?: any;
-}
-
-const HoverLabel = ({ hovered, relTaxSet }: Props) => {
-	const signature = hovered;
+const HoverLabel = ({ hovered, relTaxSet }: any) => {
 	return useMemo(() => {
 		if (hovered === "") {
 			return <></>;
@@ -49,7 +43,7 @@ const HoverLabel = ({ hovered, relTaxSet }: Props) => {
 				</p>
 			</div>
 		);
-	}, [signature]);
+	}, [hovered]);
 };
 
 export default HoverLabel;

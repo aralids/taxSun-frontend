@@ -1,14 +1,5 @@
 import { useMemo } from "react";
 
-interface Props {
-	path?: string;
-	color?: string;
-	handleClick?: any;
-	handleMouseOver?: any;
-	handleMouseOut?: any;
-	handlePlotRightClick?: any;
-}
-
 const Shape = ({
 	path,
 	color,
@@ -16,8 +7,7 @@ const Shape = ({
 	handleMouseOver,
 	handleMouseOut,
 	handlePlotRightClick,
-}: Props) => {
-	const signature = path;
+}: any) => {
 	return useMemo(() => {
 		return (
 			<path
@@ -34,7 +24,7 @@ const Shape = ({
 				onMouseLeave={handleMouseOut}
 			></path>
 		);
-	}, [signature]);
+	}, [path]);
 };
 
 export default Shape;

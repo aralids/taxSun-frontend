@@ -53,16 +53,6 @@ function handleMouseMove(event: any): void {
 	console.log("cursorX, cursorY: ", event.pageX, event.pageY);
 }
 
-function hexToRGB(hex: string): string {
-	var aRgbHex: any = hex.match(/.{1,2}/g);
-	var aRgb = [
-		parseInt(aRgbHex[0], 16),
-		parseInt(aRgbHex[1], 16),
-		parseInt(aRgbHex[2], 16),
-	];
-	return `rgb(${aRgb[0]}, ${aRgb[1]}, ${aRgb[2]})`;
-}
-
 function midColor(rgb1: string, rgb2: string, coef: number): string {
 	var coef = coef / 2;
 	var rgb1List: number[] =
@@ -189,45 +179,6 @@ function getLayerWidthInPx(
 	return [Math.max(smallerDimSize / layerNumber, dpmm * 1), cx, cy];
 }
 
-function makeID(length: number) {
-	let result = "";
-	const characters =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	const charactersLength = characters.length;
-	let counter = 0;
-	while (counter < length) {
-		result += characters.charAt(Math.floor(Math.random() * charactersLength));
-		counter += 1;
-	}
-	return result;
-}
-
-function enableEValue(median: number) {
-	document.getElementById("e-input")!.removeAttribute("disabled");
-	document.getElementById("e-label")!.style.color = "black";
-	let eText: any = document.getElementById("e-text")!;
-	eText.removeAttribute("disabled");
-	eText.value = median;
-}
-
-function disableEValue() {
-	document.getElementById("e-input")!.setAttribute("disabled", "disabled");
-	document.getElementById("e-label")!.style.color = "grey";
-	let eText: any = document.getElementById("e-text")!;
-	eText.setAttribute("disabled", "disabled");
-	eText.value = "";
-}
-
-function showContextMenu(e: any) {
-	e.preventDefault();
-	document.getElementById("context-menu")!.style.display = "block";
-	positionContextMenu(e);
-}
-
-function hideContextMenu() {
-	document.getElementById("context-menu")!.style.display = "none";
-}
-
 // Get the position of the right click in window and returns the X and Y coordinates
 function getClickCoords(e: any) {
 	var posx = 0;
@@ -250,87 +201,6 @@ function getClickCoords(e: any) {
 	}
 
 	return { x: posx, y: posy };
-}
-
-// Position the Context Menu in right position.
-function positionContextMenu(e: any) {
-	let menu: any = document.getElementById("context-menu")!;
-	let clickCoords = getClickCoords(e);
-	let clickCoordsX = clickCoords.x;
-	let clickCoordsY = clickCoords.y;
-
-	let menuWidth = menu.offsetWidth;
-	let menuHeight = menu.offsetHeight;
-	let windowWidth = window.innerWidth;
-	let windowHeight = window.innerHeight;
-
-	if (windowWidth - clickCoordsX < menuWidth) {
-		menu.style.left = windowWidth - menuWidth + "px";
-	} else {
-		menu.style.left = clickCoordsX + "px";
-	}
-
-	if (windowHeight - clickCoordsY < menuHeight) {
-		menu.style.top = windowHeight - menuHeight + "px";
-	} else {
-		menu.style.top = clickCoordsY - menuHeight + "px";
-	}
-
-	menu.setAttribute("taxon", e.target["id"]);
-}
-
-function findRealName(index: number, namesArray: any[], name: string) {
-	if (namesArray.length === 0) {
-		return name;
-	}
-	for (let i = namesArray.length - 2; i >= 0; i--) {
-		if (index > namesArray[i][1]) {
-			return namesArray[i + 1][0];
-		}
-	}
-	return namesArray[0][0];
-}
-
-function downloadSVGasTextFile(
-	fileName: string,
-	taxonName: string,
-	layerName: string,
-	modeName: string,
-	collapseName: string
-) {
-	const base64doc = btoa(
-		unescape(encodeURIComponent(document.querySelector("svg")!.outerHTML))
-	);
-	const a = document.createElement("a");
-	const e = new MouseEvent("click");
-
-	a.download = `${fileName}_${taxonName}${layerName}_${modeName}_${collapseName}.svg`;
-	a.href = "data:text/html;base64," + base64doc;
-	a.dispatchEvent(e);
-}
-
-// Returns a set of arrays, where each array contains all elements that will be on the same level in the plot.
-function getLayers(
-	lineagesCopy: string[][],
-	unique: boolean = false
-): string[][] {
-	var longestLineageLength: number = Math.max(
-		...lineagesCopy.map((item) => item.length)
-	); // get the length of the longest lineage, i.e. how many layers the plot will have
-	var layers: string[][] = [];
-	for (let i = 0; i < longestLineageLength; i++) {
-		var layer: string[] = [];
-		for (let j = 0; j < lineagesCopy.length; j++) {
-			layer.push(lineagesCopy[j][i]);
-		}
-		if (unique) {
-			layer = layer.filter(
-				(value, index, self) => Boolean(value) && self.indexOf(value) === index
-			);
-		}
-		layers.push(layer);
-	}
-	return layers;
 }
 
 function calculateArcEndpoints(
@@ -542,28 +412,16 @@ function lineCircleCollision(
 
 export {
 	calcOptLabel,
-	createPalette,
-	radians,
-	round,
-	sin,
-	cos,
-	handleMouseMove,
-	hexToRGB,
-	midColor,
-	tintify,
-	lineIntersect,
-	lineLength,
-	getFourCorners,
-	getLayerWidthInPx,
-	makeID,
-	enableEValue,
-	disableEValue,
-	showContextMenu,
-	hideContextMenu,
-	findRealName,
-	downloadSVGasTextFile,
-	getLayers,
 	calculateArcEndpoints,
+	cos,
+	createPalette,
+	getLayerWidthInPx,
+	lineLength,
+	midColor,
+	round,
 	calcHorizontalSpace,
+	sin,
+	tintify,
 	getClickCoords,
+	handleMouseMove,
 };

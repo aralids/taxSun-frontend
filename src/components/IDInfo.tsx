@@ -5,7 +5,6 @@ import Button from "react-bootstrap/Button";
 
 const IDInfo = () => {
 	const ctx: any = useContext(LeftSectionCtx);
-	const signature = ctx["name"] + ctx["root"] + ctx["id"];
 
 	return useMemo(() => {
 		if (ctx["name"] === "root" || ctx["name"].includes("&")) {
@@ -36,7 +35,7 @@ const IDInfo = () => {
 				</Card.Link>
 			</div>
 		);
-	}, [signature]);
+	}, [ctx["name"], ctx["root"], ctx["id"]]);
 };
 
 export default IDInfo;

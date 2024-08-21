@@ -5,8 +5,6 @@ import { RightSectionCtx } from "../App.tsx";
 
 const EValue = () => {
 	const ctx: any = useContext(RightSectionCtx);
-	const signature =
-		JSON.stringify(ctx["eValueApplied"]) + JSON.stringify(ctx["eValueEnabled"]);
 	return useMemo(() => {
 		return (
 			<Form>
@@ -26,7 +24,7 @@ const EValue = () => {
 				/>
 			</Form>
 		);
-	}, [signature]);
+	}, [ctx["eValueApplied"], ctx["eValueEnabled"]]);
 };
 
 export default EValue;

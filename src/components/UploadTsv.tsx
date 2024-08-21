@@ -4,7 +4,6 @@ import Button from "react-bootstrap/Button";
 
 const UploadTsv = () => {
 	const ctx: any = useContext(RightSectionCtx);
-	const signature = ctx["tsvLoadStatus"];
 	return useMemo(() => {
 		if (ctx["tsvLastTry"] === "") {
 			return (
@@ -75,7 +74,7 @@ const UploadTsv = () => {
 				</div>
 			);
 		}
-	}, [signature]);
+	}, [ctx["tsvLoadStatus"]]);
 };
 
 export default UploadTsv;

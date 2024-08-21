@@ -5,7 +5,6 @@ import Form from "react-bootstrap/Form";
 
 const Collapse = () => {
 	const ctx: any = useContext(RightSectionCtx);
-	const signature = JSON.stringify(ctx["coll"]);
 	return useMemo(() => {
 		return (
 			<Form>
@@ -18,7 +17,7 @@ const Collapse = () => {
 				/>
 			</Form>
 		);
-	}, [signature]);
+	}, [ctx["coll"]]);
 };
 
 export default Collapse;

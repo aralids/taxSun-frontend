@@ -5,7 +5,6 @@ import Card from "react-bootstrap/Card";
 
 const HoverInfo = () => {
 	const ctx: any = useContext(LeftSectionCtx);
-	const signature = JSON.stringify(ctx["hovered"]);
 	return useMemo(() => {
 		if (!ctx["hovered"]) {
 			return <></>;
@@ -32,7 +31,7 @@ const HoverInfo = () => {
 				</Card.Body>
 			</Card>
 		);
-	}, [signature]);
+	}, [ctx["hovered"]]);
 };
 
 export default HoverInfo;

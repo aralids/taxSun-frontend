@@ -4,8 +4,6 @@ import Button from "react-bootstrap/Button";
 
 const UploadFaa = () => {
 	const ctx: any = useContext(RightSectionCtx);
-	const signature =
-		JSON.stringify(ctx["faaLoadStatus"]) + JSON.stringify(ctx["fastaEnabled"]);
 	return useMemo(() => {
 		if (ctx["faaLastTry"] === "") {
 			return (
@@ -77,7 +75,7 @@ const UploadFaa = () => {
 				</div>
 			);
 		}
-	}, [signature]);
+	}, [ctx["faaLoadStatus"], ctx["fastaEnabled"]]);
 };
 
 export default UploadFaa;
