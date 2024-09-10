@@ -31,8 +31,8 @@ const Label = ({
 				y={y}
 				onClick={handleClick}
 				onContextMenu={handlePlotRightClick}
-				onMouseEnter={handleMouseOver}
-				onMouseLeave={handleMouseOut}
+				onMouseOver={handleMouseOver}
+				onMouseOut={handleMouseOut}
 			>
 				{content}
 			</text>

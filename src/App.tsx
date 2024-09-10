@@ -129,6 +129,8 @@ const App = () => {
 			})
 			.then((response) => {
 				const newData = response.data;
+				console.log("newData: ", response.data);
+				console.log("newData.taxSet: ", newData.taxSet);
 				const newRelTaxSet = calcBasicInfo(
 					false,
 					sttRef.current.eValue,
@@ -159,7 +161,8 @@ const App = () => {
 				marriedIIRef.current.checked = false;
 				allEqualRef.current.checked = true;
 			})
-			.catch(() => {
+			.catch((error) => {
+				console.log("error: ", error);
 				setStt({
 					...sttRef.current,
 					tsvLoadStatus: "close",
@@ -434,7 +437,7 @@ const App = () => {
 
 	const tmpFetchedIds: any = stt["fetchedIDs"];
 
-	if (Object.keys(stt["relTaxSet"]).length === 0) {
+	if (Object.keys(sttRef.current["relTaxSet"]).length === 0) {
 		return null;
 	}
 
@@ -499,6 +502,7 @@ const App = () => {
 				paintingOrder={stt["paintingOrder"]}
 				plotHandleClick={plotHandleClick}
 				plotRef={plotRef}
+				view={stt["view"]}
 			/>
 			<HoverLabel hovered={hovered} relTaxSet={stt["relTaxSet"]} />
 			<ContextMenu

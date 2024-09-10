@@ -17,7 +17,7 @@ const LayerInfo = () => {
 				text={"black"}
 				style={{ width: "18vw" }}
 			>
-				<Card.Header>Current layer:</Card.Header>
+				<Card.Header>Current root:</Card.Header>
 				<Card.Body>
 					<Card.Title>{ctx["name"]}</Card.Title>
 					<BasicLayerInfo />

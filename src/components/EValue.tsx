@@ -17,6 +17,7 @@ const EValue = () => {
 					disabled={!ctx["eValueEnabled"]}
 				/>
 				<Form.Control
+					id={"eValue"}
 					defaultValue={1.9e-28}
 					onKeyDown={ctx["eValueHandleKeyDown"]}
 					ref={ctx["eValueRef"]}

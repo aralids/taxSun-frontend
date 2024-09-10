@@ -12,6 +12,7 @@ const Plot = ({
 	paintingOrder,
 	plotHandleClick,
 	plotRef,
+	view,
 }: any) => {
 	return useMemo(() => {
 		let groups: any[] = [];
@@ -26,7 +27,7 @@ const Plot = ({
 						path={relTaxSet[key]["path"]}
 						color={
 							relTaxSet[key]["married"]
-								? "url(#marriage-pattern)"
+								? "url(#marriage-pattern-1)"
 								: relTaxSet[key]["color"]
 						}
 						handleClick={hc}
@@ -114,6 +115,57 @@ const Plot = ({
 								</g>
 							</svg>
 						</pattern>
+						<pattern
+							id="marriage-pattern-1"
+							x="0"
+							y="0"
+							width="40"
+							height="40"
+							patternUnits="userSpaceOnUse"
+						>
+							<svg
+								id="patternId"
+								width="100%"
+								height="100%"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<defs>
+									<pattern
+										id="a"
+										patternUnits="userSpaceOnUse"
+										width="40"
+										height="40"
+										patternTransform="scale(0.5) rotate(0)"
+									>
+										<rect
+											x="0"
+											y="0"
+											width="100%"
+											height="100%"
+											fill="hsla(0,0%,100%,1)"
+										/>
+										<path
+											d="M0 10v20m40-20v20M10 40h20M10 0h20m10 50c-5.523 0-10-4.477-10-10s4.477-10 10-10 10 4.477 10 10-4.477 10-10 10zM10 40c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10 10 4.477 10 10m30-30c-5.523 0-10-4.477-10-10s4.477-10 10-10S50-5.523 50 0s-4.477 10-10 10zM10 0c0 5.523-4.477 10-10 10S-10 5.523-10 0s4.477-10 10-10S10-5.523 10 0"
+											strokeWidth="1"
+											stroke="hsla(300, 100%, 25%, 1)"
+											fill="none"
+										/>
+										<path
+											d="M20-10v20m0 20v20m-30-30h20m20 0h20m-20 0c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10 10 4.477 10 10"
+											strokeWidth="1"
+											stroke="hsla(300, 100%, 25%, 1)"
+											fill="none"
+										/>
+									</pattern>
+								</defs>
+								<rect
+									width="800%"
+									height="800%"
+									transform="translate(0,0)"
+									fill="url(#a)"
+								/>
+							</svg>
+						</pattern>
 					</defs>
 					{...groups}
 				</svg>
@@ -121,6 +173,7 @@ const Plot = ({
 		);
 	}, [
 		lyr,
+		view,
 		window.innerWidth,
 		window.innerHeight,
 		Object.keys(relTaxSet).length,

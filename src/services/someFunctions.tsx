@@ -10,6 +10,7 @@ import {
 	calcHorizontalSpace,
 	sin,
 	tintify,
+	binarySearch,
 } from "./helperFunctions";
 import { rankPatternFull, twoVminHeights } from "./predefinedObjects";
 
@@ -76,6 +77,7 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 	// Get croppedLns.
 	const rootTaxa = lyr.split(" ").slice(0, -1).join(" ").split(" & ");
 	const rootRank = lyr.split(" ").slice(-1)[0];
+	console.log("crop taxSet: ", taxSet);
 	const lyrIndices = rootTaxa.map(
 		(item) => taxSet[item + " " + rootRank]["lnIndex"]
 	);
@@ -107,6 +109,11 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 		relTaxSet[lyr] = {
 			children: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["children"]),
+				[]
+			),
+			directChildren: rootTaxa.reduce(
+				(acc, txn) =>
+					acc.concat(taxSet[txn + " " + rootRank]["directChildren"]),
 				[]
 			),
 			eValues: rootTaxa.reduce(
@@ -158,38 +165,24 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 };
 
 const collapse = (collapse: Boolean, croppedLns: string[][][], taxSet: any) => {
-	let relTaxSet = {};
-	let collapseSurvivors: any = {};
-	let collapsePerishers: any = {};
-	let collapseDel: any = {};
+	let relTaxSet: any = {};
 	for (let i = 0; i < croppedLns.length; i++) {
-		for (let j = 0; j < croppedLns[i].length; j++) {
-			const name = croppedLns[i][j][1] + " " + croppedLns[i][j][0];
-			if (j === 0 || j === croppedLns[i].length - 1) {
-				collapseSurvivors[name] = { ...taxSet[name] };
-			} else if (name in collapsePerishers) {
-				collapseSurvivors[name] = { ...taxSet[name] };
-				delete collapseDel[name];
-				delete collapsePerishers[name];
-			} else if (!(name in collapseSurvivors)) {
-				collapsePerishers[name] = { ...taxSet[name] };
-				collapseDel[name] = [i, j];
+		for (let j = croppedLns[i].length - 1; j >= 0; j--) {
+			const taxon = croppedLns[i][j][1] + " " + croppedLns[i][j][0];
+
+			console.log("taxon: ", taxon, taxSet[taxon]);
+			if (
+				collapse &&
+				taxSet[taxon].unaCount === 0 &&
+				taxSet[taxon].directChildren.length === 1
+			) {
+				croppedLns[i].splice(j, 1);
+			} else {
+				relTaxSet[taxon] = { ...taxSet[taxon] };
 			}
 		}
 	}
-
-	if (collapse) {
-		relTaxSet = { ...collapseSurvivors };
-		for (const key of Object.keys(collapseDel)) {
-			croppedLns[collapseDel[key][0]][collapseDel[key][1]] = [""];
-		}
-		for (let i = 0; i < croppedLns.length; i++) {
-			croppedLns[i] = croppedLns[i].filter((item) => item[0] !== "");
-		}
-	} else {
-		relTaxSet = { ...collapseSurvivors, ...collapsePerishers };
-	}
-
+	console.log("relTaxSet: ", relTaxSet);
 	return [croppedLns, relTaxSet];
 };
 
@@ -204,10 +197,18 @@ const eFilter = (
 			let ln = croppedLns[i];
 			let lastTaxon = ln[ln.length - 1][1] + " " + ln[ln.length - 1][0];
 			let oldUnaCount = relTaxSet[lastTaxon]["unaCount"];
-			let newGeneNames: any[] = [];
-			let newNames: any[] = [];
-			let newHeaders: any[] = [];
 
+			const cutOffIndex = binarySearch(relTaxSet[lastTaxon]["eValues"], eValue);
+			relTaxSet[lastTaxon]["eValues"] =
+				relTaxSet[lastTaxon]["eValues"].slice(cutOffIndex);
+			relTaxSet[lastTaxon]["geneNames"] =
+				relTaxSet[lastTaxon]["geneNames"].slice(cutOffIndex);
+			relTaxSet[lastTaxon]["names"] =
+				relTaxSet[lastTaxon]["names"].slice(cutOffIndex);
+			relTaxSet[lastTaxon]["fastaHeaders"] =
+				relTaxSet[lastTaxon]["fastaHeaders"].slice(cutOffIndex);
+
+			/*
 			for (let i = 0; i < relTaxSet[lastTaxon]["eValues"].length; i++) {
 				const ev = relTaxSet[lastTaxon]["eValues"][i];
 				if (ev <= eValue) {
@@ -224,8 +225,9 @@ const eFilter = (
 			relTaxSet[lastTaxon]["geneNames"] = newGeneNames;
 			relTaxSet[lastTaxon]["names"] = newNames;
 			relTaxSet[lastTaxon]["fastaHeaders"] = newHeaders;
+            */
 
-			let newUnaCount = newGeneNames.length;
+			let newUnaCount = relTaxSet[lastTaxon]["eValues"].length;
 			relTaxSet[lastTaxon]["unaCount"] = newUnaCount;
 
 			let diff = oldUnaCount - newUnaCount;
@@ -673,7 +675,7 @@ const calcSVGPaths = (
 };
 
 const color = (croppedLns: string[][][], lyr: string, relTaxSet: any) => {
-	const palette = createPalette(8);
+	const palette = createPalette(18, 100);
 	let colors: any = {};
 	let hueColored: string[] = [];
 	let colorIndex = 0;
