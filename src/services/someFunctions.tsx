@@ -170,7 +170,6 @@ const collapse = (collapse: Boolean, croppedLns: string[][][], taxSet: any) => {
 		for (let j = croppedLns[i].length - 1; j >= 0; j--) {
 			const taxon = croppedLns[i][j][1] + " " + croppedLns[i][j][0];
 
-			console.log("taxon: ", taxon, taxSet[taxon]);
 			if (
 				collapse &&
 				taxSet[taxon].unaCount === 0 &&
@@ -182,7 +181,6 @@ const collapse = (collapse: Boolean, croppedLns: string[][][], taxSet: any) => {
 			}
 		}
 	}
-	console.log("relTaxSet: ", relTaxSet);
 	return [croppedLns, relTaxSet];
 };
 
@@ -944,7 +942,6 @@ const getAncestors = (
 			}
 		}
 	}
-	console.log("ancestors:", ancestors);
 	return ancestors;
 };
 

@@ -91,7 +91,7 @@ const App = () => {
 
 	const IDInfoHandleClick = (key: string) => {
 		axios
-			.post("http://127.0.0.1:5000/fetchID", {
+			.post("web-production-0834.up.railway.app/fetchID", {
 				taxName: key,
 			})
 			.then((response) => {
@@ -124,7 +124,7 @@ const App = () => {
 		let formData = new FormData();
 		formData.append("file", newFile);
 		axios
-			.post("http://127.0.0.1:5000/load_tsv_data", formData, {
+			.post("web-production-0834.up.railway.app/load_tsv_data", formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			})
 			.then((response) => {
@@ -182,7 +182,7 @@ const App = () => {
 		let formData = new FormData();
 		formData.append("file", newFile);
 		axios
-			.post("http://127.0.0.1:5000/load_faa_data", formData, {
+			.post("web-production-0834.up.railway.app/load_faa_data", formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			})
 			.then((response) => {
