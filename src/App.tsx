@@ -125,7 +125,7 @@ const App = () => {
 		formData.append("file", newFile);
 		axios
 			.post(
-				"https://web-production-0834.up.railway.app/load_tsv_file",
+				"https://web-production-0834.up.railway.app/load_tsv_data",
 				formData,
 				{
 					headers: { "Content-Type": "multipart/form-data" },
