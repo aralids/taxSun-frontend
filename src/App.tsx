@@ -7,6 +7,7 @@ import RightSection from "./components/RightSection.tsx";
 import Plot from "./components/Plot.tsx";
 import HoverLabel from "./components/HoveredLabel.tsx";
 import ContextMenu from "./components/ContextMenu.tsx";
+import ErrorMessage from "./components/ErrorMessage.tsx";
 
 import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
 import {
@@ -61,6 +62,7 @@ const App = () => {
 	});
 	const sttRef = useRef(stt);
 	sttRef.current = stt;
+	const [errorMessageDisplay, setErrorMessageDisplay] = useState(false);
 
 	const plotHandleClick = (key: string) => {
 		const newRelTaxSet = calcBasicInfo(
@@ -171,6 +173,7 @@ const App = () => {
 					...sttRef.current,
 					tsvLoadStatus: "close",
 				});
+				setErrorMessageDisplay(true);
 			});
 	};
 
@@ -519,6 +522,10 @@ const App = () => {
 				handleCopyClick={handleCopyClick}
 				handleDownloadSeqClick={handleDownloadSeqClick}
 				target={context["target"]}
+			/>
+			<ErrorMessage
+				display={errorMessageDisplay}
+				setDisplay={setErrorMessageDisplay}
 			/>
 		</div>
 	);

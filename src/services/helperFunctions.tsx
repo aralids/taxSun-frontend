@@ -1,6 +1,6 @@
 import { calibri1px } from "./predefinedObjects";
 
-function createPalette(colorOffset: number = 7, n: number): string[] {
+function createPalette(colorOffset: any, n: number): string[] {
 	let newColors: string[] = [];
 	for (let i = 0; i < n; i++) {
 		var r = Math.sin(0.3 * colorOffset + 4) * 55 + 200;

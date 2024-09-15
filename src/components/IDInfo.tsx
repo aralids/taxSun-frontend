@@ -26,7 +26,7 @@ const IDInfo = () => {
 			<div className="p-0 m-0 pt-2 d-flex">
 				<Card.Text className="p-0 m-0 pt-2 pb-2">NCBI ID: </Card.Text>
 				<Card.Link
-					className="p-0 m-0 pt-2 pb-2 ms-2"
+					className="p-0 m-0 pt-2 pb-2 ms-2 taxid-link"
 					target="_blank"
 					href={`https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&id=${ctx["id"]}&lvl=3&lin=f&keep=1&srchmode=1&unlock`}
 				>

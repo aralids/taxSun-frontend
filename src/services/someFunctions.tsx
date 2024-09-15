@@ -64,7 +64,7 @@ const calcBasicInfo = (
 
 	relTaxSet = calcSVGPaths(cx, cy, layerWidth, relTaxSet);
 
-	relTaxSet = color(croppedLns, lyr, relTaxSet);
+	relTaxSet = color(croppedLns, lns, lyr, relTaxSet, taxSet);
 
 	relTaxSet = label(cx, cy, layerWidth, lyr, minRankPattern, relTaxSet);
 
@@ -77,7 +77,6 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 	// Get croppedLns.
 	const rootTaxa = lyr.split(" ").slice(0, -1).join(" ").split(" & ");
 	const rootRank = lyr.split(" ").slice(-1)[0];
-	console.log("crop taxSet: ", taxSet);
 	const lyrIndices = rootTaxa.map(
 		(item) => taxSet[item + " " + rootRank]["lnIndex"]
 	);
@@ -109,11 +108,6 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 		relTaxSet[lyr] = {
 			children: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["children"]),
-				[]
-			),
-			directChildren: rootTaxa.reduce(
-				(acc, txn) =>
-					acc.concat(taxSet[txn + " " + rootRank]["directChildren"]),
 				[]
 			),
 			eValues: rootTaxa.reduce(
@@ -580,7 +574,7 @@ const calcSVGPaths = (
 		const endDeg = degArr[degArr.length - 1];
 		const innRad = round(layerArr[0] * layerWidth);
 
-		// If calculating root taxon shape - circle.
+		// If calculating central taxon shape - circle.
 		if (layerArr[0] === 0) {
 			SVGPath = `M ${cx}, ${cy} m -${layerWidth}, 0 a ${layerWidth},${layerWidth} 0 1,0 ${
 				layerWidth * 2
@@ -672,8 +666,39 @@ const calcSVGPaths = (
 	return relTaxSet;
 };
 
-const color = (croppedLns: string[][][], lyr: string, relTaxSet: any) => {
-	const palette = createPalette(18, 100);
+const color = (
+	croppedLns: string[][][],
+	lns: string[][][],
+	lyr: string,
+	relTaxSet: any,
+	taxSet: any
+) => {
+	const lnsLstTxn =
+		lns.length >= 1
+			? lns[lns.length - 1][lns[lns.length - 1].length - 1][1] +
+			  " " +
+			  lns[lns.length - 1][lns[lns.length - 1].length - 1][0]
+			: "";
+	const lns2ndLstTxn =
+		lns.length >= 2
+			? lns[lns.length - 2][lns[lns.length - 2].length - 1][1] +
+			  " " +
+			  lns[lns.length - 2][lns[lns.length - 2].length - 1][0]
+			: "";
+	const lns3rdLstTxn =
+		lns.length >= 3
+			? lns[lns.length - 3][lns[lns.length - 3].length - 1][1] +
+			  " " +
+			  lns[lns.length - 3][lns[lns.length - 3].length - 1][0]
+			: "";
+	const offset =
+		(Number(taxSet[lnsLstTxn].taxID) +
+			Number(taxSet[lns2ndLstTxn].taxID) +
+			Number(taxSet[lns3rdLstTxn].taxID) +
+			12) %
+		22;
+	//console.log(offset);
+	const palette = createPalette(offset, 100);
 	let colors: any = {};
 	let hueColored: string[] = [];
 	let colorIndex = 0;
@@ -942,6 +967,7 @@ const getAncestors = (
 			}
 		}
 	}
+	console.log("ancestors:", ancestors);
 	return ancestors;
 };
 
