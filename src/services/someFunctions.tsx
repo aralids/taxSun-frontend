@@ -694,11 +694,11 @@ const color = (
 	const offset =
 		(Number(taxSet[lnsLstTxn].taxID) +
 			Number(taxSet[lns2ndLstTxn].taxID) +
-			Number(taxSet[lns3rdLstTxn].taxID) +
+			Number(taxSet[lns3rdLstTxn].taxID) * 2 +
 			12) %
 		22;
-	//console.log(offset);
-	const palette = createPalette(offset, 100);
+	console.log(offset);
+	const palette = createPalette(17, 100);
 	let colors: any = {};
 	let hueColored: string[] = [];
 	let colorIndex = 0;

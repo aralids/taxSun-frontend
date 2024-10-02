@@ -8,7 +8,10 @@ function ErrorMessage({ display, setDisplay }: any) {
 				<Modal.Header closeButton>
 					<Modal.Title>Error</Modal.Title>
 				</Modal.Header>
-				<Modal.Body>Woohoo, you are reading this text in a modal!</Modal.Body>
+				<Modal.Body>
+					Line 6 of artificial1.tsv contains an unvalid taxon ID. <br />
+					Please inspect your file and try again!
+				</Modal.Body>
 				<Modal.Footer>
 					<Button
 						variant="secondary"

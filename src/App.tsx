@@ -126,17 +126,13 @@ const App = () => {
 		let formData = new FormData();
 		formData.append("file", newFile);
 		axios
-			.post(
-				"https://web-production-0834.up.railway.app/load_tsv_data",
-				formData,
-				{
-					headers: { "Content-Type": "multipart/form-data" },
-				}
-			)
+			.post("http://127.0.0.1:5000/load_tsv_data", formData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			})
 			.then((response) => {
 				const newData = response.data;
 				console.log("newData: ", response.data);
-				console.log("newData.taxSet: ", newData.taxSet);
+				console.log("newData.taxSet: ", JSON.stringify(newData.taxSet));
 				const newRelTaxSet = calcBasicInfo(
 					false,
 					sttRef.current.eValue,
