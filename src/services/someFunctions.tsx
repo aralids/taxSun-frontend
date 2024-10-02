@@ -698,7 +698,7 @@ const color = (
 			12) %
 		22;
 	console.log(offset);
-	const palette = createPalette(17, 100);
+	const palette = createPalette(19, 100);
 	let colors: any = {};
 	let hueColored: string[] = [];
 	let colorIndex = 0;
