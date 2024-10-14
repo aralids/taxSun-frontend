@@ -9,7 +9,8 @@ function ErrorMessage({ display, setDisplay }: any) {
 					<Modal.Title>Error</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					Line 6 of artificial1.tsv contains an unvalid taxon ID. <br />
+					Something seems to be wrong with the file you are trying to upload.{" "}
+					<br />
 					Please inspect your file and try again!
 				</Modal.Body>
 				<Modal.Footer>

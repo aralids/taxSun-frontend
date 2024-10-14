@@ -110,6 +110,11 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["children"]),
 				[]
 			),
+			directChildren: rootTaxa.reduce(
+				(acc, txn) =>
+					acc.concat(taxSet[txn + " " + rootRank]["directChildren"]),
+				[]
+			),
 			eValues: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["eValues"]),
 				[]
@@ -698,7 +703,7 @@ const color = (
 			12) %
 		22;
 	console.log(offset);
-	const palette = createPalette(19, 100);
+	const palette = createPalette(offset, 100);
 	let colors: any = {};
 	let hueColored: string[] = [];
 	let colorIndex = 0;
