@@ -345,7 +345,7 @@ const App = () => {
 				}, [])
 			);
 		}
-		navigator.clipboard.writeText(geneNames.join(" "));
+		navigator.clipboard.writeText(geneNames.join(" \n"));
 	};
 
 	const handleDownloadSeqClick = (target: string, unspecOnly: any) => {

@@ -36,14 +36,14 @@ const ContextMenu = ({
 						className="border-0 m-0 p-2"
 						onClick={() => handleCopyClick(target, true)}
 					>
-						Copy unspecified sequences
+						Copy unspecified sequence IDs
 					</Button>
 					<Button
 						className="border-0 m-0 p-2"
 						onClick={() => handleCopyClick(target, false)}
 						disabled={target.includes("&")}
 					>
-						Copy all sequences
+						Copy all sequence IDs
 					</Button>
 					<Button
 						className="border-0 m-0 p-2"
