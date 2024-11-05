@@ -26,7 +26,10 @@ const HoverInfo = () => {
 						Total count: <b>{ctx["hovered"]["totCount"]}</b>
 					</Card.Text>
 					<Card.Text className="m-0">
-						Unassigned count: <b>{ctx["hovered"]["unaCount"]}</b>
+						Unspec. count: <b>{ctx["hovered"]["unaCount"]}</b>
+					</Card.Text>
+					<Card.Text className="m-0">
+						Raw count: <b>{ctx["hovered"]["rawCount"]}</b>
 					</Card.Text>
 				</Card.Body>
 			</Card>
