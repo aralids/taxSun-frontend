@@ -16,6 +16,10 @@ const Plot = ({
 }: any) => {
 	return useMemo(() => {
 		let groups: any[] = [];
+		let twoVmin =
+			window.innerWidth <= window.innerHeight
+				? window.innerWidth / 50
+				: window.innerHeight / 50;
 		for (const key of paintingOrder) {
 			const hc =
 				key === lyr && ancestors.length > 0
@@ -47,8 +51,8 @@ const Plot = ({
 								? ""
 								: relTaxSet[key]["lblObj"]["abbrContent"]
 						}
-						fontSize="2vmin"
-						lineHeight="2vmin"
+						fontSize={twoVmin}
+						lineHeight={twoVmin}
 						transform={relTaxSet[key]["lblObj"]["transform"]}
 						x={relTaxSet[key]["lblObj"]["abbrX"]}
 						y={relTaxSet[key]["lblObj"]["y"]}
