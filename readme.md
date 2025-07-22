@@ -26,16 +26,15 @@ Occasionally, especially if your TSV file contains > 10,000 unique taxIDs, the r
 3. For Windows:
    Open a terminal in the backend folder and run the following commands:
    - `python -m venv venv` (to create a virtual environment)
-   - `venv\Scripts\activate` (to start the virtual environment)
+   - `source venv/bin/activate` for Linux/MacOS or `venv\Scripts\activate` for Windows (to start the virtual environment)
    - `python -m pip install -r requirements.txt` (to install all dependencies within the environment)
    - `python -m uvicorn main:app` (to run the backend)
-   It might take a few minutes to load the NCBI taxonomy database, after which the backend will be running at http://localhost:8080.
-
-   For Linux/MacOS:
-   Open a terminal in the "taxSun-backend" folder and run the following commands: `python install -r requirements.txt`, `python -m flask --app main.py run`. It might take a few minutes to load the NCBI taxonomy database, after which the backend will be running at http://localhost:8080.
+   
+   It might take a few minutes to load the NCBI taxonomy database, after which the backend will be running at http://localhost:8000.
 
 4. Open a second terminal in the frontend folder and run the following commands:
    - `npm install`
    - `npm run build`
    - `npm run preview`
-   The frontend will usually be hosted at http://localhost:5173, or on another port if this one is not available. Open it and use taxSun like you would the deployed version.
+     
+   The frontend will usually be hosted at http://localhost:4173, or on another port if this one is not available. Open it and use taxSun like you would the deployed version.
