@@ -1,15 +1,5 @@
 # taxSun Metagenomic Visualization
 
-The app is available at [https://taxsun-frontend-production.up.railway.app/](https://taxsun-frontend-production.up.railway.app/).
-
-## 📃 Starter Guide
-
-- [How to use](#how-to-use)
-- [How to download and run locally](#how-to-download-and-run-locally)
-- [How to embed into your project](#how-to-embed-into-your-project)
-
-## How to use
-
 ## How to download and run locally
 
 Occasionally, especially if your TSV file contains > 10,000 unique taxIDs, the remote backend might give up on it and fail to load your data. In this case, you can run the program locally and avoid a time-out. Please note that the processing of your file might still need a couple of minutes depending on how diverse your metagenome is.
