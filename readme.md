@@ -23,8 +23,7 @@ Occasionally, especially if your TSV file contains > 10,000 unique taxIDs, the r
 1. Download and unzip the code from this repository into a new folder (referred to as "frontend folder" from now on)
 2. Download and unzip the code from [the backend repository](https://github.com/aralids/taxSun-fastAPI-backend) into another folder (referred to as "backend folder" from now on)
 
-3. For Windows:
-   Open a terminal in the backend folder and run the following commands:
+3. Open a terminal in the backend folder and run the following commands:
    - `python -m venv venv` (to create a virtual environment)
    - `source venv/bin/activate` for Linux/MacOS or `venv\Scripts\activate` for Windows (to start the virtual environment)
    - `python -m pip install -r requirements.txt` (to install all dependencies within the environment)
