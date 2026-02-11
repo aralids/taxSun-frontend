@@ -12,6 +12,7 @@ import { LeftSectionCtx } from "./contexts/LeftSectionCtx";
 import { buildLeftSectionCtxValue } from "./contexts/buildLeftSectionCtxValue";
 import { RightSectionCtx } from "./contexts/RightSectionCtx";
 import { buildRightSectionCtxValue } from "./contexts/buildRightSectionCtxValue";
+import { downloadPlotSvg, downloadSequencesAsTsv } from "./utils/downloads";
 
 import {
 	uploadTsv,
@@ -331,21 +332,15 @@ const App = () => {
 	};
 
 	const dldOnClick = () => {
-		const pr: any = plotRef.current;
-		let base64doc = new XMLSerializer().serializeToString(pr);
-		base64doc = btoa(base64doc);
-		const a = document.createElement("a");
-		const e = new MouseEvent("click");
-
-		const tsvNameAbbr = stt.tsvName.slice(0, 10);
-		const lyrAbbr = stt.lyr.slice(0, 10);
-		const collAbbr = `collapse-${stt.collapse}`;
-		const eValAbbr = `eValue-${stt.collapse ? stt.eValue : "false"}`;
-		const viewAbbr = stt.view;
-		const svgFileName = `${tsvNameAbbr}_${lyrAbbr}_${collAbbr}_${eValAbbr}_${viewAbbr}.svg`;
-		a.download = svgFileName;
-		a.href = "data:text/html;base64," + base64doc;
-		a.dispatchEvent(e);
+		if (!plotRef.current) return;
+		downloadPlotSvg(plotRef.current as any, {
+			tsvName: stt.tsvName,
+			lyr: stt.lyr,
+			collapse: stt.collapse,
+			eValueApplied: stt.eValueApplied,
+			eValue: stt.eValue,
+			view: stt.view,
+		});
 	};
 
 	const handlePlotRightClick = (
@@ -376,45 +371,7 @@ const App = () => {
 	};
 
 	const handleDownloadSeqClick = (target: string, unspecOnly: any) => {
-		const targetTxn = stt.relTaxSet[target];
-		let fastaHeaders = targetTxn.fastaHeaders;
-		let geneNames = targetTxn.geneNames;
-		let names = targetTxn.names;
-
-		if (!unspecOnly) {
-			fastaHeaders = fastaHeaders.concat(
-				targetTxn.children.reduce((acc: string[], child: string) => {
-					const childTxn = stt.relTaxSet[child];
-					if (childTxn) {
-						names = names.concat(childTxn.names);
-						geneNames = geneNames.concat(childTxn.geneNames);
-						return acc.concat(childTxn.fastaHeaders);
-					}
-					return acc.concat([]);
-				}, []),
-			);
-		}
-		const faaObj: any = stt.faaObj;
-
-		let ntSeqs = fastaHeaders.map(
-			(item: string) => faaObj[item] ?? "No sequence found.",
-		);
-		let entries: any[] = [];
-		for (let i = 0; i < fastaHeaders.length; i++) {
-			entries = entries.concat([
-				`> ${fastaHeaders[i]} (${geneNames[i]}) ${names[i]}\n${ntSeqs[i]}\n\n`,
-			]);
-		}
-
-		let seqsFile = entries.join("\n");
-		const a = document.createElement("a");
-		const e = new MouseEvent("click");
-
-		a.download = `${unspecOnly ? "unspec" : "all"}_${stt.tsvName}_${
-			stt.faaName
-		}_${target}${stt.eValueApplied ? `_${stt.eValue}` : ""}.tsv`;
-		a.href = "data:text/tab-separated-values," + encodeURIComponent(seqsFile);
-		a.dispatchEvent(e);
+		downloadSequencesAsTsv(target, !!unspecOnly, stt);
 	};
 
 	const tsvRef = useRef({ files: [{ name: "" }] });
