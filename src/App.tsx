@@ -1,8 +1,4 @@
-// let baseURL = "https://taxsun-fastapi-backend-production.up.railway.app";
-let baseURL = "http://127.0.0.1:8000";
-
 import { useEffect, useRef, useState } from "react";
-import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import LeftSection from "./components/LeftSection.tsx";
@@ -16,6 +12,12 @@ import { LeftSectionCtx } from "./contexts/LeftSectionCtx";
 import { buildLeftSectionCtxValue } from "./contexts/buildLeftSectionCtxValue";
 import { RightSectionCtx } from "./contexts/RightSectionCtx";
 import { buildRightSectionCtxValue } from "./contexts/buildRightSectionCtxValue";
+
+import {
+	uploadTsv,
+	uploadFaa,
+	fetchTaxIdByName,
+} from "./services/taxSunApi.tsx";
 
 import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
 import {
@@ -96,118 +98,113 @@ const App = () => {
 		});
 	};
 
-	const IDInfoHandleClick = (key: string) => {
-		axios
-			.post(`${baseURL}/fetchID`, {
-				taxName: key,
-			})
-			.then((response) => {
-				const id = response.data.taxID;
-				const newFetchedIDs: any = { ...sttRef.current.fetchedIDs };
-				newFetchedIDs[sttRef.current.lyr] = id;
-				setStt({
-					...sttRef.current,
-					fetchedIDs: newFetchedIDs,
-				});
-			})
-			.catch((error) => {
-				console.log("error: ", error);
+	const IDInfoHandleClick = async (key: string) => {
+		try {
+			const resData = await fetchTaxIdByName(key); // { taxID: ... }
+			const id = resData.taxID;
+
+			const newFetchedIDs = {
+				...sttRef.current.fetchedIDs,
+				[sttRef.current.lyr]: id,
+			};
+
+			setStt({
+				...sttRef.current,
+				fetchedIDs: newFetchedIDs,
 			});
+		} catch (error) {
+			console.log("error: ", error);
+		}
 	};
 
 	const shortcutsHandleClick = (key: string) => {
 		plotHandleClick(key);
 	};
 
-	const uplTsvHandleChange = () => {
-		const newFile: any = tsvRef.current.files[0];
-		const newLastTry: any = newFile.name;
+	const uplTsvHandleChange = async () => {
+		const file = tsvRef.current?.files?.[0];
+		if (!file) return;
+
+		// optimistic UI state
 		setStt({
 			...sttRef.current,
-			tsvLastTry: newLastTry,
+			tsvLastTry: file.name,
 			tsvLoadStatus: "pending",
 		});
 
-		let formData = new FormData();
-		formData.append("file", newFile);
-		axios
-			.post(`${baseURL}/load_tsv_data`, formData, {
-				headers: { "Content-Type": "multipart/form-data" },
-			})
-			.then((response) => {
-				const newData = response.data;
-				console.log("newData: ", response.data);
-				console.log("newData.taxSet: ", JSON.stringify(newData.taxSet));
-				const newRelTaxSet = calcBasicInfo(
-					false,
-					sttRef.current.eValue,
-					false,
-					newData.lns,
-					"root root",
-					newData.taxSet,
-					"allEqual",
-				);
-				const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
-				setStt({
-					...sttRef.current,
-					tsvName: sttRef.current.tsvLastTry,
-					tsvLoadStatus: "check",
-					eValueEnabled: newData.eValueEnabled,
-					fastaEnabled: newData.fastaEnabled,
-					lns: newData.lns,
-					taxSet: newData.taxSet,
-					eValueApplied: false,
-					collapse: false,
-					lyr: "root root",
-					view: "allEqual",
-					paintingOrder: newPaintingOrder,
-					relTaxSet: newRelTaxSet,
-				});
-				unalteredRef.current.checked = false;
-				marriedIRef.current.checked = false;
-				marriedIIRef.current.checked = false;
-				allEqualRef.current.checked = true;
-			})
-			.catch((error) => {
-				console.log("error: ", error);
-				setStt({
-					...sttRef.current,
-					tsvLoadStatus: "close",
-				});
-				setErrorMessageDisplay(true);
+		try {
+			// use your service
+			const newData = await uploadTsv(file);
+
+			const newRelTaxSet = calcBasicInfo(
+				false,
+				sttRef.current.eValue,
+				false,
+				newData.lns,
+				"root root",
+				newData.taxSet,
+				"allEqual",
+			);
+
+			const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
+
+			setStt({
+				...sttRef.current,
+				tsvName: file.name, // or sttRef.current.tsvLastTry
+				tsvLoadStatus: "check",
+				eValueEnabled: newData.eValueEnabled,
+				fastaEnabled: newData.fastaEnabled,
+				lns: newData.lns,
+				taxSet: newData.taxSet,
+				eValueApplied: false,
+				collapse: false,
+				lyr: "root root",
+				view: "allEqual",
+				paintingOrder: newPaintingOrder,
+				relTaxSet: newRelTaxSet,
 			});
+
+			unalteredRef.current.checked = false;
+			marriedIRef.current.checked = false;
+			marriedIIRef.current.checked = false;
+			allEqualRef.current.checked = true;
+		} catch (error) {
+			console.log("error: ", error);
+			setStt({
+				...sttRef.current,
+				tsvLoadStatus: "close",
+			});
+			setErrorMessageDisplay(true);
+		}
 	};
 
-	const uplFaaHandleChange = () => {
-		const newFile: any = faaRef.current.files[0];
-		const newLastTry: any = newFile.name;
+	const uplFaaHandleChange = async () => {
+		const file = faaRef.current?.files?.[0];
+		if (!file) return;
+
 		setStt({
 			...sttRef.current,
-			faaLastTry: newLastTry,
+			faaLastTry: file.name,
 			faaLoadStatus: "pending",
 		});
 
-		let formData = new FormData();
-		formData.append("file", newFile);
-		axios
-			.post(`${baseURL}/load_faa_data`, formData, {
-				headers: { "Content-Type": "multipart/form-data" },
-			})
-			.then((response) => {
-				const newData = response.data.faaObj;
-				setStt({
-					...sttRef.current,
-					faaObj: newData,
-					faaName: sttRef.current.faaLastTry,
-					faaLoadStatus: "check",
-				});
-			})
-			.catch(() => {
-				setStt({
-					...sttRef.current,
-					faaLoadStatus: "close",
-				});
+		try {
+			const resData = await uploadFaa(file); // { faaObj: ... }
+			const newData = resData.faaObj;
+
+			setStt({
+				...sttRef.current,
+				faaObj: newData,
+				faaName: file.name, // safer than relying on ref timing
+				faaLoadStatus: "check",
 			});
+		} catch (error) {
+			console.log("FAA upload error:", error);
+			setStt({
+				...sttRef.current,
+				faaLoadStatus: "close",
+			});
+		}
 	};
 
 	const collHandleChange = () => {
