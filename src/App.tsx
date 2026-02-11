@@ -55,6 +55,7 @@ const App = () => {
 
 		collapse: false,
 		eValue: 1.9e-28,
+		eValueInput: "1.9e-28",
 		eValueApplied: false,
 		view: "allEqual",
 
@@ -155,6 +156,7 @@ const App = () => {
 					tsvName: file.name,
 					tsvLoadStatus: "check",
 					eValueEnabled: newData.eValueEnabled,
+					eValueInput: String(prev.eValue),
 					fastaEnabled: newData.fastaEnabled,
 					lns: newData.lns,
 					taxSet: newData.taxSet,
@@ -257,22 +259,31 @@ const App = () => {
 		});
 	};
 
-	const eValueHandleKeyDown = (event: any) => {
+	const eValueHandleChange = (value: string) => {
+		setStt((prev) => ({
+			...prev,
+			eValueInput: value, // always update
+		}));
+	};
+
+	const eValueHandleKeyDown = (
+		event: React.KeyboardEvent<HTMLInputElement>,
+	) => {
 		if (event.key !== "Enter") return;
 		event.preventDefault();
 
-		const raw = eValueRef.current.value;
-		const nextEValue = Number(raw);
-
 		setStt((prev) => {
+			const parsed = Number(prev.eValueInput);
+			if (Number.isNaN(parsed)) return prev; // ignore invalid scientific notation mid-edit
+
 			if (!prev.eValueApplied) {
-				return { ...prev, eValue: nextEValue };
+				return { ...prev, eValue: parsed };
 			}
 
 			try {
 				const newRelTaxSet = calcBasicInfo(
 					prev.eValueApplied,
-					nextEValue,
+					parsed,
 					prev.collapse,
 					prev.lns,
 					prev.lyr,
@@ -282,13 +293,13 @@ const App = () => {
 
 				return {
 					...prev,
-					eValue: nextEValue,
+					eValue: parsed,
 					relTaxSet: newRelTaxSet,
 					paintingOrder: determinePaintingOrder(newRelTaxSet),
 				};
 			} catch (err) {
 				console.log("calcBasicInfo failed in eValue Enter:", err);
-				return { ...prev, eValue: nextEValue }; // at least keep the input value
+				return prev;
 			}
 		});
 	};
@@ -367,7 +378,6 @@ const App = () => {
 	const tsvFormRef = useRef<HTMLInputElement | null>(null);
 	const faaFormRef = useRef<HTMLInputElement | null>(null);
 
-	const eValueRef = useRef({ value: 0 });
 	const plotRef = useRef({ outerHTML: "" });
 
 	useEffect(() => {
@@ -439,6 +449,7 @@ const App = () => {
 
 					eValueAppliedHandleChange,
 					eValueHandleKeyDown,
+					eValueHandleChange,
 
 					viewHandleChange,
 
@@ -446,7 +457,6 @@ const App = () => {
 
 					tsvFormRef,
 					faaFormRef,
-					eValueRef,
 				})}
 			>
 				<RightSection />

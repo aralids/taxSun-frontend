@@ -34,10 +34,9 @@ const ViewingModes = () => {
 						disabled={!ctx["eValueEnabled"]}
 					/>
 					<Form.Control
-						id="eValue"
-						defaultValue={1.9e-28}
+						value={ctx["eValueInput"]}
+						onChange={(e) => ctx["eValueHandleChange"](e.target.value)}
 						onKeyDown={ctx["eValueHandleKeyDown"]}
-						ref={ctx["eValueRef"]}
 						disabled={!ctx["eValueEnabled"]}
 					/>
 				</Form>

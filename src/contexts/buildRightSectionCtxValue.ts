@@ -21,7 +21,8 @@ type BuildRightCtxArgs = {
 
 	tsvFormRef: any;
 	faaFormRef: any;
-	eValueRef: any;
+
+	eValueHandleChange: (value: string) => void;
 };
 
 export function buildRightSectionCtxValue({
@@ -41,7 +42,8 @@ export function buildRightSectionCtxValue({
 
 	tsvFormRef,
 	faaFormRef,
-	eValueRef,
+
+	eValueHandleChange,
 }: BuildRightCtxArgs) {
 	return {
 		tsvLastTry: stt.tsvLastTry,
@@ -62,12 +64,15 @@ export function buildRightSectionCtxValue({
 		eValueApplied: stt["eValueApplied"],
 		eValueAppliedHandleChange,
 		eValueHandleKeyDown,
-		eValueRef,
 
 		viewHandleChange,
 
 		dldOnClick,
 
 		view: stt.view as ViewMode,
+
+		eValue: stt.eValue,
+		eValueHandleChange,
+		eValueInput: stt.eValueInput,
 	};
 }
