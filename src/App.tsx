@@ -1,3 +1,4 @@
+// App.tsx
 import { useEffect, useRef, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -124,7 +125,7 @@ const App = () => {
 	};
 
 	const uplTsvHandleChange = async () => {
-		const file = tsvRef.current?.files?.[0];
+		const file = tsvFormRef.current?.files?.[0];
 		if (!file) return;
 
 		setStt((prev) => ({
@@ -181,7 +182,7 @@ const App = () => {
 	};
 
 	const uplFaaHandleChange = async () => {
-		const file = faaRef.current?.files?.[0];
+		const file = faaFormRef.current?.files?.[0];
 		if (!file) return;
 
 		setStt((prev) => ({
@@ -374,8 +375,9 @@ const App = () => {
 		downloadSequencesAsTsv(target, !!unspecOnly, stt);
 	};
 
-	const tsvRef = useRef({ files: [{ name: "" }] });
-	const faaRef = useRef({ files: [{ name: "" }] });
+	const tsvFormRef = useRef<HTMLInputElement | null>(null);
+	const faaFormRef = useRef<HTMLInputElement | null>(null);
+
 	const eValueRef = useRef({ value: 0 });
 	let unalteredRef = useRef({ checked: false });
 	let marriedIRef = useRef({ checked: false });
@@ -457,8 +459,8 @@ const App = () => {
 
 					dldOnClick,
 
-					tsvRef,
-					faaRef,
+					tsvFormRef,
+					faaFormRef,
 					eValueRef,
 
 					unalteredRef,

@@ -13,8 +13,8 @@ type BuildRightCtxArgs = {
 
 	dldOnClick: () => void;
 
-	tsvRef: any;
-	faaRef: any;
+	tsvFormRef: any;
+	faaFormRef: any;
 	eValueRef: any;
 
 	unalteredRef: any;
@@ -38,8 +38,8 @@ export function buildRightSectionCtxValue({
 
 	dldOnClick,
 
-	tsvRef,
-	faaRef,
+	tsvFormRef,
+	faaFormRef,
 	eValueRef,
 
 	unalteredRef,
@@ -51,13 +51,13 @@ export function buildRightSectionCtxValue({
 		tsvLastTry: stt.tsvLastTry,
 		tsvLoadStatus: stt.tsvLoadStatus,
 		uplTsvHandleChange,
-		tsvFormRef: tsvRef,
+		tsvFormRef: tsvFormRef,
 
 		fastaEnabled: stt.fastaEnabled,
 		faaLastTry: stt.faaLastTry,
 		faaLoadStatus: stt.faaLoadStatus,
 		uplFaaHandleChange,
-		faaFormRef: faaRef,
+		faaFormRef: faaFormRef,
 
 		coll: stt["collapse"],
 		collHandleChange,
