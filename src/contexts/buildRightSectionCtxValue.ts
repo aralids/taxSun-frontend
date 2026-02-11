@@ -1,3 +1,9 @@
+export type ViewMode =
+	| "unaltered"
+	| "marriedTaxaI"
+	| "marriedTaxaII"
+	| "allEqual";
+
 type BuildRightCtxArgs = {
 	stt: any;
 
@@ -9,18 +15,13 @@ type BuildRightCtxArgs = {
 	eValueAppliedHandleChange: () => void;
 	eValueHandleKeyDown: (event: any) => void;
 
-	viewHandleChange: () => void;
+	viewHandleChange: (newView: ViewMode) => void;
 
 	dldOnClick: () => void;
 
 	tsvFormRef: any;
 	faaFormRef: any;
 	eValueRef: any;
-
-	unalteredRef: any;
-	marriedIRef: any;
-	marriedIIRef: any;
-	allEqualRef: any;
 };
 
 export function buildRightSectionCtxValue({
@@ -41,11 +42,6 @@ export function buildRightSectionCtxValue({
 	tsvFormRef,
 	faaFormRef,
 	eValueRef,
-
-	unalteredRef,
-	marriedIRef,
-	marriedIIRef,
-	allEqualRef,
 }: BuildRightCtxArgs) {
 	return {
 		tsvLastTry: stt.tsvLastTry,
@@ -68,12 +64,10 @@ export function buildRightSectionCtxValue({
 		eValueHandleKeyDown,
 		eValueRef,
 
-		unalteredRef,
-		marriedIRef,
-		marriedIIRef,
-		allEqualRef,
 		viewHandleChange,
 
 		dldOnClick,
+
+		view: stt.view as ViewMode,
 	};
 }

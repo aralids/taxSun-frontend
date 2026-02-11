@@ -1,3 +1,5 @@
+// components/ViewingModes.tsx
+
 import { useContext } from "react";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
@@ -41,38 +43,41 @@ const ViewingModes = () => {
 				</Form>
 
 				{/* Views */}
-				<Form className="mt-4" onChange={ctx["viewHandleChange"]}>
+				<Form className="mt-4">
 					<Form.Check
 						type="radio"
 						id="unaltered"
 						label="Unaltered"
-						ref={ctx["unalteredRef"]}
-						defaultChecked={false}
 						name="radio"
+						checked={ctx["view"] === "unaltered"}
+						onChange={() => ctx["viewHandleChange"]("unaltered")}
 					/>
+
 					<Form.Check
 						type="radio"
 						id="marriedTaxaI"
 						label="Married taxa I"
-						ref={ctx["marriedIRef"]}
-						defaultChecked={false}
 						name="radio"
+						checked={ctx["view"] === "marriedTaxaI"}
+						onChange={() => ctx["viewHandleChange"]("marriedTaxaI")}
 					/>
+
 					<Form.Check
 						type="radio"
 						id="marriedTaxaII"
 						label="Married taxa II"
-						ref={ctx["marriedIIRef"]}
-						defaultChecked={false}
 						name="radio"
+						checked={ctx["view"] === "marriedTaxaII"}
+						onChange={() => ctx["viewHandleChange"]("marriedTaxaII")}
 					/>
+
 					<Form.Check
 						type="radio"
 						id="allEqual"
 						label="All equal"
-						ref={ctx["allEqualRef"]}
-						defaultChecked={true}
 						name="radio"
+						checked={ctx["view"] === "allEqual"}
+						onChange={() => ctx["viewHandleChange"]("allEqual")}
 					/>
 				</Form>
 			</Card.Body>

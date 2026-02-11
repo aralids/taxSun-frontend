@@ -166,11 +166,6 @@ const App = () => {
 					relTaxSet: newRelTaxSet,
 				};
 			});
-
-			unalteredRef.current.checked = false;
-			marriedIRef.current.checked = false;
-			marriedIIRef.current.checked = false;
-			allEqualRef.current.checked = true;
 		} catch (error) {
 			console.log("error: ", error);
 			setStt((prev) => ({
@@ -298,20 +293,14 @@ const App = () => {
 		});
 	};
 
-	const viewHandleChange = () => {
-		let newView = "";
-		if (unalteredRef.current.checked) newView = "unaltered";
-		else if (marriedIRef.current.checked) newView = "marriedTaxaI";
-		else if (marriedIIRef.current.checked) newView = "marriedTaxaII";
-		else if (allEqualRef.current.checked) newView = "allEqual";
+	type ViewMode = "unaltered" | "marriedTaxaI" | "marriedTaxaII" | "allEqual";
 
-		const eValInput = Number(eValueRef.current.value);
-
+	const viewHandleChange = (newView: ViewMode) => {
 		setStt((prev) => {
 			try {
 				const newRelTaxSet = calcBasicInfo(
 					prev.eValueApplied,
-					eValInput,
+					prev.eValue,
 					prev.collapse,
 					prev.lns,
 					prev.lyr,
@@ -379,10 +368,6 @@ const App = () => {
 	const faaFormRef = useRef<HTMLInputElement | null>(null);
 
 	const eValueRef = useRef({ value: 0 });
-	let unalteredRef = useRef({ checked: false });
-	let marriedIRef = useRef({ checked: false });
-	let marriedIIRef = useRef({ checked: false });
-	let allEqualRef = useRef({ checked: true });
 	const plotRef = useRef({ outerHTML: "" });
 
 	useEffect(() => {
@@ -462,11 +447,6 @@ const App = () => {
 					tsvFormRef,
 					faaFormRef,
 					eValueRef,
-
-					unalteredRef,
-					marriedIRef,
-					marriedIIRef,
-					allEqualRef,
 				})}
 			>
 				<RightSection />
