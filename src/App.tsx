@@ -15,18 +15,19 @@ import { buildRightSectionCtxValue } from "./contexts/buildRightSectionCtxValue"
 import { makeInitialStt, type Stt } from "./state/state";
 import { computeFromState } from "./plot/computeFromState";
 import { useAppActions } from "./hooks/useAppActions";
+import { useDismissContextMenu } from "./hooks/useDismissContextMenu.ts";
+import { useViewport } from "./hooks/useViewport.ts";
+import { ContextState } from "./components/ContextMenu.tsx";
 
 const App = () => {
-	const contextMenuInit: any = [];
 	const [stt, setStt] = useState<Stt>(makeInitialStt);
-
 	const [viewport, setViewport] = useState({
 		w: window.innerWidth,
 		h: window.innerHeight,
 	});
 	const [hovered, setHovered] = useState("");
-	const [context, setContext] = useState({
-		coords: contextMenuInit,
+	const [context, setContext] = useState<ContextState>({
+		coords: [],
 		target: null,
 	});
 	const [errorMessageDisplay, setErrorMessageDisplay] = useState(false);
@@ -36,7 +37,6 @@ const App = () => {
 	const plotRef = useRef<SVGSVGElement | null>(null);
 	const plotModel = useMemo(() => {
 		return computeFromState(stt, stt.lyr, {
-			// only if you still want defaults at first render; otherwise omit overrides
 			eValueApplied: stt.eValueApplied,
 			eValue: stt.eValue,
 			collapse: stt.collapse,
@@ -52,6 +52,8 @@ const App = () => {
 		stt.taxSet,
 		stt.view,
 		stt.lyr,
+		viewport.w,
+		viewport.h,
 	]);
 	const plotModelRef = useRef(plotModel);
 	useEffect(() => {
@@ -70,22 +72,11 @@ const App = () => {
 		plotModelRef,
 	});
 
-	useEffect(() => {
-		const handleWindowClick = () => setContext({ coords: [], target: null });
-		window.addEventListener("click", handleWindowClick);
-		return () => window.removeEventListener("click", handleWindowClick);
-	}, []);
+	useDismissContextMenu(setContext);
+	useViewport(setViewport);
 
-	useEffect(() => {
-		const updateOnResize = () =>
-			setViewport({ w: window.innerWidth, h: window.innerHeight });
-		window.addEventListener("resize", updateOnResize);
-		return () => window.removeEventListener("resize", updateOnResize);
-	}, []);
-
-	const tmpFetchedIds: any = stt["fetchedIDs"];
-
-	if (Object.keys(plotModel.relTaxSet).length === 0) return null;
+	const tmpFetchedIds = stt.fetchedIDs as Record<string, string>;
+	const hasPlot = Object.keys(plotModel.relTaxSet).length > 0;
 
 	return (
 		<div>
@@ -121,18 +112,25 @@ const App = () => {
 				<RightSection />
 			</RightSectionCtx.Provider>
 
-			<Plot
-				viewport={viewport}
-				ancestors={plotModel.ancestors}
-				relTaxSet={plotModel.relTaxSet}
-				paintingOrder={plotModel.paintingOrder}
-				handleHover={setHovered}
-				handlePlotRightClick={actions.handlePlotRightClick}
-				lyr={stt.lyr}
-				view={stt.view}
-				plotHandleClick={actions.plotHandleClick}
-				plotRef={plotRef}
-			/>
+			{hasPlot ? (
+				<Plot
+					viewport={viewport}
+					ancestors={plotModel.ancestors}
+					relTaxSet={plotModel.relTaxSet}
+					paintingOrder={plotModel.paintingOrder}
+					handleHover={setHovered}
+					handlePlotRightClick={actions.handlePlotRightClick}
+					lyr={stt.lyr}
+					view={stt.view}
+					plotHandleClick={actions.plotHandleClick}
+					plotRef={plotRef}
+				/>
+			) : (
+				<div style={{ position: "fixed", top: 0, left: 0, padding: 12 }}>
+					No data loaded yet.
+				</div>
+			)}
+
 			<HoverLabel hovered={hovered} relTaxSet={plotModel.relTaxSet} />
 			<ContextMenu
 				coords={context["coords"]}

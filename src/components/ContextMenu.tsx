@@ -2,6 +2,11 @@ import { useMemo } from "react";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 
+export type ContextState = {
+	coords: number[];
+	target: any | null; // later: make this a real union type
+};
+
 const ContextMenu = ({
 	coords,
 	faaName,

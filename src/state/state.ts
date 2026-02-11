@@ -1,5 +1,5 @@
 // src/state/state.ts
-import { lns, pO, taxSet } from "../data/staticData";
+import { lns, taxSet } from "../data/staticData";
 import type { ViewMode } from "../plot/computePlotState";
 
 export type Stt = {
