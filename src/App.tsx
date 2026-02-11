@@ -21,16 +21,16 @@ import {
 	fetchTaxIdByName,
 } from "./services/taxSunApi.tsx";
 
-import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
+import { lns, pO, taxSet } from "./data/staticData.ts";
 import {
 	//handleMouseMove,
 	getClickCoords,
-} from "./services/helperFunctions.tsx";
+} from "./plot/radialGeometry.ts";
 import {
 	calcBasicInfo,
 	determinePaintingOrder,
 	getAncestors,
-} from "./services/someFunctions.tsx";
+} from "./plot/plotPipeline.ts";
 
 const App = () => {
 	const relTaxSetInit: any = {};

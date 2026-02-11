@@ -11,8 +11,8 @@ import {
 	sin,
 	tintify,
 	binarySearch,
-} from "./helperFunctions";
-import { rankPatternFull, twoVminHeights } from "./predefinedObjects";
+} from "./radialGeometry";
+import { rankPatternFull, twoVminHeights } from "../data/staticData";
 
 const calcBasicInfo = (
 	eValueApplied: Boolean,
@@ -21,7 +21,7 @@ const calcBasicInfo = (
 	lns: string[][][],
 	lyr: string,
 	taxSet: object,
-	view: string
+	view: string,
 ) => {
 	let [croppedLns, relTaxSet] = crop(lns, lyr, taxSet);
 
@@ -29,7 +29,7 @@ const calcBasicInfo = (
 		eValueApplied,
 		eValue,
 		croppedLns,
-		relTaxSet
+		relTaxSet,
 	);
 
 	/*
@@ -51,7 +51,7 @@ const calcBasicInfo = (
 		lyr,
 		minRankPattern,
 		relTaxSet,
-		view
+		view,
 	);
 
 	const [layerWidth, cx, cy] = getLayerWidthInPx(
@@ -59,7 +59,7 @@ const calcBasicInfo = (
 		0,
 		window.innerWidth,
 		window.innerHeight,
-		minRankPattern
+		minRankPattern,
 	);
 
 	relTaxSet = calcSVGPaths(cx, cy, layerWidth, relTaxSet);
@@ -78,7 +78,7 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 	const rootTaxa = lyr.split(" ").slice(0, -1).join(" ").split(" & ");
 	const rootRank = lyr.split(" ").slice(-1)[0];
 	const lyrIndices = rootTaxa.map(
-		(item) => taxSet[item + " " + rootRank]["lnIndex"]
+		(item) => taxSet[item + " " + rootRank]["lnIndex"],
 	);
 
 	let croppedLns: string[][][] = [];
@@ -94,7 +94,7 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 				lns[i][index][0] === rank
 			) {
 				const croppedLn: string[][] = [[rootRank, rootTaxa.join(" & ")]].concat(
-					lns[i].slice(index + 1)
+					lns[i].slice(index + 1),
 				);
 				croppedLns = croppedLns.concat([croppedLn]);
 			}
@@ -108,44 +108,44 @@ const crop = (lns: string[][][], lyr: string, taxSet: any) => {
 		relTaxSet[lyr] = {
 			children: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["children"]),
-				[]
+				[],
 			),
 			directChildren: rootTaxa.reduce(
 				(acc, txn) =>
 					acc.concat(taxSet[txn + " " + rootRank]["directChildren"]),
-				[]
+				[],
 			),
 			eValues: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["eValues"]),
-				[]
+				[],
 			),
 			fastaHeaders: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["fastaHeaders"]),
-				[]
+				[],
 			),
 			geneNames: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["geneNames"]),
-				[]
+				[],
 			),
 			lnIndex: taxSet[rootTaxa[0] + " " + rootRank]["lnIndex"],
 			name: rootTaxa.join(" & "),
 			names: rootTaxa.reduce(
 				(acc, txn) => acc.concat(taxSet[txn + " " + rootRank]["names"]),
-				[]
+				[],
 			),
 			rank: rootRank,
 			rawCount: rootTaxa.reduce(
 				(acc, txn) => acc + taxSet[txn + " " + rootRank]["rawCount"],
-				0
+				0,
 			),
 			taxID: "",
 			totCount: rootTaxa.reduce(
 				(acc, txn) => acc + taxSet[txn + " " + rootRank]["totCount"],
-				0
+				0,
 			),
 			unaCount: rootTaxa.reduce(
 				(acc, txn) => acc + taxSet[txn + " " + rootRank]["unaCount"],
-				0
+				0,
 			),
 		};
 
@@ -187,7 +187,7 @@ const eFilter = (
 	eValueApplied: Boolean,
 	eValue: number,
 	croppedLns: string[][][],
-	relTaxSet: any
+	relTaxSet: any,
 ) => {
 	if (eValueApplied && eValue !== Infinity) {
 		for (let i = croppedLns.length - 1; i >= 0; i--) {
@@ -248,13 +248,13 @@ const eFilter = (
 const calcMinRankPattern = (croppedLns: any[][], rankPatternFull: string[]) => {
 	let ranksUnique: string[] = croppedLns.reduce(
 		(accumulator, ln) => accumulator.concat(ln.map((item) => item[0])),
-		[]
+		[],
 	);
 	ranksUnique = ranksUnique.filter(
-		(value, index, array) => Boolean(value) && array.indexOf(value) === index
+		(value, index, array) => Boolean(value) && array.indexOf(value) === index,
 	);
 	let rankPattern: string[] = rankPatternFull.filter(
-		(item) => ranksUnique.indexOf(item) > -1
+		(item) => ranksUnique.indexOf(item) > -1,
 	);
 
 	return rankPattern;
@@ -264,7 +264,7 @@ const marry = (
 	croppedLns: string[][][],
 	lyr: string,
 	relTaxSet: any,
-	view: string
+	view: string,
 ) => {
 	if (view === "marriedTaxaI" || view === "marriedTaxaII") {
 		const threshold = 0.02;
@@ -339,7 +339,7 @@ const marry = (
 
 					let fstArrHalf = group.members.slice(
 						0,
-						Math.ceil(group.members.length / 2)
+						Math.ceil(group.members.length / 2),
 					);
 					let sndArrHalf = group.members
 						.slice(Math.ceil(group.members.length / 2))
@@ -398,7 +398,7 @@ const marry = (
 			let groupMembers: any[] = group.members;
 			const groupIndices = groupMembers.reduce(
 				(acc, member) => acc.concat(member.indices),
-				[]
+				[],
 			);
 			if (groupIndices.length > 1) {
 				const marriedName = groupMembers
@@ -407,15 +407,15 @@ const marry = (
 				const marriedRank = group.rank;
 				const marriedCount = groupMembers.reduce(
 					(acc, member) => acc + member.count,
-					0
+					0,
 				);
 				const marriedGeneNames = groupMembers.reduce(
 					(acc, member) => acc.concat(member.geneNames),
-					[]
+					[],
 				);
 				const marriedHeaders = groupMembers.reduce(
 					(acc, member) => acc.concat(member.fastaHeaders),
-					[]
+					[],
 				);
 				const groupNewIndex = groupIndices[0];
 				const deletableIndices = groupIndices.slice(1);
@@ -475,7 +475,7 @@ const assignDegreesLayers = (
 	lyr: string,
 	minRankPattern: string[],
 	relTaxSet: any,
-	view: string
+	view: string,
 ) => {
 	let alignedLns: string[][] = [];
 	let firstAlLayers: any = {};
@@ -537,7 +537,7 @@ const assignDegreesLayers = (
 				view === "allEqual"
 					? startDeg + 360 / sumCount
 					: startDeg + (relTaxSet[childTaxon]["unaCount"] * 360) / sumCount,
-				3
+				3,
 			);
 			degrees[currTaxon] = degrees[currTaxon].concat([degree]);
 		}
@@ -546,7 +546,7 @@ const assignDegreesLayers = (
 			view === "allEqual"
 				? 360 / sumCount
 				: (relTaxSet[childTaxon]["unaCount"] * 360) / sumCount,
-			3
+			3,
 		);
 	}
 
@@ -569,7 +569,7 @@ const calcSVGPaths = (
 	cx: number,
 	cy: number,
 	layerWidth: number,
-	relTaxSet: any
+	relTaxSet: any,
 ) => {
 	for (let key in relTaxSet) {
 		let SVGPath = "";
@@ -613,7 +613,7 @@ const calcSVGPaths = (
 							prev,
 							curr,
 							cx,
-							cy
+							cy,
 						);
 						let midArcPath: string = `${MorL} ${midArc["x2"]},${midArc["y2"]} A ${midArc["radius"]},${midArc["radius"]} 0 0 0 ${midArc["x1"]},${midArc["y1"]}`;
 						if (Math.abs(curr - prev) >= 180) {
@@ -635,7 +635,7 @@ const calcSVGPaths = (
 					startDeg,
 					endDeg,
 					cx,
-					cy
+					cy,
 				);
 				let innerArcPath: string = `M ${innerArc["x1"]},${innerArc["y1"]} A ${innRad},${innRad} 0 0 1 ${innerArc["x2"]},${innerArc["y2"]}`;
 				if (Math.abs(endDeg - startDeg) >= 180) {
@@ -653,7 +653,7 @@ const calcSVGPaths = (
 						prev,
 						curr,
 						cx,
-						cy
+						cy,
 					);
 					let midArcPath: string = `L ${midArc["x2"]},${midArc["y2"]} A ${midArc["radius"]},${midArc["radius"]} 0 0 0 ${midArc["x1"]},${midArc["y1"]}`;
 					if (Math.abs(curr - prev) >= 180) {
@@ -676,25 +676,25 @@ const color = (
 	lns: string[][][],
 	lyr: string,
 	relTaxSet: any,
-	taxSet: any
+	taxSet: any,
 ) => {
 	const lnsLstTxn =
 		lns.length >= 1
 			? lns[lns.length - 1][lns[lns.length - 1].length - 1][1] +
-			  " " +
-			  lns[lns.length - 1][lns[lns.length - 1].length - 1][0]
+				" " +
+				lns[lns.length - 1][lns[lns.length - 1].length - 1][0]
 			: "";
 	const lns2ndLstTxn =
 		lns.length >= 2
 			? lns[lns.length - 2][lns[lns.length - 2].length - 1][1] +
-			  " " +
-			  lns[lns.length - 2][lns[lns.length - 2].length - 1][0]
+				" " +
+				lns[lns.length - 2][lns[lns.length - 2].length - 1][0]
 			: "";
 	const lns3rdLstTxn =
 		lns.length >= 3
 			? lns[lns.length - 3][lns[lns.length - 3].length - 1][1] +
-			  " " +
-			  lns[lns.length - 3][lns[lns.length - 3].length - 1][0]
+				" " +
+				lns[lns.length - 3][lns[lns.length - 3].length - 1][0]
 			: "";
 	const offset =
 		(Number(taxSet[lnsLstTxn].taxID) +
@@ -751,7 +751,7 @@ const label = (
 	layerWidth: number,
 	lyr: string,
 	minRankPattern: string[],
-	relTaxSet: any
+	relTaxSet: any,
 ) => {
 	const twoVmin = Math.min(window.innerWidth, window.innerHeight) / (100 / 2);
 	const yOffset = twoVminHeights[round(twoVmin, 1)] / 4;
@@ -776,14 +776,14 @@ const label = (
 			pointOnStartBorderX,
 			pointOnStartBorderY,
 			pointOnEndBorderX,
-			pointOnEndBorderY
+			pointOnEndBorderY,
 		);
 
 		const perc = round((txn.totCount / relTaxSet[lyr].totCount) * 100);
 		const [extContent, extWidth]: any[] = calcOptLabel(
 			2,
 			`${txn.name} ${perc}%`,
-			Infinity
+			Infinity,
 		);
 		extWidth;
 		const y = labelCy + yOffset;
@@ -808,7 +808,7 @@ const label = (
 							.split(" ")
 							.slice(1)
 							.join(" ")}`,
-						spaceInPx
+						spaceInPx,
 					);
 				} else {
 					[abbrContent, abbrWidth] = calcOptLabel(2, txn.name, spaceInPx);
@@ -852,7 +852,7 @@ const label = (
 					layerWidth,
 					lstLabelLyr,
 					yOffset,
-					startDeg
+					startDeg,
 				);
 
 				if (verticalSpace > horizontalSpace) {
@@ -860,7 +860,7 @@ const label = (
 						2,
 						txn.name,
 						verticalSpace,
-						true
+						true,
 					);
 
 					angle = midDeg <= 180 ? 270 + midDeg : 270 - midDeg;
@@ -879,7 +879,7 @@ const label = (
 						2,
 						txn.name,
 						horizontalSpace - 6,
-						true
+						true,
 					);
 					abbrX = labelCx - abbrWidth / 2;
 					frameTransformOrigin = "center";
@@ -921,7 +921,7 @@ const label = (
 		2,
 		relTaxSet[lyr]["name"],
 		2 * layerWidth,
-		true
+		true,
 	);
 
 	relTaxSet[lyr]["lblObj"] = {
@@ -944,7 +944,7 @@ const getAncestors = (
 	lyr: string,
 	relTaxSet: any,
 	shortcutsHandleClick: any,
-	taxSet: any
+	taxSet: any,
 ) => {
 	let ancestors: any[] = [];
 	for (const ln of lns) {
@@ -962,7 +962,7 @@ const getAncestors = (
 							ancName: currTxn.name,
 							ancPerc: round(
 								(relTaxSet[lyr].totCount * 100) / currTxn.totCount,
-								2
+								2,
 							),
 							ancHandleClick: () => shortcutsHandleClick(currName),
 						},
@@ -979,7 +979,7 @@ const getAncestors = (
 const determinePaintingOrder = (relTaxSet: any) => {
 	const keys: any[] = Object.keys(relTaxSet);
 	return keys.sort(
-		(a, b) => relTaxSet[b]["layers"][0] - relTaxSet[a]["layers"][0]
+		(a, b) => relTaxSet[b]["layers"][0] - relTaxSet[a]["layers"][0],
 	);
 };
 

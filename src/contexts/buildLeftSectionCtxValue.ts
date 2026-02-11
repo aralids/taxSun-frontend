@@ -1,3 +1,5 @@
+// sections/buildLeftSectionCtxValue.ts
+
 type BuildLeftCtxArgs = {
 	stt: any;
 	hoveredKey: string;

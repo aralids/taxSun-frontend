@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { twoVminHeights } from "../services/predefinedObjects.tsx";
+import { twoVminHeights } from "../data/staticData.ts";
 
 const HoverLabel = ({ hovered, relTaxSet }: any) => {
 	return useMemo(() => {

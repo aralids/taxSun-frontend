@@ -1,4 +1,4 @@
-import { calibri1px } from "./predefinedObjects";
+import { calibri1px } from "../data/staticData";
 
 function createPalette(colorOffset: any, n: number): string[] {
 	let newColors: string[] = [];
@@ -89,7 +89,7 @@ function lineIntersect(
 	x3: number,
 	y3: number,
 	x4: number,
-	y4: number
+	y4: number,
 ) {
 	var ua,
 		//ub,
@@ -117,7 +117,7 @@ function getFourCorners(
 	right: number,
 	cx: number,
 	cy: number,
-	angle: number
+	angle: number,
 ): object {
 	if (!angle && navigator.userAgent.toLowerCase().indexOf("firefox") > -1) {
 		angle = 0;
@@ -167,7 +167,7 @@ function getLayerWidthInPx(
 	y: number,
 	width: number,
 	height: number,
-	minRankPattern: string[]
+	minRankPattern: string[],
 ) {
 	const cx = x + width / 2;
 	const cy = y + height / 2;
@@ -209,7 +209,7 @@ function calculateArcEndpoints(
 	deg1: number,
 	deg2: number,
 	cx: number,
-	cy: number
+	cy: number,
 ): object {
 	var radius: number = layer * layerWidthInPx;
 	var x1: number = round(radius * cos(deg1) + cx);
@@ -223,7 +223,7 @@ function calcOptLabel(
 	fontSizeInVmin: number,
 	fullLabel: string,
 	spaceInPx: number,
-	internal = false
+	internal = false,
 ) {
 	const fontSizeInPx =
 		Math.min(window.innerWidth, window.innerHeight) / (100 / fontSizeInVmin);
@@ -266,7 +266,7 @@ function calcHorizontalSpace(
 	layerWidth: number,
 	lstLabelLyr: number,
 	halfHeight: number,
-	startDeg: number
+	startDeg: number,
 ) {
 	const startFstCornerX = round(fstLabelLyr * layerWidth * cos(startDeg)) + cx;
 	const startFstCornerY = round(-fstLabelLyr * layerWidth * sin(startDeg)) + cy;
@@ -285,7 +285,7 @@ function calcHorizontalSpace(
 		window.innerWidth,
 		labelCx,
 		labelCy,
-		angle
+		angle,
 	);
 
 	let p1: any, p2: any;
@@ -298,7 +298,7 @@ function calcHorizontalSpace(
 			fourPoints["bottomLeft"][0],
 			fourPoints["bottomLeft"][1],
 			fourPoints["bottomRight"][0],
-			fourPoints["bottomRight"][1]
+			fourPoints["bottomRight"][1],
 		);
 
 		p2 = lineIntersect(
@@ -309,7 +309,7 @@ function calcHorizontalSpace(
 			fourPoints["bottomLeft"][0],
 			fourPoints["bottomLeft"][1],
 			fourPoints["bottomRight"][0],
-			fourPoints["bottomRight"][1]
+			fourPoints["bottomRight"][1],
 		);
 	} else if (hemisphere === "below") {
 		p1 = lineIntersect(
@@ -320,7 +320,7 @@ function calcHorizontalSpace(
 			fourPoints["topLeft"][0],
 			fourPoints["topLeft"][1],
 			fourPoints["topRight"][0],
-			fourPoints["topRight"][1]
+			fourPoints["topRight"][1],
 		);
 
 		p2 = lineIntersect(
@@ -331,7 +331,7 @@ function calcHorizontalSpace(
 			fourPoints["topLeft"][0],
 			fourPoints["topLeft"][1],
 			fourPoints["topRight"][0],
-			fourPoints["topRight"][1]
+			fourPoints["topRight"][1],
 		);
 	}
 
@@ -345,7 +345,7 @@ function calcHorizontalSpace(
 				fourPoints["topLeft"][0],
 				fourPoints["topLeft"][1],
 				fourPoints["topRight"][0],
-				fourPoints["topRight"][1]
+				fourPoints["topRight"][1],
 			);
 		} else if (hemisphere === "below") {
 			[p1, p2] = lineCircleCollision(
@@ -355,7 +355,7 @@ function calcHorizontalSpace(
 				fourPoints["bottomLeft"][0],
 				fourPoints["bottomLeft"][1],
 				fourPoints["bottomRight"][0],
-				fourPoints["bottomRight"][1]
+				fourPoints["bottomRight"][1],
 			);
 		}
 	}
@@ -385,7 +385,7 @@ function lineCircleCollision(
 	lx1: number,
 	ly1: number,
 	lx2: number,
-	ly2: number
+	ly2: number,
 ) {
 	const baX = lx2 - lx1;
 	const baY = ly2 - ly1;
