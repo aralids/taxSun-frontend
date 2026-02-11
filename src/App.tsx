@@ -67,8 +67,6 @@ const App = () => {
 		coords: contextMenuInit,
 		target: null,
 	});
-	const sttRef = useRef(stt);
-	sttRef.current = stt;
 	const [errorMessageDisplay, setErrorMessageDisplay] = useState(false);
 
 	const plotHandleClick = (key: string) => {
@@ -104,21 +102,19 @@ const App = () => {
 	};
 
 	const IDInfoHandleClick = async (key: string) => {
+		const lyrAtClick = stt.lyr; // capture now (or pass lyr explicitly)
 		try {
-			const resData = await fetchTaxIdByName(key); // { taxID: ... }
-			const id = resData.taxID;
+			const { taxID } = await fetchTaxIdByName(key);
 
-			const newFetchedIDs = {
-				...sttRef.current.fetchedIDs,
-				[sttRef.current.lyr]: id,
-			};
-
-			setStt({
-				...sttRef.current,
-				fetchedIDs: newFetchedIDs,
-			});
+			setStt((prev) => ({
+				...prev,
+				fetchedIDs: {
+					...prev.fetchedIDs,
+					[lyrAtClick]: taxID,
+				},
+			}));
 		} catch (error) {
-			console.log("error: ", error);
+			console.log("error:", error);
 		}
 	};
 
@@ -265,57 +261,72 @@ const App = () => {
 	};
 
 	const eValueHandleKeyDown = (event: any) => {
-		if (event.key === "Enter") {
-			event.preventDefault();
-			const newRelTaxSet = calcBasicInfo(
-				sttRef.current.eValueApplied,
-				eValueRef.current.value,
-				sttRef.current.collapse,
-				sttRef.current.lns,
-				sttRef.current.lyr,
-				sttRef.current.taxSet,
-				sttRef.current.view,
-			);
-			const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
-			if (sttRef.current["eValueApplied"]) {
-				setStt({
-					...sttRef.current,
-					eValue: eValueRef.current.value,
-					paintingOrder: newPaintingOrder,
-					relTaxSet: newRelTaxSet,
-				});
-			} else {
-				setStt({ ...sttRef.current, eValue: eValueRef.current.value });
+		if (event.key !== "Enter") return;
+		event.preventDefault();
+
+		const raw = eValueRef.current.value;
+		const nextEValue = Number(raw);
+
+		setStt((prev) => {
+			if (!prev.eValueApplied) {
+				return { ...prev, eValue: nextEValue };
 			}
-		}
+
+			try {
+				const newRelTaxSet = calcBasicInfo(
+					prev.eValueApplied,
+					nextEValue,
+					prev.collapse,
+					prev.lns,
+					prev.lyr,
+					prev.taxSet,
+					prev.view,
+				);
+
+				return {
+					...prev,
+					eValue: nextEValue,
+					relTaxSet: newRelTaxSet,
+					paintingOrder: determinePaintingOrder(newRelTaxSet),
+				};
+			} catch (err) {
+				console.log("calcBasicInfo failed in eValue Enter:", err);
+				return { ...prev, eValue: nextEValue }; // at least keep the input value
+			}
+		});
 	};
 
 	const viewHandleChange = () => {
-		let newView: string = "";
-		if (unalteredRef.current.checked) {
-			newView = "unaltered";
-		} else if (marriedIRef.current.checked) {
-			newView = "marriedTaxaI";
-		} else if (marriedIIRef.current.checked) {
-			newView = "marriedTaxaII";
-		} else if (allEqualRef.current.checked) {
-			newView = "allEqual";
-		}
-		const newRelTaxSet = calcBasicInfo(
-			sttRef.current.eValueApplied,
-			eValueRef.current.value,
-			sttRef.current.collapse,
-			sttRef.current.lns,
-			sttRef.current.lyr,
-			sttRef.current.taxSet,
-			newView,
-		);
-		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
-		setStt({
-			...sttRef.current,
-			view: newView,
-			paintingOrder: newPaintingOrder,
-			relTaxSet: newRelTaxSet,
+		let newView = "";
+		if (unalteredRef.current.checked) newView = "unaltered";
+		else if (marriedIRef.current.checked) newView = "marriedTaxaI";
+		else if (marriedIIRef.current.checked) newView = "marriedTaxaII";
+		else if (allEqualRef.current.checked) newView = "allEqual";
+
+		const eValInput = Number(eValueRef.current.value);
+
+		setStt((prev) => {
+			try {
+				const newRelTaxSet = calcBasicInfo(
+					prev.eValueApplied,
+					eValInput,
+					prev.collapse,
+					prev.lns,
+					prev.lyr,
+					prev.taxSet,
+					newView,
+				);
+
+				return {
+					...prev,
+					view: newView,
+					relTaxSet: newRelTaxSet,
+					paintingOrder: determinePaintingOrder(newRelTaxSet),
+				};
+			} catch (err) {
+				console.log("calcBasicInfo failed in view change:", err);
+				return { ...prev, view: newView };
+			}
 		});
 	};
 
@@ -326,13 +337,11 @@ const App = () => {
 		const a = document.createElement("a");
 		const e = new MouseEvent("click");
 
-		const tsvNameAbbr = sttRef.current.tsvName.slice(0, 10);
-		const lyrAbbr = sttRef.current.lyr.slice(0, 10);
-		const collAbbr = `collapse-${sttRef.current.collapse}`;
-		const eValAbbr = `eValue-${
-			sttRef.current.collapse ? sttRef.current.eValue : "false"
-		}`;
-		const viewAbbr = sttRef.current.view;
+		const tsvNameAbbr = stt.tsvName.slice(0, 10);
+		const lyrAbbr = stt.lyr.slice(0, 10);
+		const collAbbr = `collapse-${stt.collapse}`;
+		const eValAbbr = `eValue-${stt.collapse ? stt.eValue : "false"}`;
+		const viewAbbr = stt.view;
 		const svgFileName = `${tsvNameAbbr}_${lyrAbbr}_${collAbbr}_${eValAbbr}_${viewAbbr}.svg`;
 		a.download = svgFileName;
 		a.href = "data:text/html;base64," + base64doc;
@@ -349,13 +358,13 @@ const App = () => {
 	};
 
 	const handleCopyClick = (target: string, unspecOnly: any) => {
-		const targetTxn = sttRef.current.relTaxSet[target];
+		const targetTxn = stt.relTaxSet[target];
 		let geneNames = targetTxn.geneNames;
 
 		if (!unspecOnly) {
 			geneNames = geneNames.concat(
 				targetTxn.children.reduce((acc: string[], child: string) => {
-					const childTxn = sttRef.current.relTaxSet[child];
+					const childTxn = stt.relTaxSet[child];
 					if (childTxn) {
 						return acc.concat(childTxn.geneNames);
 					}
@@ -367,7 +376,7 @@ const App = () => {
 	};
 
 	const handleDownloadSeqClick = (target: string, unspecOnly: any) => {
-		const targetTxn = sttRef.current.relTaxSet[target];
+		const targetTxn = stt.relTaxSet[target];
 		let fastaHeaders = targetTxn.fastaHeaders;
 		let geneNames = targetTxn.geneNames;
 		let names = targetTxn.names;
@@ -375,7 +384,7 @@ const App = () => {
 		if (!unspecOnly) {
 			fastaHeaders = fastaHeaders.concat(
 				targetTxn.children.reduce((acc: string[], child: string) => {
-					const childTxn = sttRef.current.relTaxSet[child];
+					const childTxn = stt.relTaxSet[child];
 					if (childTxn) {
 						names = names.concat(childTxn.names);
 						geneNames = geneNames.concat(childTxn.geneNames);
@@ -385,7 +394,7 @@ const App = () => {
 				}, []),
 			);
 		}
-		const faaObj: any = sttRef.current.faaObj;
+		const faaObj: any = stt.faaObj;
 
 		let ntSeqs = fastaHeaders.map(
 			(item: string) => faaObj[item] ?? "No sequence found.",
@@ -401,11 +410,9 @@ const App = () => {
 		const a = document.createElement("a");
 		const e = new MouseEvent("click");
 
-		a.download = `${unspecOnly ? "unspec" : "all"}_${sttRef.current.tsvName}_${
-			sttRef.current.faaName
-		}_${target}${
-			sttRef.current.eValueApplied ? `_${sttRef.current.eValue}` : ""
-		}.tsv`;
+		a.download = `${unspecOnly ? "unspec" : "all"}_${stt.tsvName}_${
+			stt.faaName
+		}_${target}${stt.eValueApplied ? `_${stt.eValue}` : ""}.tsv`;
 		a.href = "data:text/tab-separated-values," + encodeURIComponent(seqsFile);
 		a.dispatchEvent(e);
 	};
@@ -461,9 +468,7 @@ const App = () => {
 
 	const tmpFetchedIds: any = stt["fetchedIDs"];
 
-	if (Object.keys(sttRef.current["relTaxSet"]).length === 0) {
-		return null;
-	}
+	if (Object.keys(stt.relTaxSet).length === 0) return null;
 
 	return (
 		<div>
