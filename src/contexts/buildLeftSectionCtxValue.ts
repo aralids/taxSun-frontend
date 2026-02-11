@@ -1,10 +1,14 @@
-// sections/buildLeftSectionCtxValue.ts
+// contexts/buildLeftSectionCtxValue.ts
 
 type BuildLeftCtxArgs = {
-	stt: any;
+	stt: any; // you can tighten later to Stt
 	hoveredKey: string;
 	tmpFetchedIds: any;
 	IDInfoHandleClick: (key: string) => void;
+
+	// derived plot data passed in (not from stt)
+	relTaxSet: any;
+
 	ancestors: any[];
 	ancestorHandleClick: (key: string) => void;
 };
@@ -14,13 +18,12 @@ export function buildLeftSectionCtxValue({
 	hoveredKey,
 	tmpFetchedIds,
 	IDInfoHandleClick,
+	relTaxSet,
 	ancestors,
 	ancestorHandleClick,
 }: BuildLeftCtxArgs) {
 	const lyr = stt["lyr"];
-	const relTaxSet = stt["relTaxSet"];
-
-	const lyrObj = relTaxSet[lyr];
+	const lyrObj = relTaxSet?.[lyr];
 
 	return {
 		...lyrObj,

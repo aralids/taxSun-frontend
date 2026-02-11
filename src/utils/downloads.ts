@@ -35,7 +35,7 @@ export function downloadPlotSvg(
 export function downloadSequencesAsTsv(
 	target: string,
 	unspecOnly: boolean,
-	stt: {
+	args: {
 		relTaxSet: any;
 		faaObj: any;
 		tsvName: string;
@@ -44,7 +44,7 @@ export function downloadSequencesAsTsv(
 		eValue: number;
 	},
 ) {
-	const targetTxn = stt.relTaxSet[target];
+	const targetTxn = args.relTaxSet[target];
 	if (!targetTxn) return;
 
 	let fastaHeaders = targetTxn.fastaHeaders;
@@ -54,7 +54,7 @@ export function downloadSequencesAsTsv(
 	if (!unspecOnly) {
 		fastaHeaders = fastaHeaders.concat(
 			targetTxn.children.reduce((acc: string[], child: string) => {
-				const childTxn = stt.relTaxSet[child];
+				const childTxn = args.relTaxSet[child];
 				if (!childTxn) return acc;
 
 				names = names.concat(childTxn.names);
@@ -65,7 +65,7 @@ export function downloadSequencesAsTsv(
 	}
 
 	const ntSeqs = fastaHeaders.map(
-		(item: string) => stt.faaObj[item] ?? "No sequence found.",
+		(item: string) => args.faaObj[item] ?? "No sequence found.",
 	);
 
 	const entries: string[] = [];
@@ -75,8 +75,8 @@ export function downloadSequencesAsTsv(
 		);
 	}
 
-	const filename = `${unspecOnly ? "unspec" : "all"}_${stt.tsvName}_${stt.faaName}_${target}${
-		stt.eValueApplied ? `_${stt.eValue}` : ""
+	const filename = `${unspecOnly ? "unspec" : "all"}_${args.tsvName}_${args.faaName}_${target}${
+		args.eValueApplied ? `_${args.eValue}` : ""
 	}.tsv`;
 
 	const blob = new Blob([entries.join("\n")], {

@@ -7,11 +7,11 @@ import {
 	fetchTaxIdByName,
 } from "../services/taxSunApi.tsx";
 import { getClickCoords } from "../plot/radialGeometry.ts";
-import { computeFromState } from "../plot/computeFromState";
 import { downloadPlotSvg, downloadSequencesAsTsv } from "../utils/downloads";
 
 import type { Stt } from "../state/state";
 import type { ViewMode } from "../plot/computePlotState";
+import type { PlotModel } from "../plot/computeFromState";
 
 type ContextState = {
 	coords: any[];
@@ -29,6 +29,9 @@ type UseAppActionsArgs = {
 	tsvFormRef: React.RefObject<HTMLInputElement | null>;
 	faaFormRef: React.RefObject<HTMLInputElement | null>;
 	plotRef: React.RefObject<SVGSVGElement | null>;
+
+	// ✅ latest derived plot model (relTaxSet / paintingOrder / ancestors)
+	plotModelRef: React.MutableRefObject<PlotModel>;
 };
 
 export function useAppActions({
@@ -40,6 +43,7 @@ export function useAppActions({
 	tsvFormRef,
 	faaFormRef,
 	plotRef,
+	plotModelRef,
 }: UseAppActionsArgs) {
 	// Keep latest stt available inside callbacks without dependency churn
 	const sttRef = useRef(stt);
@@ -47,39 +51,25 @@ export function useAppActions({
 		sttRef.current = stt;
 	}, [stt]);
 
-	/**
-	 * We need a stable shortcuts function pointer because computeFromState expects it,
-	 * and plotHandleClick also wants to call computeFromState.
-	 * If we do naive useCallback chaining, we get circular deps.
-	 */
-	const shortcutsRef = useRef<(key: string) => void>(() => {});
-
+	// ✅ Pure input update: selecting a node just changes lyr
 	const plotHandleClick = useCallback(
 		(key: string) => {
-			setStt((prev) => {
-				const computed = computeFromState(prev, key);
-				return { ...prev, lyr: key, ...computed };
-			});
+			setStt((prev) => ({ ...prev, lyr: key }));
 		},
 		[setStt],
 	);
 
-	// Now that plotHandleClick exists, wire shortcutsRef to call it
-	useEffect(() => {
-		shortcutsRef.current = (key: string) => plotHandleClick(key);
-	}, [plotHandleClick]);
-
+	// Optional alias, since some components call it "shortcuts"
 	const shortcutsHandleClick = useCallback(
 		(key: string) => {
-			// Keep this for components if you need it, but internally we use shortcutsRef.current
-			plotHandleClick(key);
+			setStt((prev) => ({ ...prev, lyr: key }));
 		},
-		[plotHandleClick],
+		[setStt],
 	);
 
 	const IDInfoHandleClick = useCallback(
 		async (key: string) => {
-			const lyrAtClick = sttRef.current.lyr; // capture current lyr at click time
+			const lyrAtClick = sttRef.current.lyr;
 			try {
 				const { taxID } = await fetchTaxIdByName(key);
 				setStt((prev) => ({
@@ -109,31 +99,24 @@ export function useAppActions({
 		try {
 			const newData = await uploadTsv(file);
 
-			setStt((prev) => {
-				const computed = computeFromState(prev, "root root", {
-					eValueApplied: false,
-					collapse: false,
-					lns: newData.lns,
-					taxSet: newData.taxSet,
-					view: "allEqual",
-				});
+			setStt((prev) => ({
+				...prev,
+				tsvName: file.name,
+				tsvLoadStatus: "check",
+				eValueEnabled: newData.eValueEnabled,
+				eValueInput: String(prev.eValue),
+				fastaEnabled: newData.fastaEnabled,
 
-				return {
-					...prev,
-					tsvName: file.name,
-					tsvLoadStatus: "check",
-					eValueEnabled: newData.eValueEnabled,
-					eValueInput: String(prev.eValue),
-					fastaEnabled: newData.fastaEnabled,
-					lns: newData.lns,
-					taxSet: newData.taxSet,
-					eValueApplied: false,
-					collapse: false,
-					lyr: "root root",
-					view: "allEqual",
-					...computed,
-				};
-			});
+				// new dataset inputs
+				lns: newData.lns,
+				taxSet: newData.taxSet,
+
+				// reset view inputs for new dataset
+				eValueApplied: false,
+				collapse: false,
+				lyr: "root root",
+				view: "allEqual",
+			}));
 		} catch (error) {
 			console.log("error: ", error);
 			setStt((prev) => ({
@@ -174,46 +157,16 @@ export function useAppActions({
 	}, [setStt, faaFormRef]);
 
 	const collHandleChange = useCallback(() => {
-		setStt((prev) => {
-			const newCollapse = !prev.collapse;
-			const computed = computeFromState(prev, prev.lyr, {
-				collapse: newCollapse,
-			});
-			return {
-				...prev,
-				collapse: newCollapse,
-				relTaxSet: computed.relTaxSet,
-				paintingOrder: computed.paintingOrder,
-			};
-		});
+		setStt((prev) => ({ ...prev, collapse: !prev.collapse }));
 	}, [setStt]);
 
 	const eValueAppliedHandleChange = useCallback(() => {
-		setStt((prev) => {
-			const newApplied = !prev.eValueApplied;
-			try {
-				const computed = computeFromState(prev, prev.lyr, {
-					eValueApplied: newApplied,
-				});
-				return {
-					...prev,
-					eValueApplied: newApplied,
-					relTaxSet: computed.relTaxSet,
-					paintingOrder: computed.paintingOrder,
-				};
-			} catch (err) {
-				console.log("calcBasicInfo failed in eValue toggle:", err);
-				return prev;
-			}
-		});
+		setStt((prev) => ({ ...prev, eValueApplied: !prev.eValueApplied }));
 	}, [setStt]);
 
 	const eValueHandleChange = useCallback(
 		(value: string) => {
-			setStt((prev) => ({
-				...prev,
-				eValueInput: value,
-			}));
+			setStt((prev) => ({ ...prev, eValueInput: value }));
 		},
 		[setStt],
 	);
@@ -226,25 +179,7 @@ export function useAppActions({
 			setStt((prev) => {
 				const parsed = Number(prev.eValueInput);
 				if (Number.isNaN(parsed)) return prev;
-
-				if (!prev.eValueApplied) {
-					return { ...prev, eValue: parsed };
-				}
-
-				try {
-					const computed = computeFromState(prev, prev.lyr, {
-						eValue: parsed,
-					});
-					return {
-						...prev,
-						eValue: parsed,
-						relTaxSet: computed.relTaxSet,
-						paintingOrder: computed.paintingOrder,
-					};
-				} catch (err) {
-					console.log("calcBasicInfo failed in eValue Enter:", err);
-					return prev;
-				}
+				return { ...prev, eValue: parsed };
 			});
 		},
 		[setStt],
@@ -252,22 +187,7 @@ export function useAppActions({
 
 	const viewHandleChange = useCallback(
 		(newView: ViewMode) => {
-			setStt((prev) => {
-				try {
-					const computed = computeFromState(prev, prev.lyr, {
-						view: newView,
-					});
-					return {
-						...prev,
-						view: newView,
-						relTaxSet: computed.relTaxSet,
-						paintingOrder: computed.paintingOrder,
-					};
-				} catch (err) {
-					console.log("calcBasicInfo failed in view change:", err);
-					return { ...prev, view: newView };
-				}
-			});
+			setStt((prev) => ({ ...prev, view: newView }));
 		},
 		[setStt],
 	);
@@ -294,33 +214,49 @@ export function useAppActions({
 		[setContext],
 	);
 
-	const handleCopyClick = useCallback((target: string, unspecOnly: any) => {
-		const s = sttRef.current;
-		const targetTxn = s.relTaxSet[target];
-		let geneNames = targetTxn.geneNames;
+	// ✅ uses derived plot model (not stt)
+	const handleCopyClick = useCallback(
+		(target: string, unspecOnly: any) => {
+			const plot = plotModelRef.current;
+			const targetTxn = plot.relTaxSet?.[target];
+			if (!targetTxn) return;
 
-		if (!unspecOnly) {
-			geneNames = geneNames.concat(
-				targetTxn.children.reduce((acc: string[], child: string) => {
-					const childTxn = s.relTaxSet[child];
-					if (childTxn) return acc.concat(childTxn.geneNames);
-					return acc;
-				}, []),
-			);
-		}
-		navigator.clipboard.writeText(geneNames.join(" \n"));
-	}, []);
+			let geneNames: string[] = targetTxn.geneNames ?? [];
 
+			if (!unspecOnly) {
+				geneNames = geneNames.concat(
+					(targetTxn.children ?? []).reduce((acc: string[], child: string) => {
+						const childTxn = plot.relTaxSet?.[child];
+						if (childTxn?.geneNames) return acc.concat(childTxn.geneNames);
+						return acc;
+					}, []),
+				);
+			}
+
+			navigator.clipboard.writeText(geneNames.join("\n"));
+		},
+		[plotModelRef],
+	);
+
+	// This utility still expects stt for now (file naming etc). That’s fine.
+	// If it needs relTaxSet internally, change that utility to accept plotModel instead.
 	const handleDownloadSeqClick = useCallback(
 		(target: string, unspecOnly: any) => {
-			downloadSequencesAsTsv(target, !!unspecOnly, sttRef.current);
+			downloadSequencesAsTsv(target, !!unspecOnly, {
+				relTaxSet: plotModelRef.current.relTaxSet,
+				faaObj: sttRef.current.faaObj,
+				tsvName: sttRef.current.tsvName,
+				faaName: sttRef.current.faaName,
+				eValueApplied: sttRef.current.eValueApplied,
+				eValue: sttRef.current.eValue,
+			});
 		},
 		[],
 	);
 
 	return {
 		plotHandleClick,
-		shortcutsHandleClick, // optional export, but harmless
+		shortcutsHandleClick,
 		IDInfoHandleClick,
 		uplTsvHandleChange,
 		uplFaaHandleChange,

@@ -1,5 +1,5 @@
 // App.tsx
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import LeftSection from "./components/LeftSection.tsx";
@@ -34,6 +34,30 @@ const App = () => {
 	const tsvFormRef = useRef<HTMLInputElement | null>(null);
 	const faaFormRef = useRef<HTMLInputElement | null>(null);
 	const plotRef = useRef<SVGSVGElement | null>(null);
+	const plotModel = useMemo(() => {
+		return computeFromState(stt, stt.lyr, {
+			// only if you still want defaults at first render; otherwise omit overrides
+			eValueApplied: stt.eValueApplied,
+			eValue: stt.eValue,
+			collapse: stt.collapse,
+			lns: stt.lns,
+			taxSet: stt.taxSet,
+			view: stt.view,
+		});
+	}, [
+		stt.eValueApplied,
+		stt.eValue,
+		stt.collapse,
+		stt.lns,
+		stt.taxSet,
+		stt.view,
+		stt.lyr,
+	]);
+	const plotModelRef = useRef(plotModel);
+	useEffect(() => {
+		plotModelRef.current = plotModel;
+	}, [plotModel]);
+
 	const actions = useAppActions({
 		stt,
 		setStt,
@@ -43,50 +67,25 @@ const App = () => {
 		tsvFormRef,
 		faaFormRef,
 		plotRef,
+		plotModelRef,
 	});
 
 	useEffect(() => {
 		const handleWindowClick = () => setContext({ coords: [], target: null });
 		window.addEventListener("click", handleWindowClick);
-		setStt((prev) => {
-			const computed = computeFromState(prev, "root root", {
-				eValueApplied: false,
-				eValue: 1.9e-28,
-				collapse: false,
-				lns: prev.lns,
-				taxSet: prev.taxSet,
-				view: "allEqual",
-			});
-			return {
-				...prev,
-				relTaxSet: computed.relTaxSet,
-				paintingOrder: computed.paintingOrder,
-				ancestors: computed.ancestors,
-			};
-		});
 		return () => window.removeEventListener("click", handleWindowClick);
 	}, []);
 
 	useEffect(() => {
-		const updateOnResize = () => {
+		const updateOnResize = () =>
 			setViewport({ w: window.innerWidth, h: window.innerHeight });
-			setStt((prev) => {
-				const computed = computeFromState(prev, prev.lyr);
-				return {
-					...prev,
-					relTaxSet: computed.relTaxSet,
-					paintingOrder: computed.paintingOrder,
-					// ancestors: computed.ancestors, // optional
-				};
-			});
-		};
 		window.addEventListener("resize", updateOnResize);
 		return () => window.removeEventListener("resize", updateOnResize);
 	}, []);
 
 	const tmpFetchedIds: any = stt["fetchedIDs"];
 
-	if (Object.keys(stt.relTaxSet).length === 0) return null;
+	if (Object.keys(plotModel.relTaxSet).length === 0) return null;
 
 	return (
 		<div>
@@ -96,7 +95,8 @@ const App = () => {
 					hoveredKey: hovered,
 					tmpFetchedIds,
 					IDInfoHandleClick: actions.IDInfoHandleClick,
-					ancestors: stt["ancestors"],
+					relTaxSet: plotModel.relTaxSet,
+					ancestors: plotModel.ancestors,
 					ancestorHandleClick: actions.shortcutsHandleClick,
 				})}
 			>
@@ -123,17 +123,17 @@ const App = () => {
 
 			<Plot
 				viewport={viewport}
-				ancestors={stt["ancestors"]}
+				ancestors={plotModel.ancestors}
+				relTaxSet={plotModel.relTaxSet}
+				paintingOrder={plotModel.paintingOrder}
 				handleHover={setHovered}
 				handlePlotRightClick={actions.handlePlotRightClick}
-				lyr={stt["lyr"]}
-				relTaxSet={stt["relTaxSet"]}
-				paintingOrder={stt["paintingOrder"]}
+				lyr={stt.lyr}
+				view={stt.view}
 				plotHandleClick={actions.plotHandleClick}
 				plotRef={plotRef}
-				view={stt["view"]}
 			/>
-			<HoverLabel hovered={hovered} relTaxSet={stt["relTaxSet"]} />
+			<HoverLabel hovered={hovered} relTaxSet={plotModel.relTaxSet} />
 			<ContextMenu
 				coords={context["coords"]}
 				faaName={stt["faaName"]}

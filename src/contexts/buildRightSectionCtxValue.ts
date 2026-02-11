@@ -27,52 +27,49 @@ type BuildRightCtxArgs = {
 
 export function buildRightSectionCtxValue({
 	stt,
-
 	uplTsvHandleChange,
 	uplFaaHandleChange,
-
 	collHandleChange,
-
 	eValueAppliedHandleChange,
 	eValueHandleKeyDown,
-
 	viewHandleChange,
-
 	dldOnClick,
-
 	tsvFormRef,
 	faaFormRef,
-
 	eValueHandleChange,
 }: BuildRightCtxArgs) {
 	return {
+		// TSV
 		tsvLastTry: stt.tsvLastTry,
 		tsvLoadStatus: stt.tsvLoadStatus,
 		uplTsvHandleChange,
-		tsvFormRef: tsvFormRef,
+		tsvFormRef,
 
+		// FAA
 		fastaEnabled: stt.fastaEnabled,
 		faaLastTry: stt.faaLastTry,
 		faaLoadStatus: stt.faaLoadStatus,
 		uplFaaHandleChange,
-		faaFormRef: faaFormRef,
+		faaFormRef,
 
-		coll: stt["collapse"],
+		// Controls
+		coll: stt.collapse,
 		collHandleChange,
 
-		eValueEnabled: stt["eValueEnabled"],
-		eValueApplied: stt["eValueApplied"],
+		eValueEnabled: stt.eValueEnabled,
+		eValueApplied: stt.eValueApplied,
 		eValueAppliedHandleChange,
 		eValueHandleKeyDown,
 
+		view: stt.view as ViewMode,
 		viewHandleChange,
 
+		// Download
 		dldOnClick,
 
-		view: stt.view as ViewMode,
-
+		// E-value input
 		eValue: stt.eValue,
-		eValueHandleChange,
 		eValueInput: stt.eValueInput,
+		eValueHandleChange,
 	};
 }

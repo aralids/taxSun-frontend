@@ -4,9 +4,6 @@ import type { ViewMode } from "../plot/computePlotState";
 
 export type Stt = {
 	lyr: string;
-	relTaxSet: any;
-	paintingOrder: any;
-	ancestors: any[];
 
 	lns: any;
 	taxSet: any;
@@ -36,9 +33,6 @@ export type Stt = {
 export function makeInitialStt(): Stt {
 	return {
 		lyr: "root root",
-		relTaxSet: {},
-		paintingOrder: pO,
-		ancestors: [],
 
 		lns,
 		taxSet,
