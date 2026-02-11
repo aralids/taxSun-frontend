@@ -1,5 +1,5 @@
 import { useContext, useMemo } from "react";
-import { LeftSectionCtx } from "../App.tsx";
+import { LeftSectionCtx } from "../contexts/LeftSectionCtx";
 
 import Card from "react-bootstrap/Card";
 

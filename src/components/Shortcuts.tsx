@@ -1,7 +1,7 @@
 import { useContext, useMemo } from "react";
 import Card from "react-bootstrap/Card";
 
-import { LeftSectionCtx } from "../App.tsx";
+import { LeftSectionCtx } from "../contexts/LeftSectionCtx";
 
 const Shortcuts = () => {
 	const ctx: any = useContext(LeftSectionCtx);
@@ -15,7 +15,7 @@ const Shortcuts = () => {
 					style={{ cursor: "pointer" }}
 				>
 					{anc["ancPerc"]}% of <b>{anc["ancName"]}</b>
-				</Card.Text>
+				</Card.Text>,
 			);
 		}
 		return (

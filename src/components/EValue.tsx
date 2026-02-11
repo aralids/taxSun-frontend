@@ -1,7 +1,7 @@
 import { useContext, useMemo } from "react";
 import Form from "react-bootstrap/Form";
 
-import { RightSectionCtx } from "../App.tsx";
+import { RightSectionCtx } from "../contexts/RightSectionCtx";
 
 const EValue = () => {
 	const ctx: any = useContext(RightSectionCtx);

@@ -4,7 +4,7 @@ import Card from "react-bootstrap/Card";
 import BasicLayerInfo from "./BasicLayerInfo.tsx";
 import IDInfo from "./IDInfo.tsx";
 import Shortcuts from "./Shortcuts.tsx";
-import { LeftSectionCtx } from "../App.tsx";
+import { LeftSectionCtx } from "../contexts/LeftSectionCtx";
 
 const LayerInfo = () => {
 	const ctx: any = useContext(LeftSectionCtx);

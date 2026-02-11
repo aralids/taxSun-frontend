@@ -1,5 +1,5 @@
 import { useContext, useMemo } from "react";
-import { RightSectionCtx } from "../App.tsx";
+import { RightSectionCtx } from "../contexts/RightSectionCtx";
 
 import Form from "react-bootstrap/Form";
 

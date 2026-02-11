@@ -1,7 +1,7 @@
-let baseURL = "https://taxsun-fastapi-backend-production.up.railway.app";
-// let baseURL = "http://127.0.0.1:8000";
+// let baseURL = "https://taxsun-fastapi-backend-production.up.railway.app";
+let baseURL = "http://127.0.0.1:8000";
 
-import { createContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -11,6 +11,11 @@ import Plot from "./components/Plot.tsx";
 import HoverLabel from "./components/HoveredLabel.tsx";
 import ContextMenu from "./components/ContextMenu.tsx";
 import ErrorMessage from "./components/ErrorMessage.tsx";
+
+import { LeftSectionCtx } from "./contexts/LeftSectionCtx";
+import { buildLeftSectionCtxValue } from "./contexts/buildLeftSectionCtxValue";
+import { RightSectionCtx } from "./contexts/RightSectionCtx";
+import { buildRightSectionCtxValue } from "./contexts/buildRightSectionCtxValue";
 
 import { lns, pO, taxSet } from "./services/predefinedObjects.tsx";
 import {
@@ -22,9 +27,6 @@ import {
 	determinePaintingOrder,
 	getAncestors,
 } from "./services/someFunctions.tsx";
-
-export const LeftSectionCtx = createContext({});
-export const RightSectionCtx = createContext({});
 
 const App = () => {
 	const relTaxSetInit: any = {};
@@ -75,7 +77,7 @@ const App = () => {
 			sttRef.current.lns,
 			key,
 			sttRef.current.taxSet,
-			sttRef.current.view
+			sttRef.current.view,
 		);
 		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 		const newAncestors: any = getAncestors(
@@ -83,7 +85,7 @@ const App = () => {
 			key,
 			newRelTaxSet,
 			shortcutsHandleClick,
-			sttRef.current.taxSet
+			sttRef.current.taxSet,
 		);
 		setStt({
 			...sttRef.current,
@@ -143,7 +145,7 @@ const App = () => {
 					newData.lns,
 					"root root",
 					newData.taxSet,
-					"allEqual"
+					"allEqual",
 				);
 				const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 				setStt({
@@ -216,7 +218,7 @@ const App = () => {
 			sttRef.current.lns,
 			sttRef.current.lyr,
 			sttRef.current.taxSet,
-			sttRef.current.view
+			sttRef.current.view,
 		);
 		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 		setStt({
@@ -235,7 +237,7 @@ const App = () => {
 			sttRef.current.lns,
 			sttRef.current.lyr,
 			sttRef.current.taxSet,
-			sttRef.current.view
+			sttRef.current.view,
 		);
 		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 		setStt({
@@ -256,7 +258,7 @@ const App = () => {
 				sttRef.current.lns,
 				sttRef.current.lyr,
 				sttRef.current.taxSet,
-				sttRef.current.view
+				sttRef.current.view,
 			);
 			const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 			if (sttRef.current["eValueApplied"]) {
@@ -290,7 +292,7 @@ const App = () => {
 			sttRef.current.lns,
 			sttRef.current.lyr,
 			sttRef.current.taxSet,
-			newView
+			newView,
 		);
 		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 		setStt({
@@ -323,7 +325,7 @@ const App = () => {
 
 	const handlePlotRightClick = (
 		event: { [x: string]: any; target: any },
-		target: any
+		target: any,
 	) => {
 		event.preventDefault();
 		const newCoords: any = getClickCoords(event);
@@ -342,7 +344,7 @@ const App = () => {
 						return acc.concat(childTxn.geneNames);
 					}
 					return acc.concat([]);
-				}, [])
+				}, []),
 			);
 		}
 		navigator.clipboard.writeText(geneNames.join(" \n"));
@@ -364,13 +366,13 @@ const App = () => {
 						return acc.concat(childTxn.fastaHeaders);
 					}
 					return acc.concat([]);
-				}, [])
+				}, []),
 			);
 		}
 		const faaObj: any = sttRef.current.faaObj;
 
 		let ntSeqs = fastaHeaders.map(
-			(item: string) => faaObj[item] ?? "No sequence found."
+			(item: string) => faaObj[item] ?? "No sequence found.",
 		);
 		let entries: any[] = [];
 		for (let i = 0; i < fastaHeaders.length; i++) {
@@ -404,7 +406,7 @@ const App = () => {
 	useEffect(() => {
 		//window.addEventListener("mousemove", (event) => handleMouseMove(event));
 		window.addEventListener("click", () =>
-			setContext({ coords: [], target: null })
+			setContext({ coords: [], target: null }),
 		);
 		setStt({
 			...sttRef.current,
@@ -415,7 +417,7 @@ const App = () => {
 				lns,
 				"root root",
 				taxSet,
-				"allEqual"
+				"allEqual",
 			),
 		});
 	}, []);
@@ -431,7 +433,7 @@ const App = () => {
 					sttRef.current.lns,
 					sttRef.current.lyr,
 					sttRef.current.taxSet,
-					sttRef.current.view
+					sttRef.current.view,
 				),
 			});
 
@@ -450,51 +452,42 @@ const App = () => {
 	return (
 		<div>
 			<LeftSectionCtx.Provider
-				value={{
-					...stt["relTaxSet"][stt["lyr"]],
-					rawCount: stt["relTaxSet"][stt["lyr"]]["rawCount"],
-					id: Boolean(stt["relTaxSet"][stt["lyr"]]["taxID"])
-						? stt["relTaxSet"][stt["lyr"]]["taxID"]
-						: tmpFetchedIds[stt["lyr"]] ?? "",
-					IDInfoHandleClick: () =>
-						IDInfoHandleClick(stt["lyr"].split(" ").slice(0, -1).join(" ")),
+				value={buildLeftSectionCtxValue({
+					stt,
+					hoveredKey: hovered,
+					tmpFetchedIds,
+					IDInfoHandleClick,
 					ancestors: stt["ancestors"],
-					hovered: stt["relTaxSet"][hovered],
-				}}
+				})}
 			>
 				<LeftSection />
 			</LeftSectionCtx.Provider>
 
 			<RightSectionCtx.Provider
-				value={{
-					tsvLastTry: stt.tsvLastTry,
-					tsvLoadStatus: stt.tsvLoadStatus,
-					uplTsvHandleChange: uplTsvHandleChange,
-					tsvFormRef: tsvRef,
+				value={buildRightSectionCtxValue({
+					stt,
 
-					fastaEnabled: stt.fastaEnabled,
-					faaLastTry: stt.faaLastTry,
-					faaLoadStatus: stt.faaLoadStatus,
-					uplFaaHandleChange: uplFaaHandleChange,
-					faaFormRef: faaRef,
+					uplTsvHandleChange,
+					uplFaaHandleChange,
 
-					coll: stt["collapse"],
-					collHandleChange: collHandleChange,
+					collHandleChange,
 
-					eValueEnabled: stt["eValueEnabled"],
-					eValueApplied: stt["eValueApplied"],
-					eValueAppliedHandleChange: eValueAppliedHandleChange,
-					eValueHandleKeyDown: eValueHandleKeyDown,
-					eValueRef: eValueRef,
+					eValueAppliedHandleChange,
+					eValueHandleKeyDown,
 
-					unalteredRef: unalteredRef,
-					marriedIRef: marriedIRef,
-					marriedIIRef: marriedIIRef,
-					allEqualRef: allEqualRef,
-					viewHandleChange: viewHandleChange,
+					viewHandleChange,
 
-					dldOnClick: dldOnClick,
-				}}
+					dldOnClick,
+
+					tsvRef,
+					faaRef,
+					eValueRef,
+
+					unalteredRef,
+					marriedIRef,
+					marriedIIRef,
+					allEqualRef,
+				})}
 			>
 				<RightSection />
 			</RightSectionCtx.Provider>

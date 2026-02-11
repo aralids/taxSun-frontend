@@ -2,7 +2,7 @@ import { useContext, useMemo } from "react";
 
 import HoverInfo from "./HoverInfo.tsx";
 import LayerInfo from "./LayerInfo.tsx";
-import { LeftSectionCtx } from "../App.tsx";
+import { LeftSectionCtx } from "../contexts/LeftSectionCtx";
 
 const LeftSection = () => {
 	const ctx: any = useContext(LeftSectionCtx);
