@@ -64,6 +64,11 @@ const App = () => {
 
 		fetchedIDs: {},
 	});
+	const [viewport, setViewport] = useState({
+		w: window.innerWidth,
+		h: window.innerHeight,
+	});
+
 	//const [ctxMenuVis, setCtxMenuVis] = useState(false);
 	const [hovered, setHovered] = useState("");
 	const [context, setContext] = useState({
@@ -334,7 +339,7 @@ const App = () => {
 
 	const dldOnClick = () => {
 		if (!plotRef.current) return;
-		downloadPlotSvg(plotRef.current as any, {
+		downloadPlotSvg(plotRef.current, {
 			tsvName: stt.tsvName,
 			lyr: stt.lyr,
 			collapse: stt.collapse,
@@ -377,8 +382,7 @@ const App = () => {
 
 	const tsvFormRef = useRef<HTMLInputElement | null>(null);
 	const faaFormRef = useRef<HTMLInputElement | null>(null);
-
-	const plotRef = useRef({ outerHTML: "" });
+	const plotRef = useRef<SVGSVGElement | null>(null);
 
 	useEffect(() => {
 		const handleWindowClick = () => setContext({ coords: [], target: null });
@@ -402,6 +406,7 @@ const App = () => {
 
 	useEffect(() => {
 		const updateOnResize = () => {
+			setViewport({ w: window.innerWidth, h: window.innerHeight });
 			setStt((prev) => ({
 				...prev,
 				relTaxSet: calcBasicInfo(
@@ -463,6 +468,7 @@ const App = () => {
 			</RightSectionCtx.Provider>
 
 			<Plot
+				viewport={viewport}
 				ancestors={stt["ancestors"]}
 				handleHover={setHovered}
 				handlePlotRightClick={handlePlotRightClick}
