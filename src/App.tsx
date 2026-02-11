@@ -72,29 +72,34 @@ const App = () => {
 	const [errorMessageDisplay, setErrorMessageDisplay] = useState(false);
 
 	const plotHandleClick = (key: string) => {
-		const newRelTaxSet = calcBasicInfo(
-			sttRef.current.eValueApplied,
-			sttRef.current.eValue,
-			sttRef.current.collapse,
-			sttRef.current.lns,
-			key,
-			sttRef.current.taxSet,
-			sttRef.current.view,
-		);
-		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
-		const newAncestors: any = getAncestors(
-			sttRef.current.lns,
-			key,
-			newRelTaxSet,
-			shortcutsHandleClick,
-			sttRef.current.taxSet,
-		);
-		setStt({
-			...sttRef.current,
-			ancestors: newAncestors,
-			lyr: key,
-			paintingOrder: newPaintingOrder,
-			relTaxSet: newRelTaxSet,
+		setStt((prev) => {
+			const newRelTaxSet = calcBasicInfo(
+				prev.eValueApplied,
+				prev.eValue,
+				prev.collapse,
+				prev.lns,
+				key,
+				prev.taxSet,
+				prev.view,
+			);
+
+			const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
+
+			const newAncestors: any = getAncestors(
+				prev.lns,
+				key,
+				newRelTaxSet,
+				shortcutsHandleClick,
+				prev.taxSet,
+			);
+
+			return {
+				...prev,
+				ancestors: newAncestors,
+				lyr: key,
+				paintingOrder: newPaintingOrder,
+				relTaxSet: newRelTaxSet,
+			};
 		});
 	};
 
@@ -125,43 +130,43 @@ const App = () => {
 		const file = tsvRef.current?.files?.[0];
 		if (!file) return;
 
-		// optimistic UI state
-		setStt({
-			...sttRef.current,
+		setStt((prev) => ({
+			...prev,
 			tsvLastTry: file.name,
 			tsvLoadStatus: "pending",
-		});
+		}));
 
 		try {
-			// use your service
 			const newData = await uploadTsv(file);
 
-			const newRelTaxSet = calcBasicInfo(
-				false,
-				sttRef.current.eValue,
-				false,
-				newData.lns,
-				"root root",
-				newData.taxSet,
-				"allEqual",
-			);
+			setStt((prev) => {
+				const newRelTaxSet = calcBasicInfo(
+					false,
+					prev.eValue,
+					false,
+					newData.lns,
+					"root root",
+					newData.taxSet,
+					"allEqual",
+				);
 
-			const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
+				const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
 
-			setStt({
-				...sttRef.current,
-				tsvName: file.name, // or sttRef.current.tsvLastTry
-				tsvLoadStatus: "check",
-				eValueEnabled: newData.eValueEnabled,
-				fastaEnabled: newData.fastaEnabled,
-				lns: newData.lns,
-				taxSet: newData.taxSet,
-				eValueApplied: false,
-				collapse: false,
-				lyr: "root root",
-				view: "allEqual",
-				paintingOrder: newPaintingOrder,
-				relTaxSet: newRelTaxSet,
+				return {
+					...prev,
+					tsvName: file.name,
+					tsvLoadStatus: "check",
+					eValueEnabled: newData.eValueEnabled,
+					fastaEnabled: newData.fastaEnabled,
+					lns: newData.lns,
+					taxSet: newData.taxSet,
+					eValueApplied: false,
+					collapse: false,
+					lyr: "root root",
+					view: "allEqual",
+					paintingOrder: newPaintingOrder,
+					relTaxSet: newRelTaxSet,
+				};
 			});
 
 			unalteredRef.current.checked = false;
@@ -170,10 +175,10 @@ const App = () => {
 			allEqualRef.current.checked = true;
 		} catch (error) {
 			console.log("error: ", error);
-			setStt({
-				...sttRef.current,
+			setStt((prev) => ({
+				...prev,
 				tsvLoadStatus: "close",
-			});
+			}));
 			setErrorMessageDisplay(true);
 		}
 	};
@@ -182,66 +187,80 @@ const App = () => {
 		const file = faaRef.current?.files?.[0];
 		if (!file) return;
 
-		setStt({
-			...sttRef.current,
+		setStt((prev) => ({
+			...prev,
 			faaLastTry: file.name,
 			faaLoadStatus: "pending",
-		});
+		}));
 
 		try {
-			const resData = await uploadFaa(file); // { faaObj: ... }
+			const resData = await uploadFaa(file);
 			const newData = resData.faaObj;
 
-			setStt({
-				...sttRef.current,
+			setStt((prev) => ({
+				...prev,
 				faaObj: newData,
-				faaName: file.name, // safer than relying on ref timing
+				faaName: file.name,
 				faaLoadStatus: "check",
-			});
+			}));
 		} catch (error) {
 			console.log("FAA upload error:", error);
-			setStt({
-				...sttRef.current,
+			setStt((prev) => ({
+				...prev,
 				faaLoadStatus: "close",
-			});
+			}));
 		}
 	};
 
 	const collHandleChange = () => {
-		const newRelTaxSet = calcBasicInfo(
-			sttRef.current.eValueApplied,
-			sttRef.current.eValue,
-			!sttRef.current["collapse"],
-			sttRef.current.lns,
-			sttRef.current.lyr,
-			sttRef.current.taxSet,
-			sttRef.current.view,
-		);
-		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
-		setStt({
-			...sttRef.current,
-			collapse: !sttRef.current["collapse"],
-			paintingOrder: newPaintingOrder,
-			relTaxSet: newRelTaxSet,
+		setStt((prev) => {
+			const newCollapse = !prev.collapse;
+
+			const newRelTaxSet = calcBasicInfo(
+				prev.eValueApplied,
+				prev.eValue,
+				newCollapse,
+				prev.lns,
+				prev.lyr,
+				prev.taxSet,
+				prev.view,
+			);
+
+			return {
+				...prev,
+				collapse: newCollapse,
+				relTaxSet: newRelTaxSet,
+				paintingOrder: determinePaintingOrder(newRelTaxSet),
+			};
 		});
 	};
 
 	const eValueAppliedHandleChange = () => {
-		const newRelTaxSet = calcBasicInfo(
-			!sttRef.current["eValueApplied"],
-			sttRef.current.eValue,
-			sttRef.current.collapse,
-			sttRef.current.lns,
-			sttRef.current.lyr,
-			sttRef.current.taxSet,
-			sttRef.current.view,
-		);
-		const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
-		setStt({
-			...sttRef.current,
-			eValueApplied: !sttRef.current["eValueApplied"],
-			paintingOrder: newPaintingOrder,
-			relTaxSet: newRelTaxSet,
+		setStt((prev) => {
+			const newApplied = !prev.eValueApplied;
+
+			try {
+				const newRelTaxSet = calcBasicInfo(
+					newApplied,
+					prev.eValue,
+					prev.collapse,
+					prev.lns,
+					prev.lyr,
+					prev.taxSet,
+					prev.view,
+				);
+
+				return {
+					...prev,
+					eValueApplied: newApplied,
+					relTaxSet: newRelTaxSet,
+					paintingOrder: determinePaintingOrder(newRelTaxSet),
+				};
+			} catch (err) {
+				console.log("calcBasicInfo failed in eValue toggle:", err);
+				// Keep UI stable instead of crashing
+				return prev;
+			}
 		});
 	};
 
@@ -401,12 +420,11 @@ const App = () => {
 	const plotRef = useRef({ outerHTML: "" });
 
 	useEffect(() => {
-		//window.addEventListener("mousemove", (event) => handleMouseMove(event));
-		window.addEventListener("click", () =>
-			setContext({ coords: [], target: null }),
-		);
-		setStt({
-			...sttRef.current,
+		const handleWindowClick = () => setContext({ coords: [], target: null });
+		window.addEventListener("click", handleWindowClick);
+
+		setStt((prev) => ({
+			...prev,
 			relTaxSet: calcBasicInfo(
 				false,
 				1.9e-28,
@@ -416,27 +434,28 @@ const App = () => {
 				taxSet,
 				"allEqual",
 			),
-		});
+		}));
+
+		return () => window.removeEventListener("click", handleWindowClick);
 	}, []);
 
 	useEffect(() => {
-		const updateOnResize = () =>
-			setStt({
-				...sttRef.current,
+		const updateOnResize = () => {
+			setStt((prev) => ({
+				...prev,
 				relTaxSet: calcBasicInfo(
-					sttRef.current.eValueApplied,
-					sttRef.current.eValue,
-					sttRef.current.collapse,
-					sttRef.current.lns,
-					sttRef.current.lyr,
-					sttRef.current.taxSet,
-					sttRef.current.view,
+					prev.eValueApplied,
+					prev.eValue,
+					prev.collapse,
+					prev.lns,
+					prev.lyr,
+					prev.taxSet,
+					prev.view,
 				),
-			});
+			}));
+		};
 
 		window.addEventListener("resize", updateOnResize);
-
-		// unsubscribe from the event on component unmount
 		return () => window.removeEventListener("resize", updateOnResize);
 	}, []);
 
