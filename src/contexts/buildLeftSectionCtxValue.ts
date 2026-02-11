@@ -6,6 +6,7 @@ type BuildLeftCtxArgs = {
 	tmpFetchedIds: any;
 	IDInfoHandleClick: (key: string) => void;
 	ancestors: any[];
+	ancestorHandleClick: (key: string) => void;
 };
 
 export function buildLeftSectionCtxValue({
@@ -14,6 +15,7 @@ export function buildLeftSectionCtxValue({
 	tmpFetchedIds,
 	IDInfoHandleClick,
 	ancestors,
+	ancestorHandleClick,
 }: BuildLeftCtxArgs) {
 	const lyr = stt["lyr"];
 	const relTaxSet = stt["relTaxSet"];
@@ -30,5 +32,6 @@ export function buildLeftSectionCtxValue({
 			IDInfoHandleClick(lyr.split(" ").slice(0, -1).join(" ")),
 		ancestors,
 		hovered: relTaxSet?.[hoveredKey],
+		ancestorHandleClick,
 	};
 }

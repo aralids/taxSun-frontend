@@ -72,7 +72,7 @@ const LayerInfo = () => {
 						<Card.Text
 							key={anc.ancName}
 							className="m-0 p-0"
-							onClick={anc.ancHandleClick}
+							onClick={() => ctx.ancestorHandleClick(anc.ancKey)}
 							style={{ cursor: "pointer" }}
 						>
 							{anc.ancPerc}% of <b>{anc.ancName}</b>

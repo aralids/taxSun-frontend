@@ -12,19 +12,9 @@ import { LeftSectionCtx } from "./contexts/LeftSectionCtx";
 import { buildLeftSectionCtxValue } from "./contexts/buildLeftSectionCtxValue";
 import { RightSectionCtx } from "./contexts/RightSectionCtx";
 import { buildRightSectionCtxValue } from "./contexts/buildRightSectionCtxValue";
-import { downloadPlotSvg, downloadSequencesAsTsv } from "./utils/downloads";
-import {
-	uploadTsv,
-	uploadFaa,
-	fetchTaxIdByName,
-} from "./services/taxSunApi.tsx";
-import {
-	//handleMouseMove,
-	getClickCoords,
-} from "./plot/radialGeometry.ts";
-import { type ViewMode } from "./plot/computePlotState";
 import { makeInitialStt, type Stt } from "./state/state";
 import { computeFromState } from "./plot/computeFromState";
+import { useAppActions } from "./hooks/useAppActions";
 
 const App = () => {
 	const contextMenuInit: any = [];
@@ -41,290 +31,32 @@ const App = () => {
 	});
 	const [errorMessageDisplay, setErrorMessageDisplay] = useState(false);
 
-	const plotHandleClick = (key: string) => {
-		setStt((prev) => {
-			const computed = computeFromState(prev, key, shortcutsHandleClick);
-			return { ...prev, lyr: key, ...computed };
-		});
-	};
-
-	const IDInfoHandleClick = async (key: string) => {
-		const lyrAtClick = stt.lyr; // capture now (or pass lyr explicitly)
-		try {
-			const { taxID } = await fetchTaxIdByName(key);
-
-			setStt((prev) => ({
-				...prev,
-				fetchedIDs: {
-					...prev.fetchedIDs,
-					[lyrAtClick]: taxID,
-				},
-			}));
-		} catch (error) {
-			console.log("error:", error);
-		}
-	};
-
-	const shortcutsHandleClick = (key: string) => {
-		plotHandleClick(key);
-	};
-
-	const uplTsvHandleChange = async () => {
-		const file = tsvFormRef.current?.files?.[0];
-		if (!file) return;
-
-		setStt((prev) => ({
-			...prev,
-			tsvLastTry: file.name,
-			tsvLoadStatus: "pending",
-		}));
-
-		try {
-			const newData = await uploadTsv(file);
-
-			setStt((prev) => {
-				const computed = computeFromState(
-					prev,
-					"root root",
-					shortcutsHandleClick,
-					{
-						eValueApplied: false,
-						collapse: false,
-						lns: newData.lns,
-						taxSet: newData.taxSet,
-						view: "allEqual",
-					},
-				);
-				return {
-					...prev,
-					tsvName: file.name,
-					tsvLoadStatus: "check",
-					eValueEnabled: newData.eValueEnabled,
-					eValueInput: String(prev.eValue),
-					fastaEnabled: newData.fastaEnabled,
-					lns: newData.lns,
-					taxSet: newData.taxSet,
-					eValueApplied: false,
-					collapse: false,
-					lyr: "root root",
-					view: "allEqual",
-					...computed,
-				};
-			});
-		} catch (error) {
-			console.log("error: ", error);
-			setStt((prev) => ({
-				...prev,
-				tsvLoadStatus: "close",
-			}));
-			setErrorMessageDisplay(true);
-		}
-	};
-
-	const uplFaaHandleChange = async () => {
-		const file = faaFormRef.current?.files?.[0];
-		if (!file) return;
-
-		setStt((prev) => ({
-			...prev,
-			faaLastTry: file.name,
-			faaLoadStatus: "pending",
-		}));
-
-		try {
-			const resData = await uploadFaa(file);
-			const newData = resData.faaObj;
-
-			setStt((prev) => ({
-				...prev,
-				faaObj: newData,
-				faaName: file.name,
-				faaLoadStatus: "check",
-			}));
-		} catch (error) {
-			console.log("FAA upload error:", error);
-			setStt((prev) => ({
-				...prev,
-				faaLoadStatus: "close",
-			}));
-		}
-	};
-
-	const collHandleChange = () => {
-		setStt((prev) => {
-			const newCollapse = !prev.collapse;
-			const computed = computeFromState(prev, prev.lyr, shortcutsHandleClick, {
-				collapse: newCollapse,
-			});
-			return {
-				...prev,
-				collapse: newCollapse,
-				relTaxSet: computed.relTaxSet,
-				paintingOrder: computed.paintingOrder,
-				// ancestors: computed.ancestors, // <- leave OUT if you want old behavior
-			};
-		});
-	};
-
-	const eValueAppliedHandleChange = () => {
-		setStt((prev) => {
-			const newApplied = !prev.eValueApplied;
-			try {
-				const computed = computeFromState(
-					prev,
-					prev.lyr,
-					shortcutsHandleClick,
-					{
-						eValueApplied: newApplied,
-					},
-				);
-				return {
-					...prev,
-					eValueApplied: newApplied,
-					relTaxSet: computed.relTaxSet,
-					paintingOrder: computed.paintingOrder,
-					// ancestors: computed.ancestors, // optional
-				};
-			} catch (err) {
-				console.log("calcBasicInfo failed in eValue toggle:", err);
-				return prev;
-			}
-		});
-	};
-
-	const eValueHandleChange = (value: string) => {
-		setStt((prev) => ({
-			...prev,
-			eValueInput: value, // always update
-		}));
-	};
-
-	const eValueHandleKeyDown = (
-		event: React.KeyboardEvent<HTMLInputElement>,
-	) => {
-		if (event.key !== "Enter") return;
-		event.preventDefault();
-
-		setStt((prev) => {
-			const parsed = Number(prev.eValueInput);
-			if (Number.isNaN(parsed)) return prev; // ignore invalid scientific notation mid-edit
-
-			if (!prev.eValueApplied) {
-				return { ...prev, eValue: parsed };
-			}
-
-			try {
-				const computed = computeFromState(
-					prev,
-					prev.lyr,
-					shortcutsHandleClick,
-					{
-						eValue: parsed,
-					},
-				);
-				return {
-					...prev,
-					eValue: parsed,
-					relTaxSet: computed.relTaxSet,
-					paintingOrder: computed.paintingOrder,
-					// ancestors: computed.ancestors, // optional
-				};
-			} catch (err) {
-				console.log("calcBasicInfo failed in eValue Enter:", err);
-				return prev;
-			}
-		});
-	};
-
-	const viewHandleChange = (newView: ViewMode) => {
-		setStt((prev) => {
-			try {
-				const computed = computeFromState(
-					prev,
-					prev.lyr,
-					shortcutsHandleClick,
-					{
-						view: newView,
-					},
-				);
-				return {
-					...prev,
-					view: newView,
-					relTaxSet: computed.relTaxSet,
-					paintingOrder: computed.paintingOrder,
-					// ancestors: computed.ancestors, // optional
-				};
-			} catch (err) {
-				console.log("calcBasicInfo failed in view change:", err);
-				return { ...prev, view: newView };
-			}
-		});
-	};
-
-	const dldOnClick = () => {
-		if (!plotRef.current) return;
-		downloadPlotSvg(plotRef.current, {
-			tsvName: stt.tsvName,
-			lyr: stt.lyr,
-			collapse: stt.collapse,
-			eValueApplied: stt.eValueApplied,
-			eValue: stt.eValue,
-			view: stt.view,
-		});
-	};
-
-	const handlePlotRightClick = (
-		event: { [x: string]: any; target: any },
-		target: any,
-	) => {
-		event.preventDefault();
-		const newCoords: any = getClickCoords(event);
-		setContext({ coords: [newCoords.x, newCoords.y], target: target });
-	};
-
-	const handleCopyClick = (target: string, unspecOnly: any) => {
-		const targetTxn = stt.relTaxSet[target];
-		let geneNames = targetTxn.geneNames;
-
-		if (!unspecOnly) {
-			geneNames = geneNames.concat(
-				targetTxn.children.reduce((acc: string[], child: string) => {
-					const childTxn = stt.relTaxSet[child];
-					if (childTxn) {
-						return acc.concat(childTxn.geneNames);
-					}
-					return acc.concat([]);
-				}, []),
-			);
-		}
-		navigator.clipboard.writeText(geneNames.join(" \n"));
-	};
-
-	const handleDownloadSeqClick = (target: string, unspecOnly: any) => {
-		downloadSequencesAsTsv(target, !!unspecOnly, stt);
-	};
-
 	const tsvFormRef = useRef<HTMLInputElement | null>(null);
 	const faaFormRef = useRef<HTMLInputElement | null>(null);
 	const plotRef = useRef<SVGSVGElement | null>(null);
+	const actions = useAppActions({
+		stt,
+		setStt,
+		setContext,
+		setHovered,
+		setErrorMessageDisplay,
+		tsvFormRef,
+		faaFormRef,
+		plotRef,
+	});
 
 	useEffect(() => {
 		const handleWindowClick = () => setContext({ coords: [], target: null });
 		window.addEventListener("click", handleWindowClick);
 		setStt((prev) => {
-			const computed = computeFromState(
-				prev,
-				"root root",
-				shortcutsHandleClick,
-				{
-					eValueApplied: false,
-					eValue: 1.9e-28,
-					collapse: false,
-					lns: prev.lns,
-					taxSet: prev.taxSet,
-					view: "allEqual",
-				},
-			);
+			const computed = computeFromState(prev, "root root", {
+				eValueApplied: false,
+				eValue: 1.9e-28,
+				collapse: false,
+				lns: prev.lns,
+				taxSet: prev.taxSet,
+				view: "allEqual",
+			});
 			return {
 				...prev,
 				relTaxSet: computed.relTaxSet,
@@ -339,7 +71,7 @@ const App = () => {
 		const updateOnResize = () => {
 			setViewport({ w: window.innerWidth, h: window.innerHeight });
 			setStt((prev) => {
-				const computed = computeFromState(prev, prev.lyr, shortcutsHandleClick);
+				const computed = computeFromState(prev, prev.lyr);
 				return {
 					...prev,
 					relTaxSet: computed.relTaxSet,
@@ -363,8 +95,9 @@ const App = () => {
 					stt,
 					hoveredKey: hovered,
 					tmpFetchedIds,
-					IDInfoHandleClick,
+					IDInfoHandleClick: actions.IDInfoHandleClick,
 					ancestors: stt["ancestors"],
+					ancestorHandleClick: actions.shortcutsHandleClick,
 				})}
 			>
 				<LeftSection />
@@ -373,20 +106,14 @@ const App = () => {
 			<RightSectionCtx.Provider
 				value={buildRightSectionCtxValue({
 					stt,
-
-					uplTsvHandleChange,
-					uplFaaHandleChange,
-
-					collHandleChange,
-
-					eValueAppliedHandleChange,
-					eValueHandleKeyDown,
-					eValueHandleChange,
-
-					viewHandleChange,
-
-					dldOnClick,
-
+					uplTsvHandleChange: actions.uplTsvHandleChange,
+					uplFaaHandleChange: actions.uplFaaHandleChange,
+					collHandleChange: actions.collHandleChange,
+					eValueAppliedHandleChange: actions.eValueAppliedHandleChange,
+					eValueHandleKeyDown: actions.eValueHandleKeyDown,
+					eValueHandleChange: actions.eValueHandleChange,
+					viewHandleChange: actions.viewHandleChange,
+					dldOnClick: actions.dldOnClick,
 					tsvFormRef,
 					faaFormRef,
 				})}
@@ -398,11 +125,11 @@ const App = () => {
 				viewport={viewport}
 				ancestors={stt["ancestors"]}
 				handleHover={setHovered}
-				handlePlotRightClick={handlePlotRightClick}
+				handlePlotRightClick={actions.handlePlotRightClick}
 				lyr={stt["lyr"]}
 				relTaxSet={stt["relTaxSet"]}
 				paintingOrder={stt["paintingOrder"]}
-				plotHandleClick={plotHandleClick}
+				plotHandleClick={actions.plotHandleClick}
 				plotRef={plotRef}
 				view={stt["view"]}
 			/>
@@ -410,8 +137,8 @@ const App = () => {
 			<ContextMenu
 				coords={context["coords"]}
 				faaName={stt["faaName"]}
-				handleCopyClick={handleCopyClick}
-				handleDownloadSeqClick={handleDownloadSeqClick}
+				handleCopyClick={actions.handleCopyClick}
+				handleDownloadSeqClick={actions.handleDownloadSeqClick}
 				target={context["target"]}
 			/>
 			<ErrorMessage

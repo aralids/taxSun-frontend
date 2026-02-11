@@ -943,7 +943,6 @@ const getAncestors = (
 	lns: string[][][],
 	lyr: string,
 	relTaxSet: any,
-	shortcutsHandleClick: any,
 	taxSet: any,
 ) => {
 	let ancestors: any[] = [];
@@ -964,7 +963,6 @@ const getAncestors = (
 								(relTaxSet[lyr].totCount * 100) / currTxn.totCount,
 								2,
 							),
-							ancHandleClick: () => shortcutsHandleClick(currName),
 						},
 					].concat(ancestors);
 				}

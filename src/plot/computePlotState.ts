@@ -19,7 +19,6 @@ export function computePlotState(args: {
 	key: string;
 	taxSet: any;
 	view: ViewMode;
-	shortcutsHandleClick: (k: string) => void;
 }) {
 	const relTaxSet = calcBasicInfo(
 		args.eValueApplied,
@@ -34,12 +33,6 @@ export function computePlotState(args: {
 	return {
 		relTaxSet,
 		paintingOrder: determinePaintingOrder(relTaxSet),
-		ancestors: getAncestors(
-			args.lns,
-			args.key,
-			relTaxSet,
-			args.shortcutsHandleClick,
-			args.taxSet,
-		),
+		ancestors: getAncestors(args.lns, args.key, relTaxSet, args.taxSet),
 	};
 }
