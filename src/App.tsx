@@ -8,68 +8,32 @@ import Plot from "./components/Plot.tsx";
 import HoverLabel from "./components/HoveredLabel.tsx";
 import ContextMenu from "./components/ContextMenu.tsx";
 import ErrorMessage from "./components/ErrorMessage.tsx";
-
 import { LeftSectionCtx } from "./contexts/LeftSectionCtx";
 import { buildLeftSectionCtxValue } from "./contexts/buildLeftSectionCtxValue";
 import { RightSectionCtx } from "./contexts/RightSectionCtx";
 import { buildRightSectionCtxValue } from "./contexts/buildRightSectionCtxValue";
 import { downloadPlotSvg, downloadSequencesAsTsv } from "./utils/downloads";
-
 import {
 	uploadTsv,
 	uploadFaa,
 	fetchTaxIdByName,
 } from "./services/taxSunApi.tsx";
-
-import { lns, pO, taxSet } from "./data/staticData.ts";
 import {
 	//handleMouseMove,
 	getClickCoords,
 } from "./plot/radialGeometry.ts";
-import {
-	calcBasicInfo,
-	determinePaintingOrder,
-	getAncestors,
-} from "./plot/plotPipeline.ts";
+import { type ViewMode } from "./plot/computePlotState";
+import { makeInitialStt, type Stt } from "./state/state";
+import { computeFromState } from "./plot/computeFromState";
 
 const App = () => {
-	const relTaxSetInit: any = {};
 	const contextMenuInit: any = [];
-	const [stt, setStt] = useState({
-		lyr: "root root",
-		relTaxSet: relTaxSetInit,
-		paintingOrder: pO,
-		ancestors: [],
+	const [stt, setStt] = useState<Stt>(makeInitialStt);
 
-		lns: lns,
-		taxSet: taxSet,
-
-		tsvLastTry: "",
-		tsvLoadStatus: "",
-		tsvName: "default",
-
-		faaLastTry: "",
-		faaLoadStatus: "",
-		faaName: "",
-		faaObj: {},
-
-		collapse: false,
-		eValue: 1.9e-28,
-		eValueInput: "1.9e-28",
-		eValueApplied: false,
-		view: "allEqual",
-
-		eValueEnabled: false,
-		fastaEnabled: false,
-
-		fetchedIDs: {},
-	});
 	const [viewport, setViewport] = useState({
 		w: window.innerWidth,
 		h: window.innerHeight,
 	});
-
-	//const [ctxMenuVis, setCtxMenuVis] = useState(false);
 	const [hovered, setHovered] = useState("");
 	const [context, setContext] = useState({
 		coords: contextMenuInit,
@@ -79,33 +43,8 @@ const App = () => {
 
 	const plotHandleClick = (key: string) => {
 		setStt((prev) => {
-			const newRelTaxSet = calcBasicInfo(
-				prev.eValueApplied,
-				prev.eValue,
-				prev.collapse,
-				prev.lns,
-				key,
-				prev.taxSet,
-				prev.view,
-			);
-
-			const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
-
-			const newAncestors: any = getAncestors(
-				prev.lns,
-				key,
-				newRelTaxSet,
-				shortcutsHandleClick,
-				prev.taxSet,
-			);
-
-			return {
-				...prev,
-				ancestors: newAncestors,
-				lyr: key,
-				paintingOrder: newPaintingOrder,
-				relTaxSet: newRelTaxSet,
-			};
+			const computed = computeFromState(prev, key, shortcutsHandleClick);
+			return { ...prev, lyr: key, ...computed };
 		});
 	};
 
@@ -144,18 +83,18 @@ const App = () => {
 			const newData = await uploadTsv(file);
 
 			setStt((prev) => {
-				const newRelTaxSet = calcBasicInfo(
-					false,
-					prev.eValue,
-					false,
-					newData.lns,
+				const computed = computeFromState(
+					prev,
 					"root root",
-					newData.taxSet,
-					"allEqual",
+					shortcutsHandleClick,
+					{
+						eValueApplied: false,
+						collapse: false,
+						lns: newData.lns,
+						taxSet: newData.taxSet,
+						view: "allEqual",
+					},
 				);
-
-				const newPaintingOrder = determinePaintingOrder(newRelTaxSet);
-
 				return {
 					...prev,
 					tsvName: file.name,
@@ -169,8 +108,7 @@ const App = () => {
 					collapse: false,
 					lyr: "root root",
 					view: "allEqual",
-					paintingOrder: newPaintingOrder,
-					relTaxSet: newRelTaxSet,
+					...computed,
 				};
 			});
 		} catch (error) {
@@ -215,22 +153,15 @@ const App = () => {
 	const collHandleChange = () => {
 		setStt((prev) => {
 			const newCollapse = !prev.collapse;
-
-			const newRelTaxSet = calcBasicInfo(
-				prev.eValueApplied,
-				prev.eValue,
-				newCollapse,
-				prev.lns,
-				prev.lyr,
-				prev.taxSet,
-				prev.view,
-			);
-
+			const computed = computeFromState(prev, prev.lyr, shortcutsHandleClick, {
+				collapse: newCollapse,
+			});
 			return {
 				...prev,
 				collapse: newCollapse,
-				relTaxSet: newRelTaxSet,
-				paintingOrder: determinePaintingOrder(newRelTaxSet),
+				relTaxSet: computed.relTaxSet,
+				paintingOrder: computed.paintingOrder,
+				// ancestors: computed.ancestors, // <- leave OUT if you want old behavior
 			};
 		});
 	};
@@ -238,27 +169,24 @@ const App = () => {
 	const eValueAppliedHandleChange = () => {
 		setStt((prev) => {
 			const newApplied = !prev.eValueApplied;
-
 			try {
-				const newRelTaxSet = calcBasicInfo(
-					newApplied,
-					prev.eValue,
-					prev.collapse,
-					prev.lns,
+				const computed = computeFromState(
+					prev,
 					prev.lyr,
-					prev.taxSet,
-					prev.view,
+					shortcutsHandleClick,
+					{
+						eValueApplied: newApplied,
+					},
 				);
-
 				return {
 					...prev,
 					eValueApplied: newApplied,
-					relTaxSet: newRelTaxSet,
-					paintingOrder: determinePaintingOrder(newRelTaxSet),
+					relTaxSet: computed.relTaxSet,
+					paintingOrder: computed.paintingOrder,
+					// ancestors: computed.ancestors, // optional
 				};
 			} catch (err) {
 				console.log("calcBasicInfo failed in eValue toggle:", err);
-				// Keep UI stable instead of crashing
 				return prev;
 			}
 		});
@@ -286,21 +214,20 @@ const App = () => {
 			}
 
 			try {
-				const newRelTaxSet = calcBasicInfo(
-					prev.eValueApplied,
-					parsed,
-					prev.collapse,
-					prev.lns,
+				const computed = computeFromState(
+					prev,
 					prev.lyr,
-					prev.taxSet,
-					prev.view,
+					shortcutsHandleClick,
+					{
+						eValue: parsed,
+					},
 				);
-
 				return {
 					...prev,
 					eValue: parsed,
-					relTaxSet: newRelTaxSet,
-					paintingOrder: determinePaintingOrder(newRelTaxSet),
+					relTaxSet: computed.relTaxSet,
+					paintingOrder: computed.paintingOrder,
+					// ancestors: computed.ancestors, // optional
 				};
 			} catch (err) {
 				console.log("calcBasicInfo failed in eValue Enter:", err);
@@ -309,26 +236,23 @@ const App = () => {
 		});
 	};
 
-	type ViewMode = "unaltered" | "marriedTaxaI" | "marriedTaxaII" | "allEqual";
-
 	const viewHandleChange = (newView: ViewMode) => {
 		setStt((prev) => {
 			try {
-				const newRelTaxSet = calcBasicInfo(
-					prev.eValueApplied,
-					prev.eValue,
-					prev.collapse,
-					prev.lns,
+				const computed = computeFromState(
+					prev,
 					prev.lyr,
-					prev.taxSet,
-					newView,
+					shortcutsHandleClick,
+					{
+						view: newView,
+					},
 				);
-
 				return {
 					...prev,
 					view: newView,
-					relTaxSet: newRelTaxSet,
-					paintingOrder: determinePaintingOrder(newRelTaxSet),
+					relTaxSet: computed.relTaxSet,
+					paintingOrder: computed.paintingOrder,
+					// ancestors: computed.ancestors, // optional
 				};
 			} catch (err) {
 				console.log("calcBasicInfo failed in view change:", err);
@@ -387,40 +311,43 @@ const App = () => {
 	useEffect(() => {
 		const handleWindowClick = () => setContext({ coords: [], target: null });
 		window.addEventListener("click", handleWindowClick);
-
-		setStt((prev) => ({
-			...prev,
-			relTaxSet: calcBasicInfo(
-				false,
-				1.9e-28,
-				false,
-				lns,
+		setStt((prev) => {
+			const computed = computeFromState(
+				prev,
 				"root root",
-				taxSet,
-				"allEqual",
-			),
-		}));
-
+				shortcutsHandleClick,
+				{
+					eValueApplied: false,
+					eValue: 1.9e-28,
+					collapse: false,
+					lns: prev.lns,
+					taxSet: prev.taxSet,
+					view: "allEqual",
+				},
+			);
+			return {
+				...prev,
+				relTaxSet: computed.relTaxSet,
+				paintingOrder: computed.paintingOrder,
+				ancestors: computed.ancestors,
+			};
+		});
 		return () => window.removeEventListener("click", handleWindowClick);
 	}, []);
 
 	useEffect(() => {
 		const updateOnResize = () => {
 			setViewport({ w: window.innerWidth, h: window.innerHeight });
-			setStt((prev) => ({
-				...prev,
-				relTaxSet: calcBasicInfo(
-					prev.eValueApplied,
-					prev.eValue,
-					prev.collapse,
-					prev.lns,
-					prev.lyr,
-					prev.taxSet,
-					prev.view,
-				),
-			}));
+			setStt((prev) => {
+				const computed = computeFromState(prev, prev.lyr, shortcutsHandleClick);
+				return {
+					...prev,
+					relTaxSet: computed.relTaxSet,
+					paintingOrder: computed.paintingOrder,
+					// ancestors: computed.ancestors, // optional
+				};
+			});
 		};
-
 		window.addEventListener("resize", updateOnResize);
 		return () => window.removeEventListener("resize", updateOnResize);
 	}, []);
