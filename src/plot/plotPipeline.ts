@@ -702,7 +702,6 @@ const color = (
 			Number(taxSet[lns3rdLstTxn].taxID) * 2 +
 			12) %
 		22;
-	console.log(offset);
 	const palette = createPalette(offset, 100);
 	let colors: any = {};
 	let hueColored: string[] = [];
@@ -970,7 +969,6 @@ const getAncestors = (
 			}
 		}
 	}
-	console.log("ancestors:", ancestors);
 	return ancestors;
 };
 
