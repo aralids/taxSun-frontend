@@ -1,6 +1,10 @@
 # taxSun Metagenomic Visualization
 
+![taxSun Screenshot](./assets/taxsun_demo.png)
+
 taxSun is an interactive web application for visualizing metagenomic classification results based on the NCBI taxonomy database. It allows users to upload TSV files and explore abundance distributions across taxonomic ranks in a radial visualization.
+
+You can access the live [here](https://taxsun-frontend-production-ed00.up.railway.app/) here.
 
 ## How to download and run locally
 
@@ -12,7 +16,7 @@ Occasionally, especially if your TSV file contains > 10,000 unique taxIDs, the r
 > [!IMPORTANT]
 > The NCBI taxonomy database gets regularly updated and is unusable for a couple of hours.
 
-1. Download and unzip the code from this repository into a new folder (referred to as "frontend folder" from now on)
+1. Download and unzip the code from [the frontend repository](https://github.com/aralids/taxSun-frontend) (referred to as "frontend folder" from now on)
 2. Download and unzip the code from [the backend repository](https://github.com/aralids/taxSun-fastAPI-backend) into another folder (referred to as "backend folder" from now on)
 
 3. Open a terminal in the backend folder and run the following commands:
@@ -27,4 +31,4 @@ Occasionally, especially if your TSV file contains > 10,000 unique taxIDs, the r
    - `npm install`
    - `npm run build`
    - `npm run preview`
-   The frontend will usually be hosted at http://localhost:4173, or on another port if this one is not available. Open it and use taxSun like you would the deployed version.
+     The frontend will usually be hosted at http://localhost:4173, or on another port if this one is not available. Open it and use taxSun like you would the deployed version.
