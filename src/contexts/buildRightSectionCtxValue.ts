@@ -1,3 +1,6 @@
+// contexts/buildRightSectionCtxValue.ts
+import type React from "react";
+
 export type ViewMode =
 	| "unaltered"
 	| "marriedTaxaI"
@@ -7,20 +10,20 @@ export type ViewMode =
 type BuildRightCtxArgs = {
 	stt: any;
 
-	uplTsvHandleChange: () => void;
-	uplFaaHandleChange: () => void;
+	uplTsvHandleChange: React.ChangeEventHandler<HTMLInputElement>;
+	uplFaaHandleChange: React.ChangeEventHandler<HTMLInputElement>;
 
-	collHandleChange: () => void;
+	collHandleChange: React.ChangeEventHandler<HTMLInputElement>;
 
-	eValueAppliedHandleChange: () => void;
-	eValueHandleKeyDown: (event: any) => void;
+	eValueAppliedHandleChange: React.ChangeEventHandler<HTMLInputElement>;
+	eValueHandleKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
 
 	viewHandleChange: (newView: ViewMode) => void;
 
 	dldOnClick: () => void;
 
-	tsvFormRef: any;
-	faaFormRef: any;
+	tsvFormRef: React.RefObject<HTMLInputElement>;
+	faaFormRef: React.RefObject<HTMLInputElement>;
 
 	eValueHandleChange: (value: string) => void;
 };
@@ -40,24 +43,24 @@ export function buildRightSectionCtxValue({
 }: BuildRightCtxArgs) {
 	return {
 		// TSV
-		tsvLastTry: stt.tsvLastTry,
-		tsvLoadStatus: stt.tsvLoadStatus,
+		tsvLastTry: stt.tsvLastTry as string,
+		tsvLoadStatus: stt.tsvLoadStatus as string,
 		uplTsvHandleChange,
 		tsvFormRef,
 
 		// FAA
-		fastaEnabled: stt.fastaEnabled,
-		faaLastTry: stt.faaLastTry,
-		faaLoadStatus: stt.faaLoadStatus,
+		fastaEnabled: Boolean(stt.fastaEnabled),
+		faaLastTry: stt.faaLastTry as string,
+		faaLoadStatus: stt.faaLoadStatus as string,
 		uplFaaHandleChange,
 		faaFormRef,
 
 		// Controls
-		coll: stt.collapse,
+		coll: Boolean(stt.collapse),
 		collHandleChange,
 
-		eValueEnabled: stt.eValueEnabled,
-		eValueApplied: stt.eValueApplied,
+		eValueEnabled: Boolean(stt.eValueEnabled),
+		eValueApplied: Boolean(stt.eValueApplied),
 		eValueAppliedHandleChange,
 		eValueHandleKeyDown,
 
@@ -68,8 +71,7 @@ export function buildRightSectionCtxValue({
 		dldOnClick,
 
 		// E-value input
-		eValue: stt.eValue,
-		eValueInput: stt.eValueInput,
+		eValueInput: stt.eValueInput as string,
 		eValueHandleChange,
 	};
 }

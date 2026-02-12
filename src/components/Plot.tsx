@@ -1,5 +1,7 @@
-import Shape from "./Shape.tsx";
-import Label from "./Label.tsx";
+// Plot.tsx
+import type React from "react";
+
+/* ---------------------------------- Types --------------------------------- */
 
 type PlotProps = {
 	ancestors: any[];
@@ -10,9 +12,97 @@ type PlotProps = {
 	paintingOrder: string[];
 	plotHandleClick: (key: string) => void;
 	plotRef: React.MutableRefObject<SVGSVGElement | null>;
-	view: string;
+	view: string; // currently unused here, kept for compatibility
 	viewport: { w: number; h: number };
 };
+
+type ShapeProps = {
+	path: string;
+	color: string;
+	handleClick?: React.MouseEventHandler<SVGPathElement>;
+	handleMouseOver?: React.MouseEventHandler<SVGPathElement>;
+	handleMouseOut?: React.MouseEventHandler<SVGPathElement>;
+	handlePlotRightClick?: React.MouseEventHandler<SVGPathElement>;
+};
+
+type LabelProps = {
+	content: string;
+	fontSize?: string | number;
+	lineHeight?: string | number;
+	transform?: string;
+	x?: number | string;
+	y?: number | string;
+	handleClick?: React.MouseEventHandler<SVGTextElement>;
+	handleMouseOver?: React.MouseEventHandler<SVGTextElement>;
+	handleMouseOut?: React.MouseEventHandler<SVGTextElement>;
+	handlePlotRightClick?: React.MouseEventHandler<SVGTextElement>;
+};
+
+/* ------------------------------ Subcomponents ------------------------------ */
+
+const Shape = ({
+	path,
+	color,
+	handleClick,
+	handleMouseOver,
+	handleMouseOut,
+	handlePlotRightClick,
+}: ShapeProps) => {
+	return (
+		<path
+			className="taxSun-shape"
+			d={path}
+			fill={color}
+			style={{
+				stroke: "#800080",
+				cursor: "pointer",
+			}}
+			onClick={handleClick}
+			onContextMenu={handlePlotRightClick}
+			onMouseEnter={handleMouseOver}
+			onMouseLeave={handleMouseOut}
+		/>
+	);
+};
+
+const Label = ({
+	content,
+	fontSize,
+	lineHeight,
+	transform,
+	x,
+	y,
+	handleClick,
+	handleMouseOver,
+	handleMouseOut,
+	handlePlotRightClick,
+}: LabelProps) => {
+	return (
+		<text
+			className="taxSun-label"
+			style={{
+				fill: "#800080",
+				fontFamily: "calibri",
+				fontSize,
+				lineHeight,
+				margin: 0,
+				padding: 0,
+				cursor: "pointer",
+			}}
+			transform={transform}
+			x={x}
+			y={y}
+			onClick={handleClick}
+			onContextMenu={handlePlotRightClick}
+			onMouseOver={handleMouseOver}
+			onMouseOut={handleMouseOut}
+		>
+			{content}
+		</text>
+	);
+};
+
+/* ---------------------------------- Plot ---------------------------------- */
 
 const Plot = ({
 	ancestors,
