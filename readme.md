@@ -1,6 +1,6 @@
 # taxSun Metagenomic Visualization
 
-<img src="./docs/screenshot.png" width="70%">
+<img src="./src/assets/taxsun_demo.png" width="70%">
 
 taxSun is an interactive web application for visualizing metagenomic classification results based on the NCBI taxonomy database. It allows users to upload TSV files and explore abundance distributions across taxonomic ranks in a radial visualization.
 
