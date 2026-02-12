@@ -1,5 +1,5 @@
-// src/hooks/appActions/idActions.ts
-import { useCallback } from "react";
+// src/actions/idActions.ts
+import type React from "react";
 
 import { fetchTaxIdByName } from "../services/taxSunApi";
 import type { Stt } from "../state/state";
@@ -10,25 +10,23 @@ type Args = {
 };
 
 export function makeIdActions({ setStt, sttRef }: Args) {
-	const IDInfoHandleClick = useCallback(
-		async (key: string) => {
-			const lyrAtClick = sttRef.current.lyr;
+	const IDInfoHandleClick = async (key: string) => {
+		const lyrAtClick = sttRef.current.lyr;
 
-			try {
-				const { taxID } = await fetchTaxIdByName(key);
-				setStt((prev) => ({
-					...prev,
-					fetchedIDs: {
-						...prev.fetchedIDs,
-						[lyrAtClick]: taxID,
-					},
-				}));
-			} catch (error) {
-				console.log("error:", error);
-			}
-		},
-		[setStt, sttRef],
-	);
+		try {
+			const { taxID } = await fetchTaxIdByName(key);
+
+			setStt((prev) => ({
+				...prev,
+				fetchedIDs: {
+					...prev.fetchedIDs,
+					[lyrAtClick]: taxID,
+				},
+			}));
+		} catch (error) {
+			console.log("error:", error);
+		}
+	};
 
 	return { IDInfoHandleClick };
 }

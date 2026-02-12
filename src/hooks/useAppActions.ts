@@ -1,5 +1,5 @@
 // src/hooks/useAppActions.ts
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 
 import type { Stt } from "../state/state";
 import type { PlotModel } from "../plot/computeFromState";
@@ -27,7 +27,7 @@ type UseAppActionsArgs = {
 	faaFormRef: React.RefObject<HTMLInputElement | null>;
 	plotRef: React.RefObject<SVGSVGElement | null>;
 
-	// ✅ latest derived plot model (relTaxSet / paintingOrder / ancestors)
+	// latest derived plot model (relTaxSet / paintingOrder / ancestors)
 	plotModelRef: React.MutableRefObject<PlotModel>;
 };
 
@@ -48,28 +48,40 @@ export function useAppActions({
 		sttRef.current = stt;
 	}, [stt]);
 
-	const plot = makePlotActions({
-		setStt,
-		setContext,
-		setHovered,
-	});
+	const plot = useMemo(
+		() =>
+			makePlotActions({
+				setStt,
+				setContext,
+				setHovered,
+			}),
+		[setStt, setContext, setHovered],
+	);
 
-	const uploads = makeUploadActions({
-		setStt,
-		setErrorMessageDisplay,
-		tsvFormRef,
-		faaFormRef,
-	});
+	const uploads = useMemo(
+		() =>
+			makeUploadActions({
+				setStt,
+				setErrorMessageDisplay,
+				tsvFormRef,
+				faaFormRef,
+			}),
+		[setStt, setErrorMessageDisplay, tsvFormRef, faaFormRef],
+	);
 
-	const controls = makeControlActions({ setStt });
+	const controls = useMemo(() => makeControlActions({ setStt }), [setStt]);
 
-	const exports_ = makeExportActions({
-		plotRef,
-		sttRef,
-		plotModelRef,
-	});
+	const exports_ = useMemo(
+		() =>
+			makeExportActions({
+				plotRef,
+				sttRef,
+				plotModelRef,
+			}),
+		[plotRef, sttRef, plotModelRef],
+	);
 
-	const id = makeIdActions({ setStt, sttRef });
+	const id = useMemo(() => makeIdActions({ setStt, sttRef }), [setStt, sttRef]);
 
 	return {
 		...plot,

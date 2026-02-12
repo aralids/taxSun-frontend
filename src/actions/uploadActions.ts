@@ -1,5 +1,5 @@
-// src/hooks/appActions/uploadActions.ts
-import { useCallback } from "react";
+// src/actions/uploadActions.ts
+import type React from "react";
 
 import { uploadTsv, uploadFaa } from "../services/taxSunApi";
 import type { Stt } from "../state/state";
@@ -17,7 +17,7 @@ export function makeUploadActions({
 	tsvFormRef,
 	faaFormRef,
 }: Args) {
-	const uplTsvHandleChange = useCallback(async () => {
+	const uplTsvHandleChange = async () => {
 		const file = tsvFormRef.current?.files?.[0];
 		if (!file) return;
 
@@ -56,9 +56,9 @@ export function makeUploadActions({
 			}));
 			setErrorMessageDisplay(true);
 		}
-	}, [setStt, setErrorMessageDisplay, tsvFormRef]);
+	};
 
-	const uplFaaHandleChange = useCallback(async () => {
+	const uplFaaHandleChange = async () => {
 		const file = faaFormRef.current?.files?.[0];
 		if (!file) return;
 
@@ -85,7 +85,7 @@ export function makeUploadActions({
 				faaLoadStatus: "close",
 			}));
 		}
-	}, [setStt, faaFormRef]);
+	};
 
 	return {
 		uplTsvHandleChange,

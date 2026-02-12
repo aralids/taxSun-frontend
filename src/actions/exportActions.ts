@@ -1,5 +1,5 @@
-// src/hooks/appActions/exportActions.ts
-import { useCallback } from "react";
+// src/actions/exportActions.ts
+import type React from "react";
 
 import { downloadPlotSvg, downloadSequencesAsTsv } from "../utils/downloads";
 import type { PlotModel } from "../plot/computeFromState";
@@ -12,7 +12,7 @@ type Args = {
 };
 
 export function makeExportActions({ plotRef, sttRef, plotModelRef }: Args) {
-	const dldOnClick = useCallback(() => {
+	const dldOnClick = () => {
 		if (!plotRef.current) return;
 		const s = sttRef.current;
 
@@ -24,45 +24,39 @@ export function makeExportActions({ plotRef, sttRef, plotModelRef }: Args) {
 			eValue: s.eValue,
 			view: s.view,
 		});
-	}, [plotRef, sttRef]);
+	};
 
 	// ✅ uses derived plot model (not stt)
-	const handleCopyClick = useCallback(
-		(target: string, unspecOnly: any) => {
-			const plot = plotModelRef.current;
-			const targetTxn = plot.relTaxSet?.[target];
-			if (!targetTxn) return;
+	const handleCopyClick = (target: string, unspecOnly: any) => {
+		const plot = plotModelRef.current;
+		const targetTxn = plot.relTaxSet?.[target];
+		if (!targetTxn) return;
 
-			let geneNames: string[] = targetTxn.geneNames ?? [];
+		let geneNames: string[] = targetTxn.geneNames ?? [];
 
-			if (!unspecOnly) {
-				geneNames = geneNames.concat(
-					(targetTxn.children ?? []).reduce((acc: string[], child: string) => {
-						const childTxn = plot.relTaxSet?.[child];
-						if (childTxn?.geneNames) return acc.concat(childTxn.geneNames);
-						return acc;
-					}, []),
-				);
-			}
+		if (!unspecOnly) {
+			geneNames = geneNames.concat(
+				(targetTxn.children ?? []).reduce((acc: string[], child: string) => {
+					const childTxn = plot.relTaxSet?.[child];
+					if (childTxn?.geneNames) return acc.concat(childTxn.geneNames);
+					return acc;
+				}, []),
+			);
+		}
 
-			navigator.clipboard.writeText(geneNames.join("\n"));
-		},
-		[plotModelRef],
-	);
+		navigator.clipboard.writeText(geneNames.join("\n"));
+	};
 
-	const handleDownloadSeqClick = useCallback(
-		(target: string, unspecOnly: any) => {
-			downloadSequencesAsTsv(target, !!unspecOnly, {
-				relTaxSet: plotModelRef.current.relTaxSet,
-				faaObj: sttRef.current.faaObj,
-				tsvName: sttRef.current.tsvName,
-				faaName: sttRef.current.faaName,
-				eValueApplied: sttRef.current.eValueApplied,
-				eValue: sttRef.current.eValue,
-			});
-		},
-		[plotModelRef, sttRef],
-	);
+	const handleDownloadSeqClick = (target: string, unspecOnly: any) => {
+		downloadSequencesAsTsv(target, !!unspecOnly, {
+			relTaxSet: plotModelRef.current.relTaxSet,
+			faaObj: sttRef.current.faaObj,
+			tsvName: sttRef.current.tsvName,
+			faaName: sttRef.current.faaName,
+			eValueApplied: sttRef.current.eValueApplied,
+			eValue: sttRef.current.eValue,
+		});
+	};
 
 	return {
 		dldOnClick,
