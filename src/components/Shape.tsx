@@ -1,4 +1,11 @@
-import { useMemo } from "react";
+type ShapeProps = {
+	path: string;
+	color: string;
+	handleClick?: React.MouseEventHandler<SVGPathElement>;
+	handleMouseOver?: React.MouseEventHandler<SVGPathElement>;
+	handleMouseOut?: React.MouseEventHandler<SVGPathElement>;
+	handlePlotRightClick?: React.MouseEventHandler<SVGPathElement>;
+};
 
 const Shape = ({
 	path,
@@ -7,24 +14,22 @@ const Shape = ({
 	handleMouseOver,
 	handleMouseOut,
 	handlePlotRightClick,
-}: any) => {
-	return useMemo(() => {
-		return (
-			<path
-				className="taxSun-shape"
-				d={path}
-				style={{
-					stroke: "#800080",
-					cursor: "pointer",
-				}}
-				fill={color}
-				onClick={handleClick}
-				onContextMenu={handlePlotRightClick}
-				onMouseEnter={handleMouseOver}
-				onMouseLeave={handleMouseOut}
-			></path>
-		);
-	}, [path]);
+}: ShapeProps) => {
+	return (
+		<path
+			className="taxSun-shape"
+			d={path}
+			fill={color}
+			style={{
+				stroke: "#800080",
+				cursor: "pointer",
+			}}
+			onClick={handleClick}
+			onContextMenu={handlePlotRightClick}
+			onMouseEnter={handleMouseOver}
+			onMouseLeave={handleMouseOut}
+		/>
+	);
 };
 
 export default Shape;

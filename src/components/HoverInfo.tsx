@@ -1,40 +1,45 @@
-import { useContext, useMemo } from "react";
+import { useContext } from "react";
+import Card from "react-bootstrap/Card";
 import { LeftSectionCtx } from "../contexts/LeftSectionCtx";
 
-import Card from "react-bootstrap/Card";
+type HoveredTaxon = {
+	name: string;
+	rank: string;
+	totCount: number;
+	unaCount: number;
+	rawCount: number;
+};
+
+type LeftSectionContextValue = {
+	hovered?: HoveredTaxon | null;
+};
 
 const HoverInfo = () => {
-	const ctx: any = useContext(LeftSectionCtx);
-	return useMemo(() => {
-		if (!ctx["hovered"]) {
-			return <></>;
-		}
-		return (
-			<Card
-				className="mt-3"
-				bg={"light"}
-				text={"black"}
-				style={{ width: "18vw" }}
-			>
-				<Card.Header>Hovering over:</Card.Header>
-				<Card.Body>
-					<Card.Title>{ctx["hovered"]["name"]}</Card.Title>
-					<Card.Text className="m-0">
-						Rank: <b>{ctx["hovered"]["rank"]}</b>
-					</Card.Text>
-					<Card.Text className="m-0">
-						Total count: <b>{ctx["hovered"]["totCount"]}</b>
-					</Card.Text>
-					<Card.Text className="m-0">
-						Unspec. count: <b>{ctx["hovered"]["unaCount"]}</b>
-					</Card.Text>
-					<Card.Text className="m-0">
-						Raw count: <b>{ctx["hovered"]["rawCount"]}</b>
-					</Card.Text>
-				</Card.Body>
-			</Card>
-		);
-	}, [ctx["hovered"]]);
+	const { hovered } = useContext(LeftSectionCtx) as LeftSectionContextValue;
+
+	if (!hovered) return null;
+
+	return (
+		<Card className="mt-3" bg="light" text="black" style={{ width: "18vw" }}>
+			<Card.Header>Hovering over:</Card.Header>
+			<Card.Body>
+				<Card.Title>{hovered.name}</Card.Title>
+
+				<Card.Text className="m-0">
+					Rank: <b>{hovered.rank}</b>
+				</Card.Text>
+				<Card.Text className="m-0">
+					Total count: <b>{hovered.totCount}</b>
+				</Card.Text>
+				<Card.Text className="m-0">
+					Unspec. count: <b>{hovered.unaCount}</b>
+				</Card.Text>
+				<Card.Text className="m-0">
+					Raw count: <b>{hovered.rawCount}</b>
+				</Card.Text>
+			</Card.Body>
+		</Card>
+	);
 };
 
 export default HoverInfo;
