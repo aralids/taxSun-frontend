@@ -3,7 +3,7 @@ import { round, getLayerWidthInPx } from "./radialGeometry";
 import { crop } from "./pipeline/crop";
 import { eFilter } from "./pipeline/eFilter";
 import { calcMinRankPattern } from "./pipeline/rank";
-import { rankPatternFull } from "../data/staticData";
+import { rankPatternFull, taxSet } from "../data/staticData";
 import { marry } from "./pipeline/marry";
 import { collapse as collapseLineages } from "./pipeline/collapse";
 import { assignDegreesLayers } from "./pipeline/assignDegreesLayers";
