@@ -1,7 +1,7 @@
 // src/actions/controlActions.ts
 import type React from "react";
 import type { Stt } from "../state/state";
-import type { ViewMode } from "../plot/computePlotState";
+import { ViewMode } from "../types/taxonomy";
 
 type Args = {
 	setStt: React.Dispatch<React.SetStateAction<Stt>>;

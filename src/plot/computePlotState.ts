@@ -10,12 +10,7 @@ import { assignDegreesLayers } from "./pipeline/assignDegreesLayers";
 import { calcSVGPaths } from "./pipeline/calcSVGPaths";
 import { color } from "./pipeline/color";
 import { label } from "./pipeline/label";
-
-export type ViewMode =
-	| "unaltered"
-	| "marriedTaxaI"
-	| "marriedTaxaII"
-	| "allEqual";
+import { ViewMode } from "../types/taxonomy";
 
 type Viewport = { w: number; h: number };
 
@@ -102,13 +97,13 @@ function calcBasicInfo(input: {
 		relTaxSet,
 	);
 
-	relTaxSet = assignDegreesLayers(
+	relTaxSet = assignDegreesLayers({
 		croppedLns,
-		input.lyr,
+		lyr: input.lyr,
 		minRankPattern,
 		relTaxSet,
-		input.view,
-	);
+		view: input.view,
+	});
 
 	const [layerWidth, cx, cy] = getLayerWidthInPx(
 		0,

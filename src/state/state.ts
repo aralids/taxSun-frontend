@@ -1,6 +1,6 @@
 // src/state/state.ts
 import { lns, taxSet } from "../data/staticData";
-import type { ViewMode } from "../plot/computePlotState";
+import type { ViewMode } from "../types/taxonomy";
 
 export type Stt = {
 	lyr: string;
