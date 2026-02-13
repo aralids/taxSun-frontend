@@ -1,6 +1,5 @@
 // src/plot/computeFromState.ts
-import { computePlotState } from "./computePlotState";
-import { ViewMode } from "../types/taxonomy";
+import { computePlotState, type ViewMode } from "./computePlotState";
 import type { Stt } from "../state/state";
 
 type Overrides = Partial<
