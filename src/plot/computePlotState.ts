@@ -5,7 +5,7 @@ import { eFilter } from "./pipeline/eFilter";
 import { calcMinRankPattern } from "./pipeline/rank";
 import { rankPatternFull } from "../data/staticData";
 import { marry } from "./pipeline/marry";
-import { collapse as collapseLineages } from "./pipeline/collapse";
+import { collapseLineages } from "./pipeline/collapseLineages";
 import { assignDegreesLayers } from "./pipeline/assignDegreesLayers";
 import { calcSVGPaths } from "./pipeline/calcSVGPaths";
 import { color } from "./pipeline/color";
@@ -97,13 +97,13 @@ function calcBasicInfo(input: {
 		relTaxSet,
 	);
 
-	relTaxSet = assignDegreesLayers({
+	relTaxSet = assignDegreesLayers(
 		croppedLns,
-		lyr: input.lyr,
+		input.lyr,
 		minRankPattern,
 		relTaxSet,
-		view: input.view,
-	});
+		input.view,
+	);
 
 	const [layerWidth, cx, cy] = getLayerWidthInPx(
 		0,
