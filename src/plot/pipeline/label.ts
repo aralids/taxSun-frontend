@@ -6,7 +6,7 @@ import {
 	cos,
 	calcOptLabel,
 	calcHorizontalSpace,
-} from "../radialGeometry";
+} from "../utils";
 
 /**
  * Compute label placement/transform metadata (`lblObj`) for each taxon in `relTaxSet`.

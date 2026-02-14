@@ -1,5 +1,5 @@
 // src/plot/pipeline/eFilter.ts
-import { binarySearch } from "../radialGeometry";
+import { binarySearch } from "../utils";
 import type {
 	CropResult,
 	Lineages,

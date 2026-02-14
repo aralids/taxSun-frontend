@@ -1,6 +1,6 @@
 // src/actions/plotActions.ts
 import type React from "react";
-import { getClickCoords } from "../plot/radialGeometry";
+import { getClickCoords } from "../plot/utils/dom";
 import type { Stt } from "../state/state";
 import type { ContextState } from "../hooks/useAppActions";
 

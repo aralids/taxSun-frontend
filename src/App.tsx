@@ -8,16 +8,20 @@ import Plot from "./components/Plot.tsx";
 import HoverLabel from "./components/HoveredLabel.tsx";
 import ContextMenu from "./components/ContextMenu.tsx";
 import ErrorMessage from "./components/ErrorMessage.tsx";
+import { ContextState } from "./components/ContextMenu.tsx";
+
+import { useAppActions } from "./hooks/useAppActions";
+import { useDismissContextMenu } from "./hooks/useDismissContextMenu.ts";
+import { useViewport } from "./hooks/useViewport.ts";
+
 import { LeftSectionCtx } from "./contexts/LeftSectionCtx";
 import { buildLeftSectionCtxValue } from "./contexts/buildLeftSectionCtxValue";
 import { RightSectionCtx } from "./contexts/RightSectionCtx";
 import { buildRightSectionCtxValue } from "./contexts/buildRightSectionCtxValue";
+
 import { makeInitialStt, type Stt } from "./state/state";
-import { computeFromState } from "./plot/computeFromState";
-import { useAppActions } from "./hooks/useAppActions";
-import { useDismissContextMenu } from "./hooks/useDismissContextMenu.ts";
-import { useViewport } from "./hooks/useViewport.ts";
-import { ContextState } from "./components/ContextMenu.tsx";
+
+import { computeFromState } from "./plot/convertAppStateToPlotArgs.ts";
 
 const App = () => {
 	const [stt, setStt] = useState<Stt>(makeInitialStt);

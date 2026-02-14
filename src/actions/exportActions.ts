@@ -2,7 +2,7 @@
 import type React from "react";
 
 import { downloadPlotSvg, downloadSequencesAsTsv } from "../utils/downloads";
-import type { PlotModel } from "../plot/computeFromState";
+import type { PlotModel } from "../types/plotTypes";
 import type { Stt } from "../state/state";
 
 type Args = {

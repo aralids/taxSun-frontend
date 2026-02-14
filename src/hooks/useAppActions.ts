@@ -2,7 +2,7 @@
 import { useEffect, useRef, useMemo } from "react";
 
 import type { Stt } from "../state/state";
-import type { PlotModel } from "../plot/computeFromState";
+import type { PlotModel } from "../types/plotTypes";
 
 import { makePlotActions } from "../actions/plotActions";
 import { makeUploadActions } from "../actions/uploadActions";

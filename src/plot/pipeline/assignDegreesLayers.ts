@@ -1,4 +1,4 @@
-import { round } from "../radialGeometry";
+import { round } from "../utils";
 
 /**
  * Assign radial "layers" (ring indices) and angular "degrees" (start/end angles)

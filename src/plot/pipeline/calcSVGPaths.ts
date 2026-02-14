@@ -1,4 +1,5 @@
-import { round, calculateArcEndpoints } from "../radialGeometry";
+import { calculateArcEndpoints } from "../utils";
+import { round } from "../utils";
 
 /**
  * Compute SVG path strings for each taxon in `relTaxSet` based on its precomputed

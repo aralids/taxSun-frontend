@@ -1,4 +1,4 @@
-import { createPalette, midColor, tintify } from "../radialGeometry";
+import { createPalette, midColor, tintify } from "../utils";
 
 /**
  * Assign colors to taxa in `relTaxSet` for visualization.

@@ -1,23 +1,11 @@
 // src/plot/computeFromState.ts
 import { computePlotState } from "./computePlotState";
-import { ViewMode } from "../types/plotTypes";
+import { PlotModel, ViewMode } from "../types/plotTypes";
 import type { Stt } from "../state/state";
 
 type Overrides = Partial<
 	Pick<Stt, "eValueApplied" | "eValue" | "collapse" | "lns" | "taxSet" | "view">
 >;
-
-export type Ancestor = {
-	ancKey: string;
-	ancName: string;
-	ancPerc: number;
-};
-
-export type PlotModel = {
-	relTaxSet: any;
-	paintingOrder: string[];
-	ancestors: Ancestor[];
-};
 
 export function computeFromState(
 	prev: Stt,

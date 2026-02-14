@@ -107,6 +107,22 @@ export type RelTaxSet = Record<TaxonKey, TaxonNode>;
  */
 export type CropResult = [croppedLns: Lineages, relTaxSet: RelTaxSet];
 
+/**
+ * Ancestor breadcrumb entry for the currently focused root taxon.
+ * Used by the UI to render "you are here" navigation.
+ */
+export type Ancestor = {
+	ancKey: TaxonKey;
+	ancName: string;
+	ancPerc: number;
+};
+
+export type PlotModel = {
+	relTaxSet: any;
+	paintingOrder: string[];
+	ancestors: Ancestor[];
+};
+
 export type ViewMode =
 	| "unaltered"
 	| "marriedTaxaI"
