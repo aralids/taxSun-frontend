@@ -1,4 +1,11 @@
 import { round } from "../radialGeometry";
+import type {
+	CropResult,
+	Lineages,
+	RelTaxSet,
+	TaxonKey,
+	ViewMode,
+} from "../../types/plotTypes";
 
 /**
  * "Marry" (merge) low-abundance leaf taxa into combined taxa, to reduce clutter in the plot.
@@ -32,11 +39,11 @@ import { round } from "../radialGeometry";
  *  - Otherwise: [croppedLns, relTaxSet]
  */
 export const marry = (
-	croppedLns: string[][][],
-	lyr: string,
-	relTaxSet: any,
-	view: string,
-) => {
+	croppedLns: Lineages,
+	lyr: TaxonKey,
+	relTaxSet: RelTaxSet,
+	view: ViewMode,
+): CropResult => {
 	// --- Only apply marrying in the dedicated views. ---
 	if (view === "marriedTaxaI" || view === "marriedTaxaII") {
 		// --- Configuration: below this percentage, taxa are considered "small" and eligible to merge. ---
@@ -194,12 +201,12 @@ export const marry = (
 
 		// --- 4) Create new cropped lineages and reduced taxSet with merged ("married") taxa. ---
 		// Prefer structuredClone if available; fall back to JSON copy.
-		const newCroppedLns: string[][][] =
+		const newCroppedLns: Lineages =
 			typeof structuredClone === "function"
 				? structuredClone(croppedLns)
 				: JSON.parse(JSON.stringify(croppedLns));
 
-		const newRelTaxSet =
+		const newRelTaxSet: RelTaxSet =
 			typeof structuredClone === "function"
 				? structuredClone(relTaxSet)
 				: JSON.parse(JSON.stringify(relTaxSet));
@@ -248,7 +255,7 @@ export const marry = (
 						const nodeKey = croppedLns[i][j][1] + " " + croppedLns[i][j][0];
 
 						if (nodeKey !== group.parent) {
-							delete newRelTaxSet[nodeKey];
+							delete newRelTaxSet[nodeKey as TaxonKey];
 						} else {
 							break;
 						}
@@ -263,7 +270,7 @@ export const marry = (
 					const nodeKey = chosenLn[j][1] + " " + chosenLn[j][0];
 
 					if (nodeKey !== group.parent) {
-						delete newRelTaxSet[nodeKey];
+						delete newRelTaxSet[nodeKey as TaxonKey];
 						newCroppedLns[groupNewIndex] = newCroppedLns[groupNewIndex]
 							.slice(0, j)
 							.concat(newCroppedLns[groupNewIndex].slice(j + 1));
@@ -273,7 +280,7 @@ export const marry = (
 				}
 
 				// --- Add the new merged taxon entry to relTaxSet. ---
-				newRelTaxSet[marriedName + " " + marriedRank] = {
+				newRelTaxSet[(marriedName + " " + marriedRank) as TaxonKey] = {
 					name: marriedName,
 					rank: marriedRank,
 					unaCount: marriedCount,
@@ -281,7 +288,7 @@ export const marry = (
 					married: true,
 					geneNames: marriedGeneNames,
 					fastaHeaders: marriedHeaders,
-				};
+				} as any;
 
 				// --- Append merged node to the chosen lineage path. ---
 				newCroppedLns[groupNewIndex] = newCroppedLns[groupNewIndex].concat([

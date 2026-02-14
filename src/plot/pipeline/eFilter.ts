@@ -1,4 +1,11 @@
+// src/plot/pipeline/eFilter.ts
 import { binarySearch } from "../radialGeometry";
+import type {
+	CropResult,
+	Lineages,
+	RelTaxSet,
+	TaxonKey,
+} from "../../types/plotTypes";
 
 /**
  * Apply an e-value threshold to the *leaf* taxon of each cropped lineage.
@@ -27,9 +34,9 @@ import { binarySearch } from "../radialGeometry";
 export const eFilter = (
 	eValueApplied: boolean,
 	eValue: number,
-	croppedLns: string[][][],
-	relTaxSet: any,
-) => {
+	croppedLns: Lineages,
+	relTaxSet: RelTaxSet,
+): CropResult => {
 	// --- Early gate: only do work if the filter is enabled and the threshold is finite. ---
 	if (eValueApplied && eValue !== Infinity) {
 		// --- Iterate backwards so we can safely remove lineages in-place. ---
@@ -37,7 +44,7 @@ export const eFilter = (
 			// --- Identify the leaf taxon for this lineage ("<name> <rank>"). ---
 			const ln = croppedLns[i];
 			const last = ln[ln.length - 1];
-			const lastTaxon = last[1] + " " + last[0];
+			const lastTaxon: TaxonKey = `${last[1]} ${last[0]}`;
 
 			// --- Safety: if upstream deletions removed this taxon, skip to avoid crashing. ---
 			if (!relTaxSet[lastTaxon]) continue;
@@ -47,7 +54,7 @@ export const eFilter = (
 
 			// --- Compute cut-off position inside the leaf's eValues using binary search. ---
 			// We clamp the result to protect against any unexpected return value from binarySearch.
-			const eVals: any[] = relTaxSet[lastTaxon]["eValues"] ?? [];
+			const eVals: number[] = relTaxSet[lastTaxon]["eValues"] ?? [];
 			let cutOffIndex = binarySearch(eVals, eValue);
 			if (cutOffIndex < 0) cutOffIndex = 0;
 			if (cutOffIndex > eVals.length) cutOffIndex = eVals.length;
@@ -71,7 +78,7 @@ export const eFilter = (
 			// --- Propagate the reduction in hits to totCount along the entire lineage. ---
 			const diff = oldUnaCount - newUnaCount;
 			for (const txn of ln) {
-				const name = txn[1] + " " + txn[0];
+				const name: TaxonKey = `${txn[1]} ${txn[0]}`;
 
 				// Safety: if a node was deleted earlier, skip it.
 				if (!relTaxSet[name]) continue;

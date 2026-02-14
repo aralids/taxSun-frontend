@@ -10,28 +10,16 @@ import { assignDegreesLayers } from "./pipeline/assignDegreesLayers";
 import { calcSVGPaths } from "./pipeline/calcSVGPaths";
 import { color } from "./pipeline/color";
 import { label } from "./pipeline/label";
-import { ViewMode } from "../types/taxonomy";
 
-type Viewport = { w: number; h: number };
-
-// Minimal “good enough” types for this module.
-// You can replace these later with real domain models.
-type LineageItem = [rank: string, name: string];
-type Lineage = LineageItem[];
-type Lineages = Lineage[];
-
-type TaxonNode = {
-	name: string;
-	totCount: number;
-	unaCount: number;
-	lnIndex: number;
-	layers?: number[];
-	degrees?: number[];
-	// plus many more keys in your real structure
-	[key: string]: any;
-};
-
-type TaxSet = Record<string, TaxonNode>;
+import type {
+	Lineages,
+	TaxSet,
+	TaxonNode,
+	RelTaxSet,
+	Viewport,
+	ViewMode,
+	TaxonKey,
+} from "../types/plotTypes";
 
 export function computePlotState(args: {
 	eValueApplied: boolean;
@@ -41,9 +29,9 @@ export function computePlotState(args: {
 	key: string; // keep external API stable for now
 	taxSet: TaxSet;
 	view: ViewMode;
-	viewport?: Viewport; // new, optional
+	viewport?: Viewport; // optional override (helps with testing)
 }) {
-	const lyr = args.key;
+	const lyr: TaxonKey = args.key;
 
 	const viewport: Viewport = args.viewport ?? {
 		w: window.innerWidth,
@@ -73,13 +61,15 @@ function calcBasicInfo(input: {
 	eValue: number;
 	collapse: boolean;
 	lns: Lineages;
-	lyr: string;
+	lyr: TaxonKey;
 	taxSet: TaxSet;
 	view: ViewMode;
 	viewport: Viewport;
-}) {
+}): RelTaxSet {
+	// 1) Crop lineages + shrink taxSet to relevant subtree
 	let [croppedLns, relTaxSet] = crop(input.lns, input.lyr, input.taxSet);
 
+	// 2) Apply e-value filter (mutates relTaxSet + may remove lineages)
 	[croppedLns, relTaxSet] = eFilter(
 		input.eValueApplied,
 		input.eValue,
@@ -87,16 +77,20 @@ function calcBasicInfo(input: {
 		relTaxSet,
 	);
 
+	// 3) Compute minimal rank pattern for the currently visible subtree
 	const minRankPattern = calcMinRankPattern(croppedLns, rankPatternFull);
 
+	// 4) Optionally marry low-abundance taxa into merged nodes
 	[croppedLns, relTaxSet] = marry(croppedLns, input.lyr, relTaxSet, input.view);
 
+	// 5) Optionally collapse pass-through nodes to simplify lineage paths
 	[croppedLns, relTaxSet] = collapseLineages(
 		input.collapse,
 		croppedLns,
 		relTaxSet,
 	);
 
+	// 6) Assign layers + degrees onto relTaxSet
 	relTaxSet = assignDegreesLayers(
 		croppedLns,
 		input.lyr,
@@ -105,6 +99,7 @@ function calcBasicInfo(input: {
 		input.view,
 	);
 
+	// 7) Compute geometry constants for the current viewport
 	const [layerWidth, cx, cy] = getLayerWidthInPx(
 		0,
 		0,
@@ -113,6 +108,7 @@ function calcBasicInfo(input: {
 		minRankPattern,
 	);
 
+	// 8) Compute SVG paths, colors, and label objects
 	relTaxSet = calcSVGPaths(cx, cy, layerWidth, relTaxSet);
 	relTaxSet = color(croppedLns, input.lns, input.lyr, relTaxSet, input.taxSet);
 	relTaxSet = label(cx, cy, layerWidth, input.lyr, minRankPattern, relTaxSet);
@@ -122,8 +118,8 @@ function calcBasicInfo(input: {
 
 function getAncestors(
 	lns: Lineages,
-	lyr: string,
-	relTaxSet: Record<string, TaxonNode>,
+	lyr: TaxonKey,
+	relTaxSet: RelTaxSet,
 	taxSet: TaxSet,
 ) {
 	const root = relTaxSet[lyr];
@@ -137,13 +133,16 @@ function getAncestors(
 
 		const [rankAtIndex, nameAtIndex] = itemAtIndex;
 
+		// lyr is of the form "<name(s)> <rank>" so check both are present.
 		if (!lyr.includes(nameAtIndex) || !lyr.includes(rankAtIndex)) continue;
 
-		const ancestors = [];
+		const ancestors: { ancKey: TaxonKey; ancName: string; ancPerc: number }[] =
+			[];
+
 		for (let j = 0; j < rootIndex; j++) {
 			const [rank, name] = ln[j];
-			const key = `${name} ${rank}`;
-			const currTxn = taxSet[key];
+			const key: TaxonKey = `${name} ${rank}`;
+			const currTxn: TaxonNode | undefined = taxSet[key];
 			if (!currTxn) continue;
 
 			ancestors.unshift({
@@ -152,14 +151,15 @@ function getAncestors(
 				ancPerc: round((root.totCount * 100) / currTxn.totCount, 2),
 			});
 		}
+
 		return ancestors;
 	}
 
 	return [];
 }
 
-function determinePaintingOrder(relTaxSet: Record<string, TaxonNode>) {
-	return Object.keys(relTaxSet).sort(
+function determinePaintingOrder(relTaxSet: RelTaxSet): TaxonKey[] {
+	return (Object.keys(relTaxSet) as TaxonKey[]).sort(
 		(a, b) => (relTaxSet[b].layers?.[0] ?? 0) - (relTaxSet[a].layers?.[0] ?? 0),
 	);
 }

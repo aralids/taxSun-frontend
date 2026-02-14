@@ -1,3 +1,6 @@
+// src/plot/pipeline/rank.ts
+import type { Lineages, Rank } from "../../types/plotTypes";
+
 /**
  * Compute the minimal rank pattern required for the current cropped lineage set.
  *
@@ -21,23 +24,23 @@
  * @returns A filtered rank pattern containing only ranks present in `croppedLns`.
  */
 export const calcMinRankPattern = (
-	croppedLns: [string, string][][],
-	rankPatternFull: string[],
-) => {
+	croppedLns: Lineages,
+	rankPatternFull: Rank[],
+): Rank[] => {
 	// --- 1) Collect all ranks from all lineages. ---
-	const allRanks = croppedLns.reduce<string[]>(
+	const allRanks = croppedLns.reduce<Rank[]>(
 		(accumulator, ln) => accumulator.concat(ln.map((item) => item[0])),
 		[],
 	);
 
 	// --- 2) Remove duplicates and empty values using a Set (preserves insertion order). ---
-	const ranksUnique: string[] = Array.from(
-		new Set(allRanks.filter((value) => value !== "")),
+	const ranksUnique: Rank[] = Array.from(
+		new Set(allRanks.filter((v) => v !== "")),
 	);
 
 	// --- 3) Keep only ranks that appear in croppedLns, preserving global rank order. ---
-	const rankPattern: string[] = rankPatternFull.filter((item) =>
-		ranksUnique.includes(item),
+	const rankPattern: Rank[] = rankPatternFull.filter((r) =>
+		ranksUnique.includes(r),
 	);
 
 	return rankPattern;
