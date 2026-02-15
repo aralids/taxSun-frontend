@@ -8,6 +8,29 @@ import {
 } from "./geometry";
 import { calibri1px } from "../../data/staticData";
 
+/**
+ * Computes the horizontal space (in pixels) available for a label along a radial plot boundary.
+ *
+ * High-level idea:
+ * - Treat the label as a rotated rectangle (centered at `labelCx,labelCy` with half-height `halfHeight`).
+ * - Compute where the relevant plot boundary lines (at `startDeg` and `endDeg`) intersect that rectangle.
+ * - If the primary intersection fails / lies outside the expected segment, fall back to line–circle intersections.
+ * - Return the distance between the two intersection points as the usable horizontal space.
+ *
+ * @param angle - Label rotation angle (degrees), used when computing the rotated label rectangle corners.
+ * @param cx - Plot center x-coordinate (pixels).
+ * @param cy - Plot center y-coordinate (pixels).
+ * @param endDeg - End angle (degrees) delimiting the label span in the plot.
+ * @param hemisphere - Which side of the label rectangle to intersect ("above" or "below").
+ * @param fstLabelLyr - Inner layer index at which label span begins.
+ * @param labelCx - Label rectangle center x-coordinate (pixels).
+ * @param labelCy - Label rectangle center y-coordinate (pixels).
+ * @param layerWidth - Width of one plot layer (pixels).
+ * @param lstLabelLyr - Outer layer index at which label span ends.
+ * @param halfHeight - Half the label rectangle height (pixels).
+ * @param startDeg - Start angle (degrees) delimiting the label span in the plot.
+ * @returns The distance (pixels) between the two computed intersection points, i.e. available horizontal space.
+ */
 export function calcHorizontalSpace(
 	angle: number,
 	cx: number,
@@ -114,13 +137,23 @@ export function calcHorizontalSpace(
 		}
 	}
 
-	//console.log("p1: ", p1);
-	//console.log("p2: ", p2);
-	//console.log("lineLength: ", lineLength(p1.x, p1.y, p2.x, p2.y));
-
 	return lineLength(p1.x, p1.y, p2.x, p2.y);
 }
 
+/**
+ * Produces an "optimal" label string that fits within a given horizontal space (in pixels).
+ *
+ * Uses a pre-measured per-character width table (`calibri1px`) scaled by the computed font size in pixels
+ * to estimate rendered text width. If the full label doesn't fit, it truncates and appends an ellipsis:
+ * - internal === false  -> "..."
+ * - internal === true   -> "."
+ *
+ * @param fontSizeInVmin - Font size expressed in vmin units (relative to viewport).
+ * @param fullLabel - Original label text to display.
+ * @param spaceInPx - Available horizontal space in pixels.
+ * @param internal - If true, use a single-dot suffix (.) instead of three dots (...).
+ * @returns Tuple: [optimizedLabel, estimatedLabelWidthInPx]
+ */
 export function calcOptLabel(
 	fontSizeInVmin: number,
 	fullLabel: string,

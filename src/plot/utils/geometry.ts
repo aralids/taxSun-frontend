@@ -1,5 +1,21 @@
 import { round, cos, sin } from "./math";
 
+/**
+ * Calculates the Cartesian endpoints of an arc segment
+ * for a given radial layer in a circular plot.
+ *
+ * Angles are interpreted in degrees and converted using
+ * the custom `cos` and `sin` helpers from ./math.
+ * Y coordinates are inverted to match screen coordinate space.
+ *
+ * @param layer - Radial layer index (multiplied by layerWidthInPx to get radius).
+ * @param layerWidthInPx - Thickness of a single layer in pixels.
+ * @param deg1 - Start angle in degrees.
+ * @param deg2 - End angle in degrees.
+ * @param cx - Center x-coordinate of the plot.
+ * @param cy - Center y-coordinate of the plot.
+ * @returns Object containing arc endpoints and radius.
+ */
 export function calculateArcEndpoints(
 	layer: number,
 	layerWidthInPx: number,
@@ -16,6 +32,19 @@ export function calculateArcEndpoints(
 	return { x1: x1, y1: y1, x2: x2, y2: y2, radius: round(radius) };
 }
 
+/**
+ * Computes the width of each radial layer in pixels,
+ * based on a rectangular bounding box and number of layers.
+ *
+ * Applies a fixed padding and ensures a minimum layer width.
+ *
+ * @param x - Left position of the bounding box.
+ * @param y - Top position of the bounding box.
+ * @param width - Width of the bounding box.
+ * @param height - Height of the bounding box.
+ * @param minRankPattern - Array representing the layers (its length determines layer count).
+ * @returns Tuple: [layerWidthInPx, centerX, centerY]
+ */
 export function getLayerWidthInPx(
 	x: number,
 	y: number,
@@ -33,6 +62,14 @@ export function getLayerWidthInPx(
 	return [Math.max(smallerDimSize / layerNumber, dpmm * 1), cx, cy];
 }
 
+/**
+ * Computes the intersection point of two infinite lines
+ * defined by (x1,y1)-(x2,y2) and (x3,y3)-(x4,y4).
+ *
+ * Returns null if lines are parallel.
+ *
+ * @returns Intersection point {x, y} or null.
+ */
 export function lineIntersect(
 	x1: number,
 	y1: number,
@@ -50,7 +87,6 @@ export function lineIntersect(
 		return null;
 	}
 	ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
-	//ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
 
 	return {
 		x: x1 + ua * (x2 - x1),
@@ -58,10 +94,31 @@ export function lineIntersect(
 	};
 }
 
+/**
+ * Computes the Euclidean distance between two points.
+ *
+ * @returns Distance between (x1,y1) and (x2,y2).
+ */
 export function lineLength(x1: number, y1: number, x2: number, y2: number) {
 	return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
+/**
+ * Calculates the four corner coordinates of a rectangle
+ * after rotation around a center point.
+ *
+ * Rotation angle is given in degrees.
+ * Includes a Firefox-specific fallback for undefined angle.
+ *
+ * @param top - Top y-coordinate of rectangle.
+ * @param bottom - Bottom y-coordinate.
+ * @param left - Left x-coordinate.
+ * @param right - Right x-coordinate.
+ * @param cx - Center x-coordinate for rotation.
+ * @param cy - Center y-coordinate for rotation.
+ * @param angle - Rotation angle in degrees.
+ * @returns Object containing topLeft, topRight, bottomLeft, bottomRight coordinates.
+ */
 export function getFourCorners(
 	top: number,
 	bottom: number,
@@ -114,6 +171,15 @@ export function getFourCorners(
 	};
 }
 
+/**
+ * Checks whether a point's y-coordinate lies within the vertical
+ * bounds of a line segment (with ±1 rounding tolerance).
+ *
+ * @param py - Point y-coordinate.
+ * @param ly1 - Line start y-coordinate.
+ * @param ly2 - Line end y-coordinate.
+ * @returns True if within bounds, otherwise false.
+ */
 export function pointOnLine(py: number, ly1: number, ly2: number) {
 	if (
 		Math.round(py) >= Math.round(Math.min(ly1, ly2) - 1) &&
@@ -125,6 +191,21 @@ export function pointOnLine(py: number, ly1: number, ly2: number) {
 	}
 }
 
+/**
+ * Computes the intersection points between a circle
+ * and a line defined by two points.
+ *
+ * Uses quadratic solution in parametric line form.
+ *
+ * @param cx - Circle center x-coordinate.
+ * @param cy - Circle center y-coordinate.
+ * @param radius - Circle radius.
+ * @param lx1 - Line start x-coordinate.
+ * @param ly1 - Line start y-coordinate.
+ * @param lx2 - Line end x-coordinate.
+ * @param ly2 - Line end y-coordinate.
+ * @returns Array of two intersection points (may contain NaN if no real intersection).
+ */
 export function lineCircleCollision(
 	cx: number,
 	cy: number,
